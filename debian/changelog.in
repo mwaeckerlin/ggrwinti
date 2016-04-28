@@ -1,0 +1,5 @@
+@PACKAGE@ (@PACKAGE_VERSION@~@DISTRO@.@BUILD_NUMBER@) @DISTRO@; urgency=low
+
+  * Please see ChangeLog of @PACKAGE@
+
+ -- @AUTHOR@  @BUILD_DATE@

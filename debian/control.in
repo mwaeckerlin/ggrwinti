@@ -1,0 +1,12 @@
+Source: @PACKAGE_NAME@
+Priority: extra
+Maintainer: @AUTHOR@
+Build-Depends: debhelper, git, pkg-config, automake, libtool, autotools-dev, lsb-release , doxygen, graphviz, mscgen
+
+Package: @PACKAGE_NAME@
+Section: 
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Description: @DESCRIPTION@
+@README_DEB@
+

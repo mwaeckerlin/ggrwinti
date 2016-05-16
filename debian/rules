@@ -12,4 +12,4 @@
 	dh $@
 
 override_dh_auto_configure:
-	 ./bootstrap.sh -c --prefix=/usr --htmldir=/var/www
+	 ./configure --prefix=/usr --htmldir=/var/www

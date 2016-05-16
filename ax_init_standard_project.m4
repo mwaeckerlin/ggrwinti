@@ -14,6 +14,7 @@ m4_define(x_least, m4_ifdef([x_least_fix], [x_least_fix],
       VCS_REVISION="ERROR-UNDEFINED-REVISION-to-be-built-in-subdirectory-of-checkout"
       for path in . .. ../.. ../../..; do
         if test -d .svn; then
+          svn upgrade 1>&2 > /dev/null || true
           VCS_REVISION=$(LANG= svn info $path | sed -n 's/Last Changed Rev: //p')
           if test -n "${VCS_REVISION}"; then break; fi
         elif test -d .git; then
@@ -26,6 +27,7 @@ m4_define(x_least, m4_ifdef([x_least_fix], [x_least_fix],
       VCS_REVISION="ERROR-UNDEFINED-REVISION-to-be-built-in-subdirectory-of-checkout"
       for path in . .. ../.. ../../..; do
         if test -d .svn; then
+          svn upgrade 1>&2 > /dev/null || true
           VCS_REVISION=$(LANG= svn info $path | sed -n 's/Last Changed Rev: //p')
           if test -n "${VCS_REVISION}"; then break; fi
         elif test -d .git; then
@@ -46,6 +48,7 @@ m4_define(x_minor_diff, m4_ifdef([x_least_fix], 0, mrw_esyscmd_s([
   VCS_REVISION="ERROR-UNDEFINED-REVISION-to-be-built-in-subdirectory-of-checkout"
   for path in . .. ../.. ../../..; do
     if test -d .svn; then
+      svn upgrade 1>&2 > /dev/null || true
       VCS_REVISION=$(LANG= svn info $path | sed -n 's/Last Changed Rev: //p')
       if test -n "${VCS_REVISION}"; then break; fi
     elif test -d .git; then
@@ -178,6 +181,8 @@ AC_DEFUN([AX_INIT_STANDARD_PROJECT], [
   _AM_SUBST_NOTMAKE([AUTHOR])
   DISTRO=$(lsb_release -sc 2>/dev/null || uname -s 2>/dev/null)
   AX_SUBST(DISTRO)
+  ARCH=$((@<:@@<:@ $(uname -sm) =~ 64 @:>@@:>@ && echo amd64) || (@<:@@<:@ $(uname -sm) =~ 'i?86' @:>@@:>@ && echo i386 || uname -sm))
+  AX_SUBST(ARCH)
   DISTRIBUTOR=$(lsb_release -si 2>/dev/null || uname -s 2>/dev/null)
   case "${DISTRIBUTOR// /-}" in
     (Ubuntu) UBUNTU=1; AX_SUBST(UBUNTU);;

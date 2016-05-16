@@ -12,10 +12,17 @@
 
 SCHROOTNAME="$1"
 PACKAGE_NAME=$(sed -n 's/^ *m4_define(x_package_name, \(.*\)).*/\1/p' configure.ac)
+PKGCONFIGS="${2:-epel-release}" # packages to configure yum
 
 if test -n "${SCHROOTNAME}"; then
     FILES=$(LANG= schroot -c ${SCHROOTNAME} -- rpmbuild -bb --clean --nobuild --define "_topdir ." --define "_sourcedir ." ${PACKAGE_NAME}.spec  2>&1 | sed -n 's, is needed by.*,,p')
     if test -n "${FILES}"; then
+        FIRST=$(echo "${FILES}" | egrep -o "${PKGCONFIGS// /|}")
+        if test -n "${FIRST}"; then
+            schroot -c ${SCHROOTNAME} -u root -- yum install -y ${FIRST} || \
+                schroot -c ${SCHROOTNAME} -u root -- zypper install -y ${FIRST} || \
+                schroot -c ${SCHROOTNAME} -u root -- dnf install -y ${FIRST}
+        fi
         schroot -c ${SCHROOTNAME} -u root -- yum install -y ${FILES} || \
             schroot -c ${SCHROOTNAME} -u root -- zypper install -y ${FILES} || \
             schroot -c ${SCHROOTNAME} -u root -- dnf install -y ${FILES}
@@ -23,6 +30,12 @@ if test -n "${SCHROOTNAME}"; then
 else
     FILES=$(LANG= rpmbuild -bb --clean --nobuild --define "_topdir ." --define "_sourcedir ." ${PACKAGE_NAME}.spec 2>&1 | sed -n 's, is needed by.*,,p')
     if test -n "${FILES}"; then
+        FIRST=$(echo "${FILES}" | egrep -o "${PKGCONFIGS// /|}")
+        if test -n "${FIRST}"; then
+            yum install -y ${FIRST} || \
+                zypper install -y ${FIRST} || \
+                dnf install -y ${FIRST}
+        fi
         yum install -y ${FILES} || \
             zypper install -y ${FILES} || \
             dnf install -y ${FILES}

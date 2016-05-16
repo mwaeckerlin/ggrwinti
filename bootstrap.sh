@@ -31,8 +31,9 @@ while test $# -gt 0; do
         (--configure|-c) configure=1;;
         (--docker|-d) docker=1;;
         (--build|-b) configure=1; build=1; buildtarget+=" distcheck";;
-        (--target|-t) shift; configure=1; build=1; buildtarget+=" $1";;
+        (--all|-a) shift; configure=1; build=1; buildtarget+=" all";;
         (--clean) shift; configure=1; build=1; buildtarget+=" maintainer-clean";;
+        (--target|-t) shift; configure=1; build=1; buildtarget+=" $1";;
         (--overwrite|-o) overwrite=1;;
         (--rebuild|-r) rebuild=1;;
         (--rebuild-file|-f) shift; rebuildfiles+=("$1");;
@@ -51,6 +52,8 @@ OPTIONS
   --configure, -c            call ./configure after initialization
   --docker, -d               build and run tests in a docker instance
   --build, -b                build, also call ./configure && make distcheck
+  --all, -a                  same as -b, but make target all
+  --clean                    same as -b, but make target maintainer-clean
   --target, -t <target>      same as -b, but specify target instead of distcheck
   --overwrite, -o            overwrite all basic files (bootstrap.sh, m4-macros)
   --rebuild, -r              force rebuild of generated files, even if modified
@@ -129,6 +132,7 @@ GENERATED FILES
     * resolve-debbuilddeps.sh - script to install debian package dependencies
     * resolve-rpmbuilddeps.sh - script to install RPM package dependencies
     * build-in-docker.sh - script to build the project encapsulated in a docker container
+    * build-in-docker.conf - additional configuration for build-in-docker.sh
     * build-resource-file.sh - build resource.qrc file from a resource directory
     * sql-to-dot.sed - script to convert SQL schema files to graphviz dot in doxygen
     * mac-create-app-bundle.sh - script to create apple mac os-x app-bundle
@@ -845,7 +849,7 @@ if testtag AX_USE_DOXYGEN; then
         doxyreplace PROJECT_NAME "@PACKAGE_NAME@"
         doxyreplace PROJECT_NUMBER "@PACKAGE_VERSION@"
         doxyreplace PROJECT_BRIEF "@DESCRIPTION@"
-        doxyreplace PROJECT_LOGO "@top_srcdir@/@PACKACE_LOGO@"
+        doxyreplace PROJECT_LOGO "@top_srcdir@/@PACKAGE_LOGO@"
         doxyreplace INLINE_INHERITED_MEMB YES
         doxyreplace MULTILINE_CPP_IS_BRIEF YES
         doxyreplace TAB_SIZE 2
@@ -1161,6 +1165,12 @@ Version: @VERSION@
 Libs: -L\${libdir} -l${PACKAGE_NAME#lib} @LDFLAGS@
 Cflags: -I\${includedir} @CPPFLAGS@
 Requires: @PKG_REQUIREMENTS@
+EOF
+to build-in-docker.conf <<EOF
+repos+=("Debian|Ubuntu-precise::::::universe")
+repos+=("Ubuntu-precise:::'deb http://archive.ubuntu.com/ubuntu precise universe'")
+envs+=("-e 'HOME=\${HOME}'")
+dirs+=("-v \${HOME}/.gnupg:\${HOME}/.gnupg:ro")
 EOF
 
 #### Cleanup If Makefile Exists ####

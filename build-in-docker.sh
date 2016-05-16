@@ -189,9 +189,9 @@ case $mode in
     (apt)
         OPTIONS='-o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew -y --force-yes --no-install-suggests --no-install-recommends'
         for f in 'libpam-systemd:amd64' 'policykit*' 'colord'; do
-            docker exec -it ${DOCKER_ID} bash -c "echo 'Package: $f' >> /etc/apt/preferences"
-            docker exec -it ${DOCKER_ID} bash -c "echo 'Pin-Priority: -100' >> /etc/apt/preferences"
-            docker exec -it ${DOCKER_ID} bash -c "echo >> /etc/apt/preferences"
+            docker exec ${DOCKER_ID} bash -c "echo 'Package: $f' >> /etc/apt/preferences"
+            docker exec ${DOCKER_ID} bash -c "echo 'Pin-Priority: -100' >> /etc/apt/preferences"
+            docker exec ${DOCKER_ID} bash -c "echo >> /etc/apt/preferences"
         done
         docker exec ${DOCKER_ID} apt-get update ${OPTIONS}
         docker exec ${DOCKER_ID} apt-get upgrade ${OPTIONS}

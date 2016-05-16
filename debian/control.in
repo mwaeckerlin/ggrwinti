@@ -4,7 +4,7 @@ Maintainer: @AUTHOR@
 Build-Depends: debhelper, git, pkg-config, automake, libtool, autotools-dev, lsb-release , doxygen, graphviz, mscgen
 
 Package: @PACKAGE_NAME@
-Section: 
+Section: web
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}, owncloud
 Description: @DESCRIPTION@

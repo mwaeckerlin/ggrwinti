@@ -135,7 +135,7 @@ function traperror() {
             fi
             if [ "$wait" -eq 1 ]; then
                 echo "  ... now you can access the docker container:"
-                echo "      docker exec -u $(id -u) -e HOME=${HOME} -it ${DOCKER_ID} bash"
+                echo "      docker exec -u $(id -u) -it ${DOCKER_ID} bash"
                 echo -n "  ... press enter to cleanup: "
                 read
             fi
@@ -148,7 +148,7 @@ function traperror() {
     done
     if [ "$wait" -eq 1 ]; then
         echo "  ... now you can access the docker container:"
-        echo "      docker exec -u $(id -u) -e HOME=${HOME} -it ${DOCKER_ID} bash"
+        echo "      docker exec -u $(id -u) -it ${DOCKER_ID} bash"
         echo -n "  ... press enter to cleanup: "
         read
     fi
@@ -183,7 +183,7 @@ function ifthenelse() {
 set -x
 
 docker pull $img
-DOCKER_ID=$(docker run -d ${dirs[@]} ${envs[@]} -w /workdir $img sleep infinity)
+DOCKER_ID=$(docker run -d ${dirs[@]} ${envs[@]} -e HOME="${HOME}" -w /workdir $img sleep infinity)
 trap 'traperror '"${DOCKER_ID}"' "$? ${PIPESTATUS[@]}" $LINENO $BASH_LINENO "$BASH_COMMAND" "${FUNCNAME[@]}" "${FUNCTION}"' SIGINT INT TERM EXIT
 case $mode in
     (apt)
@@ -234,4 +234,4 @@ EOF
         docker exec ${DOCKER_ID} ./resolve-rpmbuilddeps.sh || true
         ;;
 esac
-docker exec -u $(id -u):$(id -g) -e HOME=${HOME} ${DOCKER_ID} ./bootstrap.sh -t "${targets}"
+docker exec -u $(id -u):$(id -g) ${DOCKER_ID} ./bootstrap.sh -t "${targets}"

@@ -1187,15 +1187,15 @@ run autoconf
 
 #### Run Configure If User Requires ####
 if test "$configure" -eq 1; then
-    ./configure $*
+    ./configure $* || exit 1
 fi
 
 #### Run Make If User Requires ####
 if test "$build" -eq 1; then
-    make $buildtarget
+    make $buildtarget || exit 1
 fi
 
 #### Build In Docker If User Requires ####
 if test "$docker" -eq 1; then
-    ./build-in-docker.sh
+    ./build-in-docker.sh || exit 1
 fi

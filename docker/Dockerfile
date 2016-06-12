@@ -7,3 +7,4 @@ RUN wget -O- https://dev.marc.waeckerlin.org/repository/PublicKey \
       | apt-key add -
 RUN apt-get update -y
 RUN apt-get install -y ggrwinti
+RUN sudo -u www-data ./occ app:enable ggrwinti

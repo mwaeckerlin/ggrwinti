@@ -1,10 +1,20 @@
-<p>Hello World <?php p($_['user']) ?></p>
+<h1>Geschäfte</h1>
 
-<p><button id="hello">click me</button></p>
-
-<p><textarea id="echo-content">
-	Send this as ajax
-</textarea></p>
-<p><button id="echo">Send ajax request</button></p>
-
-Ajax response: <div id="echo-result"></div>
+<table id="geschaefte">
+  <thead>
+    <tr><th>GGR-Nr.</th><th>Titel</th><th>Typ</th><th>Status</th><th>Datum</th><th>Verantwortlich</th><th>Antrag</th><th>Entscheid Fraktion</th></tr>
+  </thead>
+  <tbody>
+    <?php
+    foreach ($_['data'] as $data) {
+      echo "<tr>";
+      echo "<td>".$data->ggrnr()."</td>";
+      echo "<td>".$data->title()."</td>";
+      echo "<td>".$data->type()."</td>";
+      echo "<td>".$data->status()."</td>";
+      echo "<td>".$data->datum()."</td>";
+      echo "</tr>";
+    }
+    ?>
+  </tbody>
+</table>

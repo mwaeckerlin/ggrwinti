@@ -5,7 +5,7 @@
     <description>My first ownCloud app</description>
     <licence>AGPL</licence>
     <author>Marc Wäckerlin</author>
-    <version>0.0.2</version>
+    <version>0.0.3</version>
     <namespace>GgrWinti</namespace>
     <category>other</category>
     <dependencies>

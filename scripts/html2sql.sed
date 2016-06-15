@@ -19,12 +19,6 @@
   s,.*table/tr/td/div/div/div/div=,,p
   Tb
 }
-/div=Geschäftsart/ {
-  :c
-  n
-  s,.*table/tr/td/div/div/div/div=,,p
-  Tc
-}
 /div=Status/ {
   :d
   n

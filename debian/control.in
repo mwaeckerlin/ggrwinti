@@ -6,7 +6,7 @@ Build-Depends: debhelper, git, pkg-config, automake, libtool, autotools-dev, lsb
 Package: @PACKAGE_NAME@
 Section: web
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, owncloud
+Depends: ${shlibs:Depends}, ${misc:Depends}, owncloud, xml2
 Description: @DESCRIPTION@
 @README_DEB@
 

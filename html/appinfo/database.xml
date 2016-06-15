@@ -17,7 +17,7 @@
             <field>
                 <name>title</name>
                 <type>text</type>
-                <length>300</length>
+                <length>500</length>
                 <notnull>true</notnull>
             </field>
             <field>

@@ -44,7 +44,8 @@ class PageController extends Controller {
   public function index() {
     $params = [
       'user' => $this->userId,
-      'data' => $this->mapper->findAll()
+      'data' => $this->mapper->findAll(),
+      'test' => 'Marc Wäckerlin'
     ];
     return new TemplateResponse('ggrwinti', 'main', $params);  // templates/main.php
   }

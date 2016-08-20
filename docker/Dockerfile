@@ -9,3 +9,4 @@ RUN wget -O- https://dev.marc.waeckerlin.org/repository/PublicKey \
       | apt-key add -
 RUN apt-get update -y
 RUN apt-get install -y ggrwinti
+ADD cronjob.sh /etc/cron.hourly/update-db

@@ -45,4 +45,22 @@
             </field>
         </declaration>
     </table>
+    <table>
+        <name>*dbprefix*ggrwinti_sitzung</name>
+        <declaration>
+            <field>
+                <name>nr</name>
+                <type>string</type>
+                <notnull>true</notnull>
+                <primary>true</primary>
+                <length>4</length>
+            </field>
+            <field>
+                <name>ggrnr</name>
+                <type>text</type>
+                <length>10</length>
+                <notnull>true</notnull>
+            </field>
+        </declaration>
+    </table>
 </database>

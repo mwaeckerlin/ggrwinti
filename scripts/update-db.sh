@@ -41,9 +41,9 @@ for geschaeft in ${geschaefte}; do
     fi
 done
 
-echo "start transction;"
+echo "start transaction;"
 echo "delete from ${PREFIX}ggrwinti_sitzung"
 naechste=$(wget -qO- http://gemeinderat.winterthur.ch/de/sitzung/ | html2 2> /dev/null | sed -n 's,.*tbody/tr/td/span/a/@href=,,p' | head -1)
 echo "insert into ${PREFIX}ggrwinti_sitzung (nr, ggrnr) values"
-wget -qO- "${sitzungen}${naechste}" | html2 2> /dev/null | awk -F= -f ${SITZUNGENAWK}
+wget -qO- "${sitzungen}${naechste}" | html2 2> /dev/null | ${SITZUNGENAWK}
 echo "commit"

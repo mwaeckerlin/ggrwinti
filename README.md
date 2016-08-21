@@ -1,5 +1,4 @@
-# ggrwinti
-OwnCloud App für die Fraktionsarbet im Winterthurer Gemeinderat
+# OwnCloud App für die Fraktionsarbeit im Winterthurer Gemeinderat
 
 For testing purposes, start docker containers, e.g.:
 

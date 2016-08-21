@@ -33,5 +33,7 @@ AX_BUILD_HTML
 #AX_REQUIRE_QT([QT], [QtCore QtGui QtNetwork], [QtWidgets])
 #AX_QT_NO_KEYWORDS
 
+AC_CONFIG_FILES(html/appinfo/info.xml)
+
 # create output
 AC_OUTPUT

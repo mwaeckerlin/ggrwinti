@@ -36,4 +36,4 @@ AX_BUILD_HTML
 AC_CONFIG_FILES(html/appinfo/info.xml)
 
 # create output
-AC_OUTPUT
+AX_OUTPUT

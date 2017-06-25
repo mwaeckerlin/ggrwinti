@@ -1,0 +1,8 @@
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    $navpath
+    <li class="footer"><a href="@AUTHOR_URL@" target="_blank">@AUTHOR_NAME@</a></li>
+  </ul>
+</div>
+</body>
+</html>

@@ -11,6 +11,11 @@ H;$!d;$x
 # remove all single-line comment lines
 s/\n--[^\n]*//g
 
+# encode html entities
+s/&/\&amp##SEMICOLON##/g
+s/</\&lt##SEMICOLON##/g
+s/>/\&gt##SEMICOLON##/g
+
 # reduce spaces
 s,\t\| \+, ,g
 
@@ -21,7 +26,7 @@ s,\t\| \+, ,g
 s,\n\+,\n,g
 
 # remove unknown commands
-s,\(;\|\n\) *\(DELIMITER\|USE\|DROP\|CREATE[ \n]\+DATABASE\)[ \n]\+[^;]*;\+,,ig
+s,\(;\|\n\) *\(INSERT\|DELIMITER\|USE\|DROP\|CREATE[ \n]\+DATABASE\)[ \n]\+[^;]*;\+,,ig
 
 # convert special characters within quotes
 :a;s/^\(\([^"]*"[^",]*"\)*[^"]*"[^"]*\),\([^"]*".*\)/\1\##COMMA##\3/g;ta
@@ -34,17 +39,18 @@ h
 s,.*\(create[ \n]\+table[^;]*;\).*,\1,ig
 
 # start html table node
-s|CREATE[ \n]\+TABLE[ \n]\+\(if[ \n]\+not[ \n]\+exists[ \n]\+\)\?`\?\(\w\+\)`\?|    \2\n        [shape=none, margin=0, label=<\n            <table bgcolor="#dddddd">\n                <tr><td bgcolor="#ddddff" colspan="4"><b>\2</b></td></tr>|ig
+s|CREATE[ \n]\+TABLE[ \n]\+\(IF[ \n]\+NOT[ \n]\+EXISTS[ \n]\+\)\?`\?\(\w\+\)`\?|    \2\n        [shape=none, margin=0, label=<\n            <table bgcolor="#dddddd">\n                <tr><td bgcolor="#ddddff" colspan="4"><b>\2</b></td></tr>|ig
 
 # remove key definitions
-s/[),][\n ]*\(PRIMARY[ \n]\+\)\?KEY[ \n]\+[^(]*([^)]*)//gi
+s/[),][\n ]*\(\(UNIQUE\|PRIMARY\)[ \n]\+\)\?KEY[ \n]\+[^(]*([^)]*)//gi
 
 # move foreign keys as relation to the end
 :b;s/\(\w\+\)\([^;]*\)FOREIGN[\n ]\+KEY[ \n]*([ \n]*`\?\([a-z]\+\)`\?[ \n]*)[ \n]*REFERENCES[ \n]*`\?\([a-z]\+\)`\?[ \n]*([ \n]*`\?\([a-z]\+\)`\?[ \n]*)[ \n]*\([^,)]*\)\([,)].*\)/\1\2\7\n \1:\3 -> \4:\5 [label="\6"]##SEMICOLON##/ig;tb
 
 # create table rows
-s|[(,][ \n]*`\?\(\w\+\)`\?[ \n]\+\(\w\+\(([^)]\+)\)\?\)[ \n]*\([^,)]*\)[ \n]\+COMMENT[ \n]*["']\([^"']*\)["'][ \n]*|\n                <tr><td align="left" port="\1"><b>\1</b></td><td align="left">\2</td><td align="left">\4</td><td align="left">\5</td></tr>|gi
-s|[(,][ \n]*`\?\(\w\+\)`\?[ \n]\+\(\w\+\(([^)]\+)\)\?\)[ \n]*\([^,)]*\)|\n                <tr><td align="left" port="\1"><b>\1</b></td><td align="left">\2</td><td align="left">\4</td></tr>|g
+s|[(,][ \n]*`\?\(\w\+\)`\?[ \n]\+\(\w\+\(([^)]\+)\)\?\)[ \n]*\([^,)]*\)|\n                <tr><td align="left" port="\1"><b>\1</b></td><td align="left">\2</td><td align="left">\4</td><td></td></tr>|g
+# extract comment
+s|\(<td\( *\w*="\w*"\)* *>[^<]*\)COMMENT[ \n]\+["']\([^"']*\)["']\([^<]*</td>\)<td></td>|\1\4<td align="left">\3</td>|g
 
 # add line breaks for long lines
 s|\(<td[^>]*>[^<]\{30,40\}\)[ \n]\+\([^<]\{20,\}</td>\)|\1<br/>\2|g

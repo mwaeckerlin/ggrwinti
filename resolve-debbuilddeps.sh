@@ -16,7 +16,7 @@ if test -n "${SCHROOTNAME}"; then
   SUDO="schroot -c "${SCHROOTNAME}" -u root -d / --"
 else
   DO=""
-  if grep -q '/docker/' /proc/1/cgroup; then
+  if grep -q '/docker' /proc/1/cgroup; then
       SUDO=""
   else
       SUDO="sudo"
@@ -32,21 +32,32 @@ function install() {
 }
 
 TO_INSTALL=
+DEPS=
 
 if test -e debian/control.in -a ! -e debian/control; then
-    for f in $(sed -n 's, *AX_DEB_DEPEND_IFEXISTS(\([^)]*\)).*,\1,p' configure.ac); do
-        if test -n "$(${DO} apt-cache policy -q ${f})" && ! "$(${DO} apt-cache policy ${f} 2>&1 | grep -q 'N: Unable to locate package')" && ! ${DO} dpkg -l "${f}"; then
-            TO_INSTALL+=" ${f}"
+    for f in $(sed -n 's, *AX_\(DEB\|ALL\)_DEPEND_IFEXISTS(\([^)]*\)).*,\2,p' configure.ac); do
+        if test -n "$(${DO} apt-cache policy -q ${f})" && ((! $(${DO} apt-cache policy ${f} 2>&1 | grep -q 'N: Unable to locate package')) && (! ${DO} dpkg -l "${f}")); then
+            DEPS+=" ${f}"
         fi
     done
+    for f in $(sed -n 's, *AX_\(DEB\|ALL\)_DEPEND_IFEXISTS_DEV(\([^)]*\)).*,\2,p' configure.ac); do
+        if test -n "$(${DO} apt-cache policy -q ${f}-dev)" && ((! $(${DO} apt-cache policy ${f}-dev 2>&1 | grep -q 'N: Unable to locate package')) && (! ${DO} dpkg -l "${f}-dev")); then
+            DEPS+=" ${f}-dev"
+        fi
+    done
+    for f in $(sed -n 's, *AX_\(DEB\|ALL\)\(_BUILD\)\?_DEPEND(\([^)]*\)).*,\3,p' configure.ac); do
+        DEPS+=" ${f}"
+    done
+    for f in $(sed -n 's, *AX_\(DEB\|ALL\)\(_BUILD\)\?_DEPEND_DEV(\([^)]*\)).*,\3,p' configure.ac); do
+        DEPS+=" ${f}-dev"
+    done
     trap "rm debian/control" INT TERM EXIT
-    sed 's,@DEB_DEPEND_IFEXISTS@,,g' debian/control.in | \
+    sed 's,@\(\(ALL\|DEB\)_DEPEND_IFEXISTS\|\(ALL\|DEB\)_BUILD_DEPEND\|\(ALL\|DEB\)_DEPEND\)@,,g' debian/control.in | \
         sed 's,@[^@]*@, dummytext,g' > debian/control
 fi
 
 install dpkg-dev
-DEPS=$(LANG= ${DO} dpkg-checkbuilddeps 2>&1 || true)
-DEPS=$(echo "$DEPS" | sed -n '/Unmet build dependencies/ { s,.*Unmet build dependencies: ,,g; s, ([^)]*),,g; s, *| *,|,g; p}')
+DEPS+=" $(LANG= ${DO} dpkg-checkbuilddeps 2>&1 | sed -n '/Unmet build dependencies/ { s,.*Unmet build dependencies: ,,g; s, ([^)]*),,g; s, *| *,|,g; p}')"
 
 for pa in ${DEPS}; do
     if test ${pa//|/} = ${pa}; then

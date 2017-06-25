@@ -1,12 +1,12 @@
 Source: @PACKAGE_NAME@
 Priority: extra
-Maintainer: @AUTHOR@
-Build-Depends: debhelper, git, pkg-config, automake, libtool, autotools-dev, lsb-release , doxygen, graphviz, mscgen
+Maintainer: @PACKAGER@
+Build-Depends: debhelper, fakeroot, git2cl, git, pkg-config, automake, libtool, autotools-dev, pandoc, lsb-release, doxygen, graphviz, mscgen, default-jre-headless|default-jre @DEB_BUILD_DEPEND@ @DEB_DEPEND_IFEXISTS@
 
 Package: @PACKAGE_NAME@
-Section: web
+Section: @DEB_SECTION@
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends}, owncloud, xml2
+Depends: ${shlibs:Depends}, ${misc:Depends} @DEB_DEPEND@
 Description: @DESCRIPTION@
 @README_DEB@
 

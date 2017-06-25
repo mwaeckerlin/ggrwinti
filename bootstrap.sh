@@ -129,10 +129,12 @@ GENERATED FILES
     * ax_init_standard_project.m4 - auxiliary macro definition file
     * ax_cxx_compile_stdcxx_11.m4 - auxiliary macro definition file
     * ax_check_qt.m4 - auxiliary macro definition file
+    * makefile_test.inc.am - makefile to be included in tests
     * resolve-debbuilddeps.sh - script to install debian package dependencies
     * resolve-rpmbuilddeps.sh - script to install RPM package dependencies
     * build-in-docker.sh - script to build the project encapsulated in a docker container
     * build-in-docker.conf - additional configuration for build-in-docker.sh
+    * rpmsign.exp - script for signing rpms unattended
     * build-resource-file.sh - build resource.qrc file from a resource directory
     * sql-to-dot.sed - script to convert SQL schema files to graphviz dot in doxygen
     * mac-create-app-bundle.sh - script to create apple mac os-x app-bundle
@@ -146,11 +148,34 @@ GENERATED FILES
     * src/makefile.am - if you enabled AX_USE_CXX
     * src/version.hxx - if you enabled AX_USE_CXX
     * src/version.cxx - if you enabled AX_USE_CXX
-    * html/makefile.am - if you enabled AX_BUILD_HTML
+    * etc/makefile.am - if you enable AX_USE_ETC
+    * html/makefile.am - if you enabled AX_BUILD_HTML or AX_BUILD_HTML_NPM
+    * html/package.json.in - if you enabled AX_BUILD_HTML_NPM
     * scripts/makefile.am - if you enabled AX_USE_SCRIPTS
-    * doc/makefile.am - if you enabled AX_USE_DOXYGEN
+    * nodejs/makefile.am - if you add AX_USE_NODEJS
+    * nodejs/${DEFAULT_PROJECT_NAME}.js - if you add AX_USE_NODEJS
+    * nodejs/package.json.in - if you add AX_USE_NODEJS
+    * nodejs/etc/${DEFAULT_PROJECT_NAME}.json - if you add AX_USE_NODEJS
+    * nodejs/etc/default/${DEFAULT_PROJECT_NAME} - if you add AX_USE_NODEJS
+    * nodejs/etc/init/${DEFAULT_PROJECT_NAME}.conf - if you add AX_USE_NODEJS
+    * nodejs/etc/systemd/system/${DEFAULT_PROJECT_NAME}.service - if you add AX_USE_NODEJS
+    * nodejs/public - if you add AX_USE_NODEJS
+    * nodejs/public/images - if you add AX_USE_NODEJS
+    * nodejs/public/javascripts/${DEFAULT_PROJECT_NAME}.js - if you add AX_USE_NODEJS
+    * nodejs/public/stylesheets/style.styl - if you add AX_USE_NODEJS
+    * nodejs/routes/index.js - if you add AX_USE_NODEJS
+    * nodejs/sockets/index.js - if you add AX_USE_NODEJS
+    * nodejs/views/index.ejs - if you add AX_USE_NODEJS
+    * nodejs/views/layout.ejs - if you add AX_USE_NODEJS
+    * nodejs/node_modules - if you add AX_USE_NODEJS
+    * doc/makefile.am - if you enabled AX_USE_DOXYGEN or AX_USE_PERLDOC
     * doc/doxyfile.in - if you enabled AX_USE_DOXYGEN
-    * test/makefile.am - if you enabled AX_BUILD_TEST or AX_USE_CPPUNIT
+    * doc/header.html.in - if you enabled AX_USE_DOXYGEN
+    * doc/footer.html.in - if you enabled AX_USE_DOXYGEN
+    * doc/style.css - if you enabled AX_USE_DOXYGEN
+    * doc/plantuml.jar - if you enable AX_USE_DOXYGEN
+    * test/makefile.am - if you enabled AX_USE_CPPUNIT and AX_USE_CXX
+    * test/${DEFAULT_PROJECT_NAME#lib}.cxx - if you enabled AX_BUILD_TEST or AX_USE_CPPUNIT
     * examples/makefile.am - if you enabled AX_BUILD_EXAMPLES
     * debian/changelog.in - if you enabled AX_USE_DEBIAN_PACKAGING
     * debian/control.in - if you enabled AX_USE_DEBIAN_PACKAGING
@@ -191,6 +216,7 @@ FILES TO EDIT
     * src/makefile.am
     * html/makefile.am
     * test/makefile.am
+    * test/${DEFAULT_PROJECT_NAME}.cxx
     * examples/makefile.am
 
 FILE DEPENDENCIES
@@ -199,10 +225,10 @@ FILE DEPENDENCIES
   configuration a dependent, i.e.:
 
     * test/makefile.am depends on AX_USE_LIBTOOL
-    * html/makefile.am depends on AX_BUILD_HTML
+    * html/makefile.am depends on AX_BUILD_HTML or AX_BUILD_HTML_NPM
     * doc/doxyfile.in depends on AX_BUILD_EXAMPLES
-    * debian/control.in depends on AX_USE_DOXYGEN, AX_USE_CPPUNIT
-      AX_CXX_QT, AX_CHECK_QT, AX_REQUIRE_QT, AX_USE_LIBTOOL
+    * debian/control.in depends on AX_USE_DOXYGEN, AX_USE_PERLDOC,
+      AX_USE_CPPUNIT AX_CXX_QT, AX_CHECK_QT, AX_REQUIRE_QT, AX_USE_LIBTOOL
     * debian/${DEFAULT_PROJECT_NAME}.install depends on AX_USE_LIBTOOL
     * debian/${DEFAULT_PROJECT_NAME}.dirs depends on AX_USE_LIBTOOL
     * debian/${DEFAULT_PROJECT_NAME}-dev.install depends on AX_USE_LIBTOOL
@@ -233,9 +259,12 @@ FILES
                   number. In git, git rev-list --all --count is used.
                   The following macros are supported in configure.ac:
       * Enable C++: AX_USE_CXX
+      * Enable system config files in /etc: AX_USE_ETC
       * Enable LibTool library creation: AX_USE_LIBTOOL
       * Enable Scripts: AX_USE_SCRIPTS
+      * Enable NodeJS project: AX_USE_NODEJS
       * Enable Doxygen documentation generation: AX_USE_DOXYGEN
+      * Enable Perldoc documentation generation: AX_USE_PERLDOC
       * Enable Debian packaging by calling "make deb": AX_USE_DEBIAN_PACKAGING
       * Enable RPM packaging by calling "make rpm": AX_USE_RPM_PACKAGING
       * Enable C++ testing using CppUnit: AX_USE_CPPUNIT
@@ -274,15 +303,22 @@ done
 echo -en "\e[1m-> checking:\e[0m for version control system ..."
 VCS=""
 VCSDEPENDS=""
-if test -d .svn; then
-    VCS="svn"
-    VCSDEPENDS="subversion,"
-    echo -e " \e[32msuccess\e[0m detected ${VCS}"
-elif test -d .git; then
-    VCS="git"
-    VCSDEPENDS="git,"
-    echo -e " \e[32msuccess\e[0m detected ${VCS}"
-else
+for path in . .. ../.. ../../..; do
+    if test -d ${path}/.svn; then
+        VCS="svn"
+        VCSDEPENDS_DEB="svn2cl, subversion, subversion-tools,"
+        VCSDEPENDS_RPM="subversion, "
+        echo -e " \e[32msuccess\e[0m detected ${VCS}"
+        break
+    elif test -d ${path}/.git; then
+        VCS="git"
+        VCSDEPENDS_DEB="git2cl, git,"
+        VCSDEPENDS_RPM="git, "
+        echo -e " \e[32msuccess\e[0m detected ${VCS}"
+        break
+    fi
+done
+if test -z "$VCS"; then
     echo -e " \e[33mignored\e[0m"
 fi
 
@@ -345,7 +381,7 @@ run() {
 
 testtag() {
     local IFS="|"
-    egrep -q '^ *'"($*)" configure.ac
+    egrep -q '^ *'"($*)"' *(\(.*)? *$' configure.ac
 }
 
 contains() {
@@ -433,6 +469,9 @@ copy() {
             source="${0%/*}/$1"
         fi
     fi
+    if test "${1%/*}" != "$1"; then
+        test -d "${1%/*}" || svn mkdir "${1%/*}"
+    fi
     run cp "${source}" "$1"
     if test $exists -eq 0; then
         if test -n "${VCS}" -a $novcs -eq 0 && ! contains "$1" "${excludevcs[@]}"; then
@@ -476,6 +515,8 @@ vcs2cl() {
     if test -x $(which ${VCS}2cl); then
         if test "${VCS}" = "git"; then
             ${VCS}2cl > ChangeLog
+        elif test "${VCS}" = "svn"; then
+            ${VCS}2cl --break-before-msg -a -i
         elif test -n "${VCS}"; then
             ${VCS}2cl
         fi
@@ -500,13 +541,15 @@ copy ${MY_NAME}
 copy ax_init_standard_project.m4
 copy ax_cxx_compile_stdcxx_11.m4
 copy ax_check_qt.m4
+copy makefile_test.inc.am
 copy resolve-debbuilddeps.sh
 copy resolve-rpmbuilddeps.sh
 copy build-in-docker.sh
+copy rpmsign.exp
 copy build-resource-file.sh
 copy sql-to-dot.sed
 copy mac-create-app-bundle.sh
-AUTHOR=$(gpg -K  | sed -n 's,uid *,,p' | sort | head -1)
+AUTHOR=$(gpg -K 2>/dev/null | sed -n 's,uid *\(\[ultimate\] *\)\?,,p' | head -1)
 if test -z "${AUTHOR}"; then
     AUTHOR="FIRSTNAME LASTNAME (URL) <EMAIL>"
 fi
@@ -522,7 +565,11 @@ ${DEFAULT_PROJECT_NAME}
 add description for ${DEFAULT_PROJECT_NAME}
 EOF
 to configure.ac <<EOF && notice "please edit configure.ac, then rerun $0" && exit 0
-${HEADER}m4_define(x_package_name, ${DEFAULT_PROJECT_NAME}) # project's name
+${HEADER}# default is generated from AUTHORS and project name
+PROJECT_URL=
+SOURCE_DOWNLOAD=
+
+m4_define(x_package_name, ${DEFAULT_PROJECT_NAME}) # project's name
 m4_define(x_major, 0) # project's major version
 m4_define(x_minor, 0) # project's minor version
 m4_include(ax_init_standard_project.m4)
@@ -532,15 +579,19 @@ AX_INIT_STANDARD_PROJECT
 
 # requirements, uncomment, what you need:
 #AX_USE_CXX
+#AX_USE_ETC
 #AX_USE_LIBTOOL
 #AX_USE_SCRIPTS
+#AX_USE_NODEJS
 #AX_USE_DOXYGEN
+#AX_USE_PERLDOC
 #AX_USE_DEBIAN_PACKAGING
 #AX_USE_RPM_PACKAGING
 #AX_USE_CPPUNIT
 #AX_BUILD_TEST
 #AX_BUILD_EXAMPLES
 #AX_BUILD_HTML
+#AX_BUILD_HTML_NPM
 
 # qt features, uncomment, what you need:
 #AX_CHECK_QT([QT], [QtCore QtGui QtNetwork], [QtWidgets])
@@ -548,7 +599,7 @@ AX_INIT_STANDARD_PROJECT
 #AX_QT_NO_KEYWORDS
 
 # create output
-AC_OUTPUT
+AX_OUTPUT
 EOF
 
 PACKAGE_NAME=$(sed -n 's/.*m4_define *( *x_package_name *, *\([^ ]*\) *).*/\1/p' configure.ac)
@@ -562,6 +613,20 @@ if ! testtag AX_CHECK_QT && \
    ! testtag AX_REQUIRE_QT; then
     echo "${HEADER}MAINTAINERCLEANFILES = makefile.in" | \
         to --condition AX_USE_CXX src/makefile.am
+    if ! ls src/*.[ch]xx; then
+        to --condition AX_USE_CXX src/${PACKAGE_NAME#lib}.hxx <<EOF
+${CHEADER}#ifndef ${PackageName^^}_HXX
+#define ${PackageName^^}_HXX
+
+/** @mainpage @description
+
+    @readme
+
+    */
+
+#endif
+EOF
+    fi
 elif ! test -e src/makefile.am; then
     to --condition AX_USE_CXX src/makefile.am <<EOF
 ${HEADER}bin_PROGRAMS = ${PACKAGE_NAME}
@@ -574,7 +639,7 @@ LANGUAGE_FILE_BASE = ${PACKAGE_NAME}
 QT_PLUGINS = iconengines imageformats platforms
 
 #### enable if you deliver a KDE/Gnome desktop file
-#applicationsdir = ${datarootdir}/applications
+#applicationsdir = \${datarootdir}/applications
 #dist_applications_DATA = ${PACKAGE_NAME}.desktop
 
 #### enable (ev. instead of bin_PROGRAMS) if you build a library
@@ -611,25 +676,26 @@ ${PACKAGE_NAME//-/_}_TR_FILES = main.cxx version.cxx
 ${PACKAGE_NAME//-/_}_SOURCES = \${${PACKAGE_NAME//-/_}_TR_FILES} \${BUILT_SOURCES}
 
 ## automatic assembly, no need to change
-BUILT_SOURCES = \${${PACKAGE_NAME//-/_}_MOCFILES} \
-                \${${PACKAGE_NAME//-/_}_UIFILES} \
-                \${${PACKAGE_NAME//-/_}_TRANSLATIONS} \
+BUILT_SOURCES = \${${PACKAGE_NAME//-/_}_MOCFILES} \\
+                \${${PACKAGE_NAME//-/_}_UIFILES} \\
+                \${${PACKAGE_NAME//-/_}_TRANSLATIONS} \\
                 \${${PACKAGE_NAME//-/_}_RESOURCES}
 
 ## automatic assembly, no need to change
-EXTRA_DIST_TR = \${${PACKAGE_NAME//-/_}_MOCFILES:moc_%.cxx=%.hxx} \
+EXTRA_DIST_TR = \${${PACKAGE_NAME//-/_}_MOCFILES:moc_%.cxx=%.hxx} \\
                 \${${PACKAGE_NAME//-/_}_UIFILES:ui_%.hxx=%.ui}
 
 ## automatic assembly, no need to change
 ## except: adapt the pre-delivered qt_%.qm list (language files you copy from qt
-EXTRA_DIST = \${EXTRA_DIST_TR} \
-             \${${PACKAGE_NAME//-/_}_RESOURCES:qrc_%.cxx:%.qrc} \
-             \${${PACKAGE_NAME//-/_}_TRANSLATIONS:%.qm=%.ts} \
+EXTRA_DIST = \${EXTRA_DIST_TR} \\
+             \${${PACKAGE_NAME//-/_}_RESOURCES:qrc_%.cxx=%.qrc} \\
+             \${${PACKAGE_NAME//-/_}_TRANSLATIONS:%.qm=%.ts} \\
              qt_de.qm qt_fr.qm
 
 ## automatic assembly, no need to change
 LANGUAGE_FILES = \${EXTRA_DIST_TR} \${${PACKAGE_NAME//-/_}_TR_FILES}
 
+CLEANFILES = \${${PACKAGE_NAME//-/_}_RESOURCES}
 MAINTAINERCLEANFILES = makefile.in
 EOF
     to --condition AX_USE_CXX src/main.cxx <<EOF
@@ -637,9 +703,13 @@ ${CHEADER}#include <${PACKAGE_NAME}.hxx>
 #include <QApplication>
 #include <QCommandLineParser>
 #include <iostream>
+#include <version.hxx>
 
 int main(int argc, char *argv[]) try {
   QApplication a(argc, argv);
+  a.setApplicationDisplayName(a.tr("${PACKAGE_NAME}"));
+  a.setApplicationName(${PACKAGE_NAME}::package_name().c_str());
+  a.setApplicationVersion(${PACKAGE_NAME}::version().c_str());
   QCommandLineParser parser;
   parser.addHelpOption();
   parser.process(a);
@@ -652,9 +722,16 @@ int main(int argc, char *argv[]) try {
   return 1;
  }
 EOF
-    to --condition AX_USE_CXX src/${PACKAGE_NAME}.hxx <<EOF
+    if ! ls src/*.[ch]xx; then
+        to --condition AX_USE_CXX src/${PACKAGE_NAME#lib}.hxx <<EOF
 ${CHEADER}#ifndef ${PackageName^^}_HXX
 #define ${PackageName^^}_HXX
+
+/** @mainpage @description
+
+    @readme
+
+    */
 
 #include <QMainWindow>
 #include <ui_${PACKAGE_NAME}.hxx>
@@ -665,6 +742,7 @@ class ${PackageName}: public QMainWindow, protected Ui::${PackageName} {
     Q_OBJECT;
   public:
     explicit ${PackageName}(QWidget *parent = 0): QMainWindow(parent) {
+      setTitle(tr("${PACKAGE_NAME}[*]"));
       setupUi(this);
     }
     virtual ~${PackageName}() {}
@@ -672,7 +750,8 @@ class ${PackageName}: public QMainWindow, protected Ui::${PackageName} {
 
 #endif
 EOF
-    to --condition AX_USE_CXX src/${PACKAGE_NAME}.ui <<EOF
+    fi
+    to --condition AX_USE_CXX src/${PACKAGE_NAME#lib}.ui <<EOF
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
  <class>${PackageName}</class>
@@ -754,7 +833,7 @@ EOF
 to --condition AX_USE_CXX src/version.cxx <<EOF
 /*! @file
 
-    @id $Id\$
+    @id \$Id\$
 */
 //       1         2         3         4         5         6         7         8
 // 45678901234567890123456789012345678901234567890123456789012345678901234567890
@@ -793,12 +872,364 @@ namespace NAMESPACE {
   const std::string IDENT("\$Id: " PACKAGE_STRING);
 }
 EOF
+to --condition AX_USE_ETC etc/makefile.am <<EOF
+${HEADER}pkgsysconfdir = \${sysconfdir}/@PACKAGE_NAME@
+
+dist_pkgsysconf_DATA = 
+
+MAINTAINERCLEANFILES = makefile.in
+EOF
 to --condition AX_USE_SCRIPTS scripts/makefile.am <<EOF
 ${HEADER}dist_bin_SCRIPTS =
 
 MAINTAINERCLEANFILES = makefile.in
 EOF
-echo "${HEADER}MAINTAINERCLEANFILES = makefile.in" | to --condition AX_USE_DOXYGEN doc/makefile.am
+if testtag AX_USE_NODEJS; then
+    checkdir nodejs
+    checkdir nodejs/public
+    checkdir nodejs/public/images
+    checkdir nodejs/etc
+    checkdir nodejs/etc/systemd
+fi
+to --condition AX_USE_NODEJS nodejs/makefile.am <<EOF
+${HEADER}EXTRA_DIST = @PACKAGE_NAME@.js package.json.in public routes sockets views
+
+nodejsdir = \${pkgdatadir}/nodejs
+
+sysconfdefaultdir = \${sysconfdir}/default
+sysconfinitdir = \${sysconfdir}/init
+dist_sysconf_DATA = \${sysconfdir}/@PACKAGE_NAME@.json
+dist_sysconfdefault_DATA = \${sysconfdir}/default/@PACKAGE_NAME@
+dist_sysconfinit_DATA = \${sysconfdir}/init/@PACKAGE_NAME@.conf
+
+all: node_modules
+
+node_modules: package.json.in
+	HOME=. npm install
+
+clean-local:
+	-rm -r node_modules .npm
+
+install-data-hook:
+	test -d \$(DESTDIR)\${nodejsdir} || mkdir -p \$(DESTDIR)\${nodejsdir}
+	chmod -R u+w \$(DESTDIR)\${nodejsdir}
+	cp -r . \$(DESTDIR)\${nodejsdir}
+
+uninstall-local:
+	-chmod -R u+w \$(DESTDIR)\${nodejsdir}
+	-rm -rf \$(DESTDIR)\${nodejsdir}
+
+MAINTAINERCLEANFILES = makefile.in
+EOF
+to --condition AX_USE_NODEJS nodejs/${PACKAGE_NAME}.js <<EOF
+${CHEADER}try {
+
+  process.on('uncaughtException', function(e) {
+    console.log("**** UNCAUGHT EXCEPTION ****");
+    console.log(e);
+    console.log(e.stack);
+    process.exit(1);
+  });
+  
+  /**
+   * Module dependencies.
+   */
+
+  var express = require('express')
+    , routes = require(__dirname+'/routes');
+
+  var app = module.exports = express.createServer();
+  var io  = require('socket.io').listen(app);
+  var package = require(__dirname+'/package.json');
+  var config = require(package.path.config);
+  var authentication = require(__dirname+'/authentication')(config.restrict);
+  var sockets = require(__dirname+'/sockets')(io, authentication);
+
+  // Configuration
+  process.argv.forEach(function(val, index) {
+    if (index<2) {return}
+    if (index!=2 || isNaN(val)) {
+      console.log("**** ERROR: Unexpected Argument - allowed is only a port number");
+      process.exit(1);
+    }
+    config.port = parseInt(val);
+  });
+  if (typeof config.port != 'number') {
+    console.log("**** WARNING: no valid port given, defaults to 8888");
+    config.port = 8888;
+  }
+
+  app.configure(function(){
+    app.set('views', __dirname + '/views');
+    app.set('view engine', 'ejs');
+    app.use(express.bodyParser());
+    app.use(express.methodOverride());
+    app.use(require('stylus').middleware({ src: __dirname + '/public' }));
+    app.use(app.router);
+    app.use(express.static(__dirname + '/public'));
+  });
+
+  app.configure('development', function(){
+    app.use(express.errorHandler({ dumpExceptions: true, showStack: true }));
+  });
+
+  app.configure('production', function(){
+    app.use(express.errorHandler());
+  });
+
+  // Routes
+  app.get('/', routes.index);
+
+  app.listen(config.port, function() {
+    console.log("Express server listening on port %d in %s mode",
+                app.address().port, app.settings.env);
+  });
+} catch (e) {
+  console.log("**** EXCEPTION ****");
+  console.log(e);
+  console.log(e.stack);
+  process.exit(1);
+}
+EOF
+to --condition AX_USE_NODEJS nodejs/package.json.in <<EOF
+{
+  "name": "@PACKAGE_NAME@",
+  "version": "@PACKAGE_VERSION@",
+  "private": true,
+  "dependencies": {
+    "express": "~2.5.8",
+    "stylus": "~0.53.0",
+    "ejs": ">= 0.0.1",
+    "socket.io": "~1.4.4",
+    "socketio-auth": "0.0.5",
+    "ldapauth": "git+https://github.com/DimensionSoftware/node-ldapauth.git"
+  },
+  "description": "@DESCRIPTION@",
+  "main": "@PACKAGE_NAME@.js",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "@AUTHOR@",
+  "license": "@LICENSE@",
+  "path": {
+      "prefix": "@PREFIX@",
+      "sysconf": "@SYSCONFDIR@",
+      "pkgdata": "@PKGDATADIR@",
+      "localstate": "@LOCALSTATEDIR@",
+      "log": "@LOCALSTATEDIR@/log/@PACKAGE_NAME@.log",
+      "config":  "@SYSCONFDIR@/@PACKAGE_NAME@.json",
+      "nodejs": "@PKGDATADIR@/nodejs"
+  }
+}
+EOF
+to --condition AX_USE_NODEJS nodejs/etc/${PACKAGE_NAME}.json <<EOF
+{
+  "port": 8888,
+  "restrict": {
+    "passwords": {
+      "foo": ["sha256", "fcde2b2edxx56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9"]
+    },
+    "ldap": {
+      "url": "ldap://dev.marc.waeckerlin.org",
+      "adminDn": "cn=tmp,ou=system,ou=people,dc=dev,dc=marc,dc=waeckerlin,dc=org",
+      "adminPassword": "secret",
+      "searchBase": "ou=person,ou=people,dc=dev,dc=marc,dc=waeckerlin,dc=org",
+      "searchFilter": "(uid={{username}})"
+    }
+  }
+}
+EOF
+to --condition AX_USE_NODEJS nodejs/etc/default/${PACKAGE_NAME} <<EOF
+#EXEC_${PACKAGE_NAME^^}="/usr/bin/nodejs /usr/share/${PACKAGE_NAME}/nodejs/${PACKAGE_NAME}"
+#${PACKAGE_NAME^^}_LOG="/var/log/${PACKAGE_NAME^^}.log"
+#${PACKAGE_NAME^^}="${PACKAGE_NAME}"
+#${PACKAGE_NAME^^}_PORT="8888"
+EOF
+to --condition AX_USE_NODEJS nodejs/etc/init/${PACKAGE_NAME}.conf <<EOF
+#!upstart
+description "$(head -1 README)"
+author      "$(head -1 AUTHORS)"
+
+start on (local-filesystems and net-device-up)
+stop on runlevel [!2345]
+
+respawn
+
+script
+    echo \$\$ > /var/run/${PACKAGE_NAME}.pid
+    # there are some useful defaults
+    # do not edit this file, overwrite values in /etc/default/${PACKAGE_NAME}
+    EXEC_${PACKAGE_NAME^^}="/usr/bin/nodejs /usr/share/${PACKAGE_NAME}/nodejs/${PACKAGE_NAME}"
+    ${PACKAGE_NAME^^}_LOG="/var/log/${PACKAGE_NAME}.log"
+    ${PACKAGE_NAME^^}_USER="${PACKAGE_NAME}"
+    ${PACKAGE_NAME^^}_PORT=""
+    [ -r /etc/default/${PACKAGE_NAME} ] && . /etc/default/${PACKAGE_NAME}
+    if test -n "\${${PACKAGE_NAME^^}_USER}"; then
+        exec sudo -u "\${${PACKAGE_NAME^^}_USER}" \${EXEC_${PACKAGE_NAME^^}} \${${PACKAGE_NAME^^}_PORT} >> \${${PACKAGE_NAME^^}_LOG} 2>&1
+    else
+        exec \${EXEC_${PACKAGE_NAME^^}} \${${PACKAGE_NAME^^}_PORT} >> \${${PACKAGE_NAME^^}_LOG} 2>&1
+    fi
+end script
+
+pre-start script
+    ${PACKAGE_NAME^^}_LOG="/var/log/${PACKAGE_NAME}.log"
+    [ -r /etc/default/${PACKAGE_NAME} ] && . /etc/default/${PACKAGE_NAME}
+    # Date format same as (new Date()).toISOString() for consistency
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> \${${PACKAGE_NAME^^}_LOG}
+end script
+
+pre-stop script
+    ${PACKAGE_NAME^^}_LOG="/var/log/${PACKAGE_NAME}.log"
+    [ -r /etc/default/${PACKAGE_NAME} ] && . /etc/default/${PACKAGE_NAME}
+    rm /var/run/${PACKAGE_NAME}.pid
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> \${${PACKAGE_NAME^^}_LOG}
+end script
+EOF
+to --condition AX_USE_NODEJS nodejs/etc/systemd/system/${PACKAGE_NAME}.service <<EOF
+[Unit]
+Description=$(head -1 README)
+
+[Service]
+ExecStart=/usr/bin/nodejs /usr/share/${PACKAGE_NAME}/nodejs/${PACKAGE_NAME}
+StandardOutput=journal
+StandardError=journal
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+EOF
+to --condition AX_USE_NODEJS nodejs/public/javascripts/${PACKAGE_NAME}.js <<EOF
+${CHEADER}var socket = null;
+function init() {
+  socket = io.connect();
+  /*
+  socket
+    .io
+    .on("connect", connect)
+    .on("reconnect", connect)
+    .on("disconnect", disconnected)
+    .on("error", disconnected);
+  socket
+    .on("authenticated", authenticated)
+    .on("unauthorized", unauthorized)
+    .on("fail", error);
+  */
+}
+
+/// On Load, Call @ref start
+/*
+   \$(window.onbeforeunload = function() {
+   return "Are you sure you want to navigate away?";
+   });
+ */
+\$(init);
+EOF
+to --condition AX_USE_NODEJS nodejs/public/stylesheets/style.styl <<EOF
+body
+  padding: 50px
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif
+a
+  color: #00B7FF
+EOF
+to --condition AX_USE_NODEJS nodejs/routes/index.js <<EOF
+${CHEADER}var package = require(__dirname+"/../package.json");
+
+exports.index = function(req, res) {
+  res.render('index', {
+    packagename: package.name,
+    packageversion: package.version
+  });
+};
+EOF
+to --condition AX_USE_NODEJS nodejs/sockets/index.js <<EOF
+module.exports = function(io, authentication) {
+
+  var module={};
+  
+  function broadcast(signal, data) {
+    console.log("<= signal: "+signal);
+    io.sockets.emit(signal, data);
+  }
+  
+  function fail(txt, data) {
+    console.log("** "+txt, data);
+  }
+
+  function connection(socket, userdata) {
+    
+    console.log("=> new connection from "+userdata.username);
+
+    function emit(signal, data, info) {
+      if (typeof data == 'string' && !data.match("\n")) {
+        console.log("<- signal: "+signal+"("+data+")");
+      } else {
+        console.log("<- signal: "+signal);
+      }
+      if (info) console.log(info);
+      socket.emit(signal, data);
+    }
+
+    function fail(txt, data) {
+      console.log("** "+txt, data);
+      emit("fail", txt);
+    }
+
+    /*
+    socket
+      .on("xxx", xxx)
+      .on("yyy", yyy;
+    */
+
+  }
+  
+  // Handle Connection
+  require('socketio-auth')(io, {
+    authenticate: function (socket, data, callback) {
+      console.log("=> authenticate: ", data.username);
+      //get credentials sent by the client
+      var username = data.username;
+      var password = data.password;
+      authentication(data.username, data.password,
+                     function() {
+                       console.log("####LOGIN-SUCESS####");
+                       callback(null, true)
+                     },
+                     function() {
+                       console.log("####LOGIN-FAIL####");
+                       callback(new Error("wrong credentials"))
+                     });
+    },
+    postAuthenticate: connection,
+    timeout: "none"
+  });
+
+  return module;
+}
+EOF
+to --condition AX_USE_NODEJS nodejs/views/index.ejs <<EOF
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width initial-scale=1" />
+    <link href="stylesheets/style.css" rel="stylesheet" type="text/css" />
+    <script type="text/javascript" src="/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="javascripts/${PACKAGE_NAME}.js"></script>
+    <title>$(head -1 README)</title>
+  </head>
+
+  <body>
+    <h1>$(head -1 README)</h1>
+    <p>generated by bootstrap, please edit</p>
+  </body>
+</html>
+
+EOF
+to --condition AX_USE_NODEJS nodejs/views/layout.ejs <<EOF
+<%- body %>
+EOF
+echo "${HEADER}MAINTAINERCLEANFILES = makefile.in" | to --condition 'AX_USE_DOXYGEN|AX_USE_PERLDOC' doc/makefile.am
 if testtag AX_BUILD_TEST; then
     to test/runtests.sh < ${0%/*}/test/runtests.sh
 fi
@@ -809,15 +1240,50 @@ AM_CPPFLAGS = -I\${top_srcdir}/src -I\${top_builddir}/src
 AM_LDFLAGS = -L\${abs_top_builddir}/src/.libs
 $(if testtag AX_USE_LIBTOOL; then
 cat <<EOF3
-LDADD = -l${PACKAGE_NAME#lib}
+LDADD = -lcppunit -l${PACKAGE_NAME#lib}
 EOF3
 fi)
 EOF2
 fi)
 
-TESTS =
+check_PROGRAMS = ${PACKAGE_NAME#lib}
+TESTS = \${check_PROGRAMS}
+
+${PACKAGE_NAME#lib}_SOURCES = ${PACKAGE_NAME#lib}.cxx
 
 MAINTAINERCLEANFILES = makefile.in
+EOF
+to --condition AX_USE_CPPUNIT --condition AX_USE_CXX test/${PACKAGE_NAME#lib}.cxx <<EOF
+${CHEADER}
+#include <cppunit/TestFixture.h>
+#include <cppunit/ui/text/TestRunner.h>
+#include <cppunit/extensions/HelperMacros.h>
+#include <cppunit/extensions/TestFactoryRegistry.h>
+#include <cppunit/XmlOutputter.h>
+#include <fstream>
+
+/// @todo Rename DummyTest and DummyTest::dummy()
+/// @todo Write test cases
+class DummyTest: public CppUnit::TestFixture { 
+  public:
+    void dummy() {
+    }
+    CPPUNIT_TEST_SUITE(DummyTest);
+    CPPUNIT_TEST(dummy);
+    CPPUNIT_TEST_SUITE_END();
+};
+CPPUNIT_TEST_SUITE_REGISTRATION(DummyTest);
+
+int main(int argc, char** argv) try {
+  std::ofstream ofs((*argv+std::string(".xml")).c_str());
+  CppUnit::TextUi::TestRunner runner;
+  runner.setOutputter(new CppUnit::XmlOutputter(&runner.result(), ofs));
+  runner.addTest(CppUnit::TestFactoryRegistry::getRegistry().makeTest());
+  return runner.run() ? 0 : 1;
+ } catch (std::exception& e) {
+  std::cerr<<"***Exception: "<<e.what()<<std::endl;
+  return 1;
+ }
 EOF
 to --condition AX_BUILD_EXAMPLES examples/makefile.am <<EOF
 ${HEADER}AM_CPPFLAGS = -I\${top_srcdir}/src -I\${top_builddir}/src
@@ -826,14 +1292,150 @@ LDADD = -l${PACKAGE_NAME#lib}
 
 MAINTAINERCLEANFILES = makefile.in
 EOF
-to --condition AX_BUILD_HTML html/makefile.am <<EOF
-${HEADER}EXTRA_DIST = \${www_DATA}
+to --condition AX_BUILD_HTML_NPM html/package.json.in <<EOF
+{
+  "name": "@PACKAGE_NAME@",
+  "version": "@PACKAGE_VERSION@",
+  "private": true,
+  "dependencies": {
+  },
+  "description": "@DESCRIPTION@",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "@AUTHOR@",
+  "license": "@LICENSE@",
+  "path": {
+      "prefix": "@PREFIX@",
+      "sysconf": "@SYSCONFDIR@",
+      "pkgdata": "@PKGDATADIR@",
+      "localstate": "@LOCALSTATEDIR@",
+      "log": "@LOCALSTATEDIR@/log/@PACKAGE_NAME@.log",
+      "config":  "@SYSCONFDIR@/@PACKAGE_NAME@.json",
+      "nodejs": "@PKGDATADIR@/nodejs"
+  }
+}
+EOF
+to --condition 'AX_BUILD_HTML|AX_BUILD_HTML_NPM' html/makefile.am <<EOF
+${HEADER}EXTRA_DIST = $(testtag AX_BUILD_HTML_NPM && echo "package.json.in")
 
 wwwdir = \${pkgdatadir}/html
-www_DATA = 
+www_DATA = $(testtag AX_BUILD_HTML_NPM && echo "package.json")
+dist_www_DATA = 
+
+$(if testtag AX_BUILD_HTML_NPM; then
+cat<<EOF2
+
+all: node_modules
+
+node_modules: package.json.in
+	HOME=. npm install
+
+clean-local:
+	-rm -r node_modules .npm
+
+install-data-hook:
+	test -d \$(DESTDIR)\${wwwdir} || mkdir -p \$(DESTDIR)\${wwwdir}
+	chmod -R u+w \$(DESTDIR)\${wwwdir}
+	cp -r . \$(DESTDIR)\${wwwdir}
+
+uninstall-local:
+	-chmod -R u+w \$(DESTDIR)\${wwwdir}
+	-rm -rf \$(DESTDIR)\${wwwdir}
+EOF2
+fi)
 
 MAINTAINERCLEANFILES = makefile.in
 EOF
+to --condition AX_USE_DOXYGEN doc/header.html.in <<EOF
+<!-- HTML header for doxygen 1.8.6-->
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=9"/>
+<meta name="generator" content="Doxygen \$doxygenversion"/>
+<!--BEGIN PROJECT_NAME--><title>\$projectname: \$title</title><!--END PROJECT_NAME-->
+<!--BEGIN !PROJECT_NAME--><title>\$title</title><!--END !PROJECT_NAME-->
+<link href="\$relpath^tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="\$relpath^jquery.js"></script>
+<script type="text/javascript" src="\$relpath^dynsections.js"></script>
+\$treeview
+\$search
+\$mathjax
+<link href="\$relpath^\$stylesheet" rel="stylesheet" type="text/css" />
+\$extrastylesheet
+</head>
+<body>
+<div id="top"><!-- do not remove this div, it is closed by doxygen! -->
+
+<div id="titlearea">
+  <div id="projecthead">
+    <div id="projectlogo"><img alt="" src="\$relpath^\$projectlogo"/></div>
+    <div id="projectname">\$projectname</span>&#160;<span id="projectnumber">\$projectnumber</div>
+    <div id="projectbrief">\$projectbrief</div>
+  </div>
+  <nav>
+    <a href="@PROJECT_URL@" target="_blank">Project Management</a>
+    <a href="@SOURCE_DOWNLOAD@" target="_blank">Download</a>
+    <div>\$searchbox</div>
+  </nav>
+</div>
+EOF
+to --condition AX_USE_DOXYGEN doc/footer.html.in <<EOF
+<div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
+  <ul>
+    \$navpath
+    <li class="footer"><a href="@AUTHOR_URL@" target="_blank">@AUTHOR_NAME@</a></li>
+  </ul>
+</div>
+</body>
+</html>
+EOF
+to --condition AX_USE_DOXYGEN doc/style.css <<EOF
+#titlearea {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-begin;
+}
+#titlearea nav {
+  padding: 0;
+  margin: 0;
+}
+#titlearea nav a {
+  background-color: lightgray;
+  border: 1px solid gray;
+  color: black;
+  padding: 1ex;
+  margin: 0;
+}
+img, object {
+  max-width: 100% !important;
+}
+@media (max-width: 50em) {
+  #navrow1, #navrow2 {
+    display: block
+  }
+  #side-nav, #splitbar, .ui-resizable-handle ui-resizable-e, .ui-resizable-handle ui-resizable-s {
+    display: none;
+  }
+  #doc-content {
+    margin-left: 0 !important;
+  }
+}
+@media (min-width: 50em) {
+  #navrow1, #navrow2 {
+    display: none;
+  }
+  #side-nav, #splitbar, .ui-resizable-handle ui-resizable-e, .ui-resizable-handle ui-resizable-s {
+    display: block
+  }
+}
+EOF
+if testtag AX_USE_DOXYGEN; then
+    copy doc/plantuml.jar
+fi
 if testtag AX_USE_DOXYGEN; then
     if ! checkfile doc/doxyfile.in || \
         contains doc/doxyfile.in "${rebuildfiles[@]}"; then
@@ -854,12 +1456,16 @@ if testtag AX_USE_DOXYGEN; then
         doxyreplace MULTILINE_CPP_IS_BRIEF YES
         doxyreplace TAB_SIZE 2
         doxyreplace ALIASES '"id=\\par File-ID\\n"'
-        doxyadd ALIASES '"copy=\\par Copyright\\n"'
+        doxyadd ALIASES '"copy=\\par Copyright by <a href="@AUTHOR_URL@" target="_blank">@AUTHOR_NAME@</a>\\n"'
         doxyadd ALIASES '"license=\\par License\\n"'
         doxyadd ALIASES '"classmutex=\\par Reentrant:\\nAccess is locked with class static mutex @c "'
         doxyadd ALIASES '"instancemutex=\\par Reentrant:\\nAccess is locked with per instance mutex @c "'
         doxyadd ALIASES '"mutex=\\par Reentrant:\\nAccess is locked with mutex @c "'
         doxyadd ALIASES '"api=\\xrefitem api \\"API Call\\" \\"\\""'
+        doxyadd ALIASES '"description=@DESCRIPTION@"'
+        doxyadd ALIASES '"readme=@README_HTML@"'
+        doxyadd ALIASES '"author=<a href="@AUTHOR_URL@" target="_blank">@AUTHOR_NAME@</a>"'
+        doxyreplace PLANTUML_JAR_PATH '"@top_srcdir@/doc/plantuml.jar"'
         doxyreplace ENABLE_PREPROCESSING YES
         doxyreplace MACRO_EXPANSION YES
         doxyadd PREDEFINED '"NAMESPACE=@PACKAGE_NAME@"'
@@ -886,9 +1492,20 @@ if testtag AX_USE_DOXYGEN; then
         if testtag AX_BUILD_TEST AX_USE_CPPUNIT; then
             doxyadd INPUT "@top_srcdir@/test"
         fi
+        if testtag AX_USE_NODEJS; then
+            doxyadd INPUT "@top_srcdir@/nodejs"
+            doxyadd EXCLUDE "@top_srcdir@/nodejs/node_modules"
+	    doxyadd EXCLUDE "@top_srcdir@/nodejs/public/javascripts/ext"
+        fi
         doxyreplace FILE_PATTERNS '*.c *.cc *.cxx *.cpp *.c++ *.java *.ii *.ixx *.ipp *.i++ *.inl *.idl *.ddl *.odl *.h *.hh *.hxx *.hpp *.h++ *.cs *.d *.php *.php4 *.php5 *.phtml *.inc *.m *.markdown *.md *.mm *.dox *.py *.f90 *.f *.for *.tcl *.vhd *.vhdl *.ucf *.qsf *.as *.js *.wt *.sql'
         doxyreplace RECURSIVE YES
-        doxyreplace EXCLUDE_PATTERNS "moc_* uic_* qrc_*"
+        doxyreplace EXCLUDE_PATTERNS "moc_* uic_* qrc_* version.[ch]xx"
+        doxyreplace HTML_HEADER header.html
+        doxyreplace HTML_FOOTER footer.html
+        doxyreplace HTML_EXTRA_STYLESHEET style.css
+        doxyreplace HTML_DYNAMIC_SECTIONS YES
+        doxyreplace DISABLE_INDEX NO
+        doxyreplace GENERATE_TREEVIEW YES 
         if testtag AX_BUILD_EXAMPLES; then
             doxyreplace EXAMPLE_PATH @top_srcdir@/examples
         fi
@@ -897,7 +1514,6 @@ if testtag AX_USE_DOXYGEN; then
         doxyreplace SOURCE_BROWSER YES
         doxyreplace INLINE_SOURCES YES
         doxyreplace GENERATE_TESTLIST YES
-        doxyreplace GENERATE_TREEVIEW NO
         doxyreplace SEARCHENGINE NO
         doxyreplace GENERATE_HTML YES
         doxyreplace GENERATE_LATEX NO
@@ -920,21 +1536,22 @@ if testtag AX_USE_DEBIAN_PACKAGING; then
     to debian/changelog.in <<EOF
 @PACKAGE@ (@PACKAGE_VERSION@~@DISTRO@.@BUILD_NUMBER@) @DISTRO@; urgency=low
 
-  * Please see ChangeLog of @PACKAGE@
+@DEB_CHANGELOG@
 
- -- @AUTHOR@  @BUILD_DATE@
+ -- @PACKAGER@  @BUILD_DATE@
 EOF
-    BUILD_DEPENDS="debhelper, ${VCSDEPENDS} pkg-config, automake, libtool, autotools-dev, lsb-release $(if testtag AX_USE_DOXYGEN; then echo -n ", doxygen, graphviz, mscgen"; fi; if testtag AX_USE_CPPUNIT; then echo -n ", libcppunit-dev"; fi; if testtag AX_CXX_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then echo -n ", qt5-default | libqt4-core | libqtcore4, qt5-qmake | qt4-qmake, qtbase5-dev | libqt4-dev, qtbase5-dev-tools | qt4-dev-tools, qttools5-dev-tools | qt4-dev-tools, qttools5-dev-tools | qt4-dev-tools"; fi)"
+    RUN_DEPENDS="$(if testtag AX_USE_NODEJS; then echo -n ", nodejs, npm"; fi)"
+    BUILD_DEPENDS="debhelper, fakeroot, ${VCSDEPENDS_DEB} pkg-config, automake, libtool, autotools-dev, pandoc, lsb-release$(if testtag AX_USE_DOXYGEN; then echo -n ", doxygen, graphviz, mscgen, default-jre-headless|default-jre"; fi; if testtag AX_USE_PERLDOC; then echo -n ", libpod-tree-perl"; fi; if testtag AX_USE_CPPUNIT; then echo -n ", libcppunit-dev"; fi; if testtag AX_CXX_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then echo -n ", qt5-default | libqt4-core | libqtcore4, qt5-qmake | qt4-qmake, qtbase5-dev | libqt4-dev, qtbase5-dev-tools | qt4-dev-tools, qttools5-dev-tools | qt4-dev-tools, qttools5-dev-tools | qt4-dev-tools"; fi)"
     to debian/control.in <<EOF
 Source: @PACKAGE_NAME@
 Priority: extra
-Maintainer: @AUTHOR@
-Build-Depends: ${BUILD_DEPENDS}
+Maintainer: @PACKAGER@
+Build-Depends: ${BUILD_DEPENDS}${RUN_DEPENDS} @DEB_BUILD_DEPEND@ @DEB_DEPEND_IFEXISTS@
 
 Package: @PACKAGE_NAME@
-Section: $(if testtag AX_USE_LIBTOOL; then echo  "libs"; fi)
+Section: $(if testtag AX_USE_LIBTOOL; then echo  "libs"; else echo "@DEB_SECTION@"; fi)
 Architecture: any
-Depends: \${shlibs:Depends}, \${misc:Depends}
+Depends: \${shlibs:Depends}, \${misc:Depends}${RUN_DEPENDS} @DEB_DEPEND@
 Description: @DESCRIPTION@
 @README_DEB@
 $(      if testtag AX_USE_LIBTOOL; then
@@ -943,7 +1560,7 @@ $(      if testtag AX_USE_LIBTOOL; then
 Package: @PACKAGE_NAME@-dev
 Section: libdevel
 Architecture: any
-Depends: @PACKAGE_NAME@ (= \${binary:Version}), ${BUILD_DEPENDS}
+Depends: @PACKAGE_NAME@ (= \${binary:Version}), ${BUILD_DEPENDS}${RUN_DEPENDS} @DEB_BUILD_DEPEND@ @DEB_DEPEND_IFEXISTS@
 Description: @DESCRIPTION@ - Development Package
 @README_DEB@
 EOF2
@@ -955,6 +1572,7 @@ README
 EOF
     to --condition AX_USE_LIBTOOL debian/${PACKAGE_NAME}.install <<EOF
 usr/lib/lib*.so.*
+usr/share/${PACKAGE_NAME}
 EOF
     to --condition AX_USE_LIBTOOL debian/${PACKAGE_NAME}-dev.install <<EOF
 usr/include/*
@@ -962,7 +1580,6 @@ usr/lib/lib*.a
 usr/lib/lib*.so
 usr/lib/pkgconfig/*
 usr/lib/*.la
-usr/share/${PACKAGE_NAME}
 usr/share/doc/${PACKAGE_NAME}/html
 EOF
     to --mode "u=rwx,g=rwx,o=rx" debian/rules <<EOF
@@ -991,39 +1608,44 @@ License: LGPL
 Group: $(if testtag AX_USE_LIBTOOL; then
   echo Development/Libraries/C++;
 else
-  echo Applications/...;
+  echo @RPM_GROUP@;
 fi)
+$(if testtag AX_RPM_DEPEND; then echo "Requires: @RPM_DEPEND@"; fi)
 Source0: %{name}-%{version}.tar.gz
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root
-BuildRequires: gnupg, ${VCSDEPENDS} make, automake, autoconf, rpm-build$(
+BuildRequires: which, pkgconfig, gnupg, expect, ${VCSDEPENDS_RPM}make, automake, autoconf, rpm-build$(
+    if testtag AX_USE_CXX; then
+      echo -n ", binutils-devel, gcc-c++"
+    fi
+    if testtag AX_USE_LIBTOOL; then
+      echo -n ", libtool, libtool-ltdl-devel"
+    fi
+    if testtag AX_USE_CPPUNIT; then
+      echo -n ", cppunit-devel"
+    fi
     if testtag AX_USE_DOXYGEN; then
-      echo -n ", doxygen";
-    fi)
-%if 0%{?fedora} != 20
-$(if testtag AX_USE_DOXYGEN; then echo -n "BuildRequires: graphviz"; fi)
-%endif
-%if 0%{?fedora} || 0%{?rhel} || 0%{?rhl} || 0%{?centos} || 0%{?centos_ver} || 0%{?centos_version}
-BuildRequires: pkgconfig, redhat-lsb$(
-    if testtag AX_USE_CPPUNIT; then
-      echo -n ", cppunit-devel";
-    fi)
-%if ! ( 0%{?centos} || 0%{?centos_ver} || 0%{?centos_version} )
-$(if testtag AX_USE_DOXYGEN; then echo -n "BuildRequires: mscgen"; fi)
-$(if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then echo -n "BuildRequires: qt5-qtbase-devel, qt5-qttools, qt5-qtwebkit-devel"; fi)
+      echo -n ", doxygen, graphviz, java-openjdk";
+    fi
+    if testtag AX_USE_PERLDOC; then
+      echo -n ", libpod-tree-perl";
+    fi
+    if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then
+      echo -n ", qt-devel, libqt5-qtbase-devel, libqt5-qttools, libQt5WebKit5-devel";
+    fi
+)  @RPM_BUILD_DEPEND@ @RPM_DEPEND_IFEXISTS@
+
+#### os dependent definitions ####
+%if 0%{?suse_version} || 0%{?sles_version}
+BuildRequires: lsb-release
 %else
-$(if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then echo -n "BuildRequires: qt-devel"; fi)
-%endif
-%else%if 0%{?suse_version} || 0%{?sles_version}
-BuildRequires: pkg-config, lsb-release$(
-    if testtag AX_USE_CPPUNIT; then
-      echo -n ", libcppunit-devel";
-    fi)
-%if 0%{?suse_version} < 1200 ||  0%{?sles_version} < 1200
-$(if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then echo -n "BuildRequires: libqt4-devel, qt4-x11-tools, libQtWebKit-devel"; fi)
-%else
-$(if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then echo -n "BuildRequires: libqt5-qtbase-devel, libqt5-qttools, libQt5WebKit5-devel"; fi)
-%endif
-%endif%endif
+BuildRequires: rpm-sign, redhat-lsb
+%endif$(
+    if testtag AX_USE_DOXYGEN; then cat <<EOS
+%if ! 0%{?centos}
+BuildRequires: mscgen
+%fi
+EOS
+fi)
 
 %description
 @README@
@@ -1032,7 +1654,9 @@ echo
 echo This package contains only the shared libraries required at runtime.
 fi)
 
-
+$(if ! testtag 'AX_USE_LIBTOOL|AX_USE_CXX'; then
+  echo '%global debug_package %{nil}'
+fi)
 %prep
 %setup -q
 ./configure --prefix=/usr \\
@@ -1052,10 +1676,13 @@ rm -rf \$RPM_BUILD_ROOT
 %files
 %defattr(-,root,root,-)
 $(if testtag AX_USE_LIBTOOL; then
-echo '/usr/%_lib/@PACKAGE_NAME@.so.*'
+echo '/usr/%_lib/*.so.*'
 else
 echo '/usr/bin/*'
 echo '/usr/share/applications/*'
+fi)
+$(if testtag AX_USE_NODEJS AX_BUILD_HTML AX_BUILD_HTML_NPM; then
+echo '/usr/share/@PACKAGE_NAME@'
 fi)
 %doc
 $(if testtag AX_USE_LIBTOOL; then
@@ -1068,7 +1695,7 @@ $(if testtag AX_USE_LIBTOOL; then
 /usr/share/doc/packages/@PACKAGE_NAME@/README
 EOF2
 else
-  echo '/usr/share/*'
+  echo '/usr/share'
 fi)
 
 $(if testtag AX_USE_LIBTOOL; then
@@ -1076,7 +1703,7 @@ cat <<EOF2
 %package devel
 Summary: @DESCRIPTION@
 Group: Development/Libraries/C++
-Requires: @PACKAGE_NAME@ = @VERSION@
+Requires: @PACKAGE_NAME@ = @VERSION@ @RPM_BUILD_DEPEND@
 
 %description devel
 @README@
@@ -1085,14 +1712,18 @@ This Package contains all files required for developement.
 
 %files devel
 %defattr(-,root,root,-)
-/usr/%_lib/@PACKAGE_NAME@.so
-/usr/%_lib/@PACKAGE_NAME@.a
-/usr/%_lib/@PACKAGE_NAME@.la
+/usr/%_lib/*.so
+/usr/%_lib/*.a
+/usr/%_lib/*.la
 /usr/%_lib/pkgconfig
 /usr/include/*
 %doc
-/usr/share/@PACKAGE_NAME@
-/usr/share/doc/packages/@PACKAGE_NAME@/html
+$(if testtag AX_USE_DOXYGEN AX_USE_PERLDOC; then
+  echo '/usr/share/doc/packages/@PACKAGE_NAME@/html'
+fi)
+$(if testtag AX_BUILD_EXAMPLES; then
+  echo '/usr/share/doc/packages/@PACKAGE_NAME@/examples'
+fi)
 EOF2
 fi)
 
@@ -1103,13 +1734,16 @@ SUBDIRS=""
 if testtag AX_USE_CXX; then
     SUBDIRS="${SUBDIRS} src"
 fi
+if testtag AX_USE_ETC; then
+    SUBDIRS="${SUBDIRS} etc"
+fi
 if testtag AX_BUILD_TEST AX_USE_CPPUNIT; then
     SUBDIRS="${SUBDIRS} test"
 fi
 if testtag AX_USE_SCRIPTS; then
     SUBDIRS="${SUBDIRS} scripts"
 fi
-if testtag AX_USE_DOXYGEN; then
+if testtag 'AX_USE_DOXYGEN|AX_USE_PERLDOC'; then
     SUBDIRS="${SUBDIRS} doc"
 fi
 if testtag AX_BUILD_EXAMPLES; then
@@ -1125,7 +1759,7 @@ for d in src test scripts doc examples html; do
 done
 to --mode "u=rwx,g=rwx,o=rx" autogen.sh <<EOF
 #!/bin/bash -e
-if test -n "$VCS" -a -d .$VCS -a -e -x $(which ${VCS}2cl); then
+if test -n "$VCS" -a -d ".$VCS" -a -e -x "\$(which ${VCS}2cl)"; then
 $(case "$VCS" in
   (svn) echo "    ${VCS}2cl";;
   (git) echo "    ${VCS}2cl > ChangeLog";;
@@ -1167,35 +1801,42 @@ Cflags: -I\${includedir} @CPPFLAGS@
 Requires: @PKG_REQUIREMENTS@
 EOF
 to build-in-docker.conf <<EOF
-repos+=("Debian|Ubuntu-precise::::::universe")
-repos+=("Ubuntu-precise:::'deb http://archive.ubuntu.com/ubuntu precise universe'")
-envs+=("-e 'HOME=\${HOME}'")
-dirs+=("-v \${HOME}/.gnupg:\${HOME}/.gnupg:ro")
+${HEADER}# Use Ubuntu Universe Repository
+repos+=("Ubuntu:::universe")
+
+# Use Marc Wäckerlin's Repository, see https://dev.marc.waeckerlin.org
+repos+=("Debian|Ubuntu:::https://dev.marc.waeckerlin.org/repository")
+repos+=("openSUSE:::https://dev.marc.waeckerlin.org/repository/opensuse/marc-waeckerlin.repo")
+repos+=("Fedora:::https://dev.marc.waeckerlin.org/repository/fedora/marc-waeckerlin.repo")
+repos+=("CentOS:::https://dev.marc.waeckerlin.org/repository/centos/marc-waeckerlin.repo")
+keys+=("https://dev.marc.waeckerlin.org/repository/PublicKey")
 EOF
 
 #### Cleanup If Makefile Exists ####
 if test -f makefile; then
-    run --no-check make distclean
-fi
-
-#### Bootstrap Before Configure ####
-run --no-check vcs2cl
-run aclocal
-if testtag AX_USE_LIBTOOL; then run libtoolize --force; fi
-run automake -a
-run autoconf
-
-#### Run Configure If User Requires ####
-if test "$configure" -eq 1; then
-    ./configure $* || exit 1
-fi
-
-#### Run Make If User Requires ####
-if test "$build" -eq 1; then
-    make $buildtarget || exit 1
+    run --no-check make maintainer-clean
 fi
 
 #### Build In Docker If User Requires ####
 if test "$docker" -eq 1; then
-    ./build-in-docker.sh || exit 1
+    ./build-in-docker.sh $buildtarget $* || exit 1
+else
+    
+    #### Bootstrap Before Configure ####
+    run --no-check vcs2cl
+    run aclocal
+    if testtag AX_USE_LIBTOOL; then run libtoolize --force; fi
+    run automake -a
+    run autoconf
+    
+    #### Run Configure If User Requires ####
+    if test "$configure" -eq 1; then
+        ./configure $* || exit 1
+    fi
+    
+    #### Run Make If User Requires ####
+    if test "$build" -eq 1; then
+        make $buildtarget || exit 1
+    fi
+    
 fi

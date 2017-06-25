@@ -51,18 +51,33 @@
 
 AC_DEFUN([AX_CXX_QT_TOOL], [
   PKG_PROG_PKG_CONFIG
-  if test -z "$HAVE_$1"; then
+  if test -z "${HAVE_$1}"; then
     HAVE_$1=1
     AC_MSG_CHECKING([for $2])
     AC_ARG_VAR([$1], [path to Qt tool $2])
-    $1=${$1:-$(${PKG_CONFIG} --variable=$2_location Qt5Core)}
-    $1=${$1:-$(${PKG_CONFIG} --variable=host_bins Qt5Core)/$2-qt5}
-    $1=${$1:-$(${PKG_CONFIG} --variable=host_bins Qt5Core)/$2}
-    $1=${$1:-$(${PKG_CONFIG} --variable=$2_location QtCore)}
-    $1=${$1:-$(${PKG_CONFIG} --variable=host_bins QtCore)/$2}
-    $1=${$1:-$(${PKG_CONFIG} --variable=host_bins QtCore)/$2-qt4}
-    if ! which "${$1%% *}" > /dev/null; then
-      if which "$2-qt5" > /dev/null; then
+    for package in Qt5Core QtCore; do
+        if test -x "${$1}"; then
+            break
+        fi
+        tool=$(${PKG_CONFIG} --variable=$2_location $package 2> /dev/null)
+        if test -x "${tool}"; then
+            $1="${tool}"
+            break
+        fi
+        tool=$(${PKG_CONFIG} --variable=host_bins $package 2> /dev/null)
+        if test -n "$tool"; then
+            for name in $2 $2-qt5 $2-qt4; do
+                if test -x "${tool}/${name}"; then
+                    $1="${tool}/${name}"
+                    break
+                fi
+            done
+        fi
+    done
+    if ! test -x "${$1}"; then
+      if which "$2" > /dev/null; then
+        $1=$2
+      elif which "$2-qt5" > /dev/null; then
         $1=$2-qt5
       elif which "$2" > /dev/null; then
         $1=$2
@@ -70,15 +85,15 @@ AC_DEFUN([AX_CXX_QT_TOOL], [
         $1=$2-qt4
       else
         HAVE_$1=0
-        $1=""
+        unset $1
       fi
     fi
     AC_SUBST($1)
     AM_CONDITIONAL(HAVE_$1, test $HAVE_[$1] -eq 1)
     if test $HAVE_$1 -eq 1; then
-      AC_MSG_RESULT([$$1])
+        AC_MSG_RESULT([$$1])
     else
-      AC_MSG_RESULT([not found])
+        AC_MSG_RESULT([not found])
     fi
   fi
 ])

@@ -90,7 +90,7 @@ while test $# -gt 0; do
                     img="mwaeckerlin/ubuntu:latest"; host="${host:---host=i686-w64-mingw32}"
                     targets="all install"
                     flags+=("--prefix=/workdir/usr")
-                    packages1=("mingw-w64")
+                    packages+=("mingw-w64")
                     ;;
                 (*)
                     echo "**** ERROR: unknown mode '$1', try --help" 1>&2
@@ -195,21 +195,27 @@ function ifthenelse() {
     arg="$1"
     shift
     cmd="$*"
+    DISTRIBUTOR=$(docker exec ${DOCKER_ID} lsb_release -si | sed 's, .*,,' | tr [:upper:] [:lower:])
+    CODENAME=$(docker exec ${DOCKER_ID} lsb_release -cs)
+    ARCH=$((docker exec ${DOCKER_ID} which dpkg > /dev/null 2> /dev/null && docker exec ${DOCKER_ID} dpkg --print-architecture) || echo amd64)
     if test "${arg/:::/}" = "${arg}"; then
-        docker exec ${DOCKER_ID} bash -c "${cmd//ARG/${arg}}"
+        docker exec ${DOCKER_ID} bash -c "${cmd//ARG/${arg//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
     else
         os="${arg%%:::*}"
         thenpart="${arg#*:::}"
-        if test "${thenpart/:::/}" = "${thenpart}"; then
-            docker exec ${DOCKER_ID} bash -c 'os="'$os'"; if [[ "$(lsb_release -is)-$(lsb_release -cs)-$((which dpkg > /dev/null 2> /dev/null && dpkg --print-architecture) || echo amd64)" =~ ${os} ]]; then '"${cmd//ARG/${thenpart}}"'; fi'
-        else
+        elsepart=
+        if test "${thenpart/:::/}" != "${thenpart}"; then
             elsepart="${thenpart##*:::}"
-            thenpart="${thenpart%:::*}"
+            thenpart="${thenpart%%:::*}"
+        fi
+        if [[ "${DISTRIBUTOR}-${CODENAME}-${ARCH}" =~ ${os} ]]; then
             if test -n "${thenpart}"; then
-                docker exec ${DOCKER_ID} bash -c 'os="'$os'"; if [[ "$(lsb_release -is)-$(lsb_release -cs)-$((which dpkg > /dev/null 2> /dev/null && dpkg --print-architecture) || echo amd64)" =~ ${os} ]]; then '"${cmd//ARG/${thenpart}}"'; else '"${cmd//ARG/${elsepart}}"'; fi'
-            else
-                docker exec ${DOCKER_ID} bash -c 'os="'$os'"; if [[ "$(lsb_release -is)-$(lsb_release -cs)-$((which dpkg > /dev/null 2> /dev/null && dpkg --print-architecture) || echo amd64)" =~ ${os} ]]; then true; else '"${cmd//ARG/${elsepart}}"'; fi'
-            fi    
+                docker exec ${DOCKER_ID} bash -c "${cmd//ARG/${thenpart//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
+            fi
+        else
+            if test -n "${elsepart}"; then
+                docker exec ${DOCKER_ID} bash -c "${cmd//ARG/${elsepart//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
+            fi
         fi
     fi
 }
@@ -290,9 +296,15 @@ EOF
             rm rpm-key
         done
         for repo in "${repos[@]}"; do
-            INSTALL_REPO=$((docker exec ${DOCKER_ID} test -x /usr/bin/zypper && echo zypper ar) || (docker exec ${DOCKER_ID} test -x /usr/bin/dnf && echo dnf config-manager --add-repo) || (docker exec ${DOCKER_ID} test -x /usr/bin/yum && echo wget -O/etc/yum.repos.d/additional$i.repo) || (docker exec ${DOCKER_ID} test -x /usr/sbin/urpmi && echo true))
+            INSTALL_REPO=$((docker exec ${DOCKER_ID} test -x /usr/bin/zypper && echo zypper ar) || (docker exec ${DOCKER_ID} test -x /usr/bin/dnf && echo dnf config-manager --add-repo) || (docker exec ${DOCKER_ID} test -x /usr/bin/yum && echo wget -O/etc/yum.repos.d/additional$i.repo) || (docker exec ${DOCKER_ID} test -x /usr/sbin/urpmi && echo false))
             ifthenelse "${repo}" "${INSTALL_REPO} 'ARG'"
             ((++i))
+        done
+        for package in "${packages[@]}"; do
+            ifthenelse "${package}" "${INSTALL_TOOL} ARG"
+        done
+        for command in "${commands[@]}"; do
+            ifthenelse "${command}" "ARG"
         done
         docker exec ${DOCKER_ID} ./resolve-rpmbuilddeps.sh
         ;;

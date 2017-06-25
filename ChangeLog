@@ -1,5 +1,9 @@
 2017-06-25  Marc Wäckerlin <marc@jupiter>
 
+	* ChangeLog, configure.ac: build fixed
+
+2017-06-25  Marc Wäckerlin <marc@jupiter>
+
 	* AUTHORS: build fixed
 
 2017-06-25  Marc Wäckerlin <marc@jupiter>

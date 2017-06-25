@@ -138,6 +138,8 @@ GENERATED FILES
     * build-resource-file.sh - build resource.qrc file from a resource directory
     * sql-to-dot.sed - script to convert SQL schema files to graphviz dot in doxygen
     * mac-create-app-bundle.sh - script to create apple mac os-x app-bundle
+    * dependency-graph.sh - script to draw project dependencies
+    * template.sh - generic template for bash scripts
     * test/runtests.sh - template file to run test scripts, i.e. docker based
     * AUTHORS - replace your name in AUTHORS before first run
     * NEWS - empty file add your project's news
@@ -549,6 +551,8 @@ copy rpmsign.exp
 copy build-resource-file.sh
 copy sql-to-dot.sed
 copy mac-create-app-bundle.sh
+copy dependency-graph.sh
+copy template.sh
 AUTHOR=$(gpg -K 2>/dev/null | sed -n 's,uid *\(\[ultimate\] *\)\?,,p' | head -1)
 if test -z "${AUTHOR}"; then
     AUTHOR="FIRSTNAME LASTNAME (URL) <EMAIL>"
@@ -1290,6 +1294,9 @@ ${HEADER}AM_CPPFLAGS = -I\${top_srcdir}/src -I\${top_builddir}/src
 AM_LDFLAGS = -L\${abs_top_builddir}/src/.libs
 LDADD = -l${PACKAGE_NAME#lib}
 
+exampledir = ${docdir}/examples
+example_DATA = 
+
 MAINTAINERCLEANFILES = makefile.in
 EOF
 to --condition AX_BUILD_HTML_NPM html/package.json.in <<EOF
@@ -1603,7 +1610,7 @@ to --condition AX_USE_RPM_PACKAGING ${PACKAGE_NAME}.spec.in <<EOF
 Summary: @DESCRIPTION@
 Name: @PACKAGE_NAME@
 Version: @VERSION@
-Release: @BUILD_NUMBER@%{?dist}
+Release: @BUILD_NUMBER@.@DISTRO@
 License: LGPL
 Group: $(if testtag AX_USE_LIBTOOL; then
   echo Development/Libraries/C++;
@@ -1617,9 +1624,6 @@ BuildRequires: which, pkgconfig, gnupg, expect, ${VCSDEPENDS_RPM}make, automake,
     if testtag AX_USE_CXX; then
       echo -n ", binutils-devel, gcc-c++"
     fi
-    if testtag AX_USE_LIBTOOL; then
-      echo -n ", libtool, libtool-ltdl-devel"
-    fi
     if testtag AX_USE_CPPUNIT; then
       echo -n ", cppunit-devel"
     fi
@@ -1629,23 +1633,40 @@ BuildRequires: which, pkgconfig, gnupg, expect, ${VCSDEPENDS_RPM}make, automake,
     if testtag AX_USE_PERLDOC; then
       echo -n ", libpod-tree-perl";
     fi
-    if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then
-      echo -n ", qt-devel, libqt5-qtbase-devel, libqt5-qttools, libQt5WebKit5-devel";
-    fi
 )  @RPM_BUILD_DEPEND@ @RPM_DEPEND_IFEXISTS@
 
 #### os dependent definitions ####
 %if 0%{?suse_version} || 0%{?sles_version}
-BuildRequires: lsb-release
+BuildRequires: lsb-release$(
+    if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT; then
+      echo -n ", libqt5-qtbase-devel, libqt5-qttools, libqt5-linguist-devel, libQt5WebKit5-devel libqt5-qtwebengine-devel libQt5WebKitWidgets-devel";
+    fi)
+%else
+$(
+    if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT; then
+      echo -n "BuildRequires: qt5-qtbase-devel, qt5-qttools-devel, qt5-qtwebkit-devel";
+    fi)
+%if  0%{?mageia}
+BuildRequires: rpm-sign, lsb-release
 %else
 BuildRequires: rpm-sign, redhat-lsb
-%endif$(
+%endif
+%endif
+$(
     if testtag AX_USE_DOXYGEN; then cat <<EOS
 %if ! 0%{?centos}
 BuildRequires: mscgen
-%fi
+%endif
 EOS
-fi)
+    fi
+    if testtag AX_USE_LIBTOOL; then cat <<EOS
+%if 0%{?mageia}
+BuildRequires: libtool, libltdl-devel
+%else
+BuildRequires: libtool, libtool-ltdl-devel
+%endif
+EOS
+    fi)
 
 %description
 @README@
@@ -1678,25 +1699,12 @@ rm -rf \$RPM_BUILD_ROOT
 $(if testtag AX_USE_LIBTOOL; then
 echo '/usr/%_lib/*.so.*'
 else
-echo '/usr/bin/*'
-echo '/usr/share/applications/*'
+echo '/usr/bin'
+echo '/usr/share/applications'
 fi)
-$(if testtag AX_USE_NODEJS AX_BUILD_HTML AX_BUILD_HTML_NPM; then
-echo '/usr/share/@PACKAGE_NAME@'
-fi)
+/usr/share/@PACKAGE_NAME@
 %doc
-$(if testtag AX_USE_LIBTOOL; then
-  cat <<EOF2
-/usr/share/doc/packages/@PACKAGE_NAME@/AUTHORS
-/usr/share/doc/packages/@PACKAGE_NAME@/COPYING
-/usr/share/doc/packages/@PACKAGE_NAME@/ChangeLog
-/usr/share/doc/packages/@PACKAGE_NAME@/INSTALL
-/usr/share/doc/packages/@PACKAGE_NAME@/NEWS
-/usr/share/doc/packages/@PACKAGE_NAME@/README
-EOF2
-else
-  echo '/usr/share'
-fi)
+/usr/share/doc
 
 $(if testtag AX_USE_LIBTOOL; then
 cat <<EOF2
@@ -1781,6 +1789,7 @@ dist_pkgdata_DATA = @PACKAGE_ICON@ ax_check_qt.m4 bootstrap.sh		\\
                     build-resource-file.sh				\\
                     ax_init_standard_project.m4				\\
                     mac-create-app-bundle.sh resolve-debbuilddeps.sh    \\
+                    dependency-graph.sh template.sh                     \\
                     sql-to-dot.sed
 dist_doc_DATA = AUTHORS NEWS README COPYING INSTALL ChangeLog
 
@@ -1802,14 +1811,14 @@ Requires: @PKG_REQUIREMENTS@
 EOF
 to build-in-docker.conf <<EOF
 ${HEADER}# Use Ubuntu Universe Repository
-repos+=("Ubuntu:::universe")
+repos+=("ubuntu:::universe")
 
 # Use Marc Wäckerlin's Repository, see https://dev.marc.waeckerlin.org
-repos+=("Debian|Ubuntu:::https://dev.marc.waeckerlin.org/repository")
-repos+=("openSUSE:::https://dev.marc.waeckerlin.org/repository/opensuse/marc-waeckerlin.repo")
-repos+=("Fedora:::https://dev.marc.waeckerlin.org/repository/fedora/marc-waeckerlin.repo")
-repos+=("CentOS:::https://dev.marc.waeckerlin.org/repository/centos/marc-waeckerlin.repo")
+repos+=("debian|ubuntu:::https://dev.marc.waeckerlin.org/repository:::https://dev.marc.waeckerlin.org/repository/@DISTRIBUTOR@/marc-waeckerlin.repo")
 keys+=("https://dev.marc.waeckerlin.org/repository/PublicKey")
+
+# centos requires epel-release for some packages, such as Qt WebKit
+packages+=("centos:::epel-release")
 EOF
 
 #### Cleanup If Makefile Exists ####

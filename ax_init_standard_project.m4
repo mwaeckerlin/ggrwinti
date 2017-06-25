@@ -90,7 +90,7 @@ dnl refers to ${prefix}.  Thus we have to use `eval' twice.
 #     $3 = filename of makefile.in
 AC_DEFUN([AX_ADD_MAKEFILE_TARGET_DEP], [
   sh_add_makefile_target_dep() {
-    sed -i -e ':a;/^'${1}':.*\\$/{N;s/\\\n//;ta};s/^'${1}':.*$/& '${2}'/' "${srcdir}/${3}"
+    sed -i -e ':a;/^'${1}':.*\\$/{N;s/\\\n//;ta};s/^'"${1}"':.*$/& '"${2}"'/' "${srcdir}/${3}"
     if ! egrep -q "${1}:.* ${2}" "${srcdir}/${3}"; then
         echo "${1}: ${2}" >> "${srcdir}/${3}"
     fi
@@ -225,6 +225,9 @@ AC_DEFUN([AX_INIT_STANDARD_PROJECT], [
   VENDOR=$((lsb_release -is 2>/dev/null || echo unknown) | tr ' ' '_')
   AX_SUBST(VENDOR)
   DISTRO=$(lsb_release -sc 2>/dev/null || uname -s 2>/dev/null)
+  if test "${DISTRO}" = "n/a"; then
+     DISTRO="${VENDOR}_$(lsb_release -sr 2>/dev/null | tr ' ' '_')"
+  fi
   AX_SUBST(DISTRO)
   ARCH=$((@<:@@<:@ $(uname -sm) =~ 64 @:>@@:>@ && echo amd64) || (@<:@@<:@ $(uname -sm) =~ 'i?86' @:>@@:>@ && echo i386 || uname -sm))
   AX_SUBST(ARCH)
@@ -453,6 +456,12 @@ AC_DEFUN([AX_USE_NODEJS], [
                          [${PATH}${PATH_SEPARATOR}${ANDROID_HOME}/tools])
   AC_CONFIG_FILES([nodejs/package.json])
   AC_CONFIG_FILES([nodejs/makefile])
+  if test -z "${DEB_SECTION}"; then
+    AX_DEB_SECTION([web])
+  fi
+  if test -z "${RPM_GROUP}"; then
+    AX_RPM_GROUP([Applications/Internet])
+  fi
   AX_ADD_MAKEFILE_TARGET_DEP([maintainer-clean-am], [maintainer-clean-nodejs-targets], [nodejs/makefile.in])
   test -f nodejs/makefile.in && cat >> nodejs/makefile.in <<EOF
 #### Begin: Appended by $0
@@ -491,6 +500,12 @@ EOF
 # use this in configure.ac to support HTML data for webservers
 AC_DEFUN([AX_BUILD_HTML], [
   AC_CONFIG_FILES([html/makefile])
+  if test -z "${DEB_SECTION}"; then
+    AX_DEB_SECTION([web])
+  fi
+  if test -z "${RPM_GROUP}"; then
+    AX_RPM_GROUP([Applications/Internet])
+  fi
   AX_ADD_MAKEFILE_TARGET_DEP([maintainer-clean-am], [maintainer-clean-html-targets], [html/makefile.in])
   test -f html/makefile.in && cat >> html/makefile.in <<EOF
 #### Begin: Appended by $0
@@ -518,6 +533,12 @@ AC_DEFUN([AX_USE_LIBTOOL], [
   AC_SUBST(LIB_VERSION)
   AC_PROG_LIBTOOL
   AC_CONFIG_FILES([src/${PACKAGE_NAME}.pc])
+  if test -z "${DEB_SECTION}"; then
+    AX_DEB_SECTION([devel])
+  fi
+  if test -z "${RPM_GROUP}"; then
+    AX_RPM_GROUP([Development/Libraries])
+  fi
   AX_ADD_MAKEFILE_TARGET_DEP([install-data-am], [install-data-libtool-pkg], [src/makefile.in])
   AX_ADD_MAKEFILE_TARGET_DEP([uninstall-am], [uninstall-data-am], [src/makefile.in])
   AX_ADD_MAKEFILE_TARGET_DEP([uninstall-data-am], [uninstall-data-libtool-pkg], [src/makefile.in])
@@ -535,7 +556,11 @@ EOF
 ])
 
 # use this in configure.ac to support debian packages
+#  - $1: optional debian package section
 AC_DEFUN([AX_USE_DEBIAN_PACKAGING], [
+  if test -n "$1"; then
+    AX_DEB_SECTION([$1])
+  fi
   if test -f README.md; then
     README_DEB=$(tail -n +3 README.md | sed -e 's/^ *$/./g' -e 's/^/ /g')
   else
@@ -560,7 +585,11 @@ EOF
 ])
 
 # use this in configure.ac to support RPM packages
+#  - $1: optional rpm package group
 AC_DEFUN([AX_USE_RPM_PACKAGING], [
+  if test -n "$1"; then
+    AX_RPM_GROUP([$1])
+  fi
   AC_CONFIG_FILES([${PACKAGE_NAME}.spec])
   #AX_ADD_MAKEFILE_TARGET_DEP([clean-am], [clean-rpm-targets], [makefile.in])
   AX_ADD_MAKEFILE_TARGET_DEP([clean-am], [clean-rpm-targets], [makefile.in])
@@ -715,12 +744,10 @@ EOF
 #     $5 = optional flags:
 #            manualflags if CXXFLAGS, CPPFLAGS, LIBS should remain unchanged
 #     $6 = optional parameters, allowed are (evaluated in this order):
-#           - RPM_DIST_PKG=<name>
-#             special name for the RPM package
-#           - DEB_DIST_PKG=<name>
-#             special name for the debian package
-#           - DIST_PKG=<name>
-#             if the name of the package is different
+#           - DEV_RPM_DIST_PKG=<name>
+#             special name for the RPM development package
+#           - DEV_DEB_DIST_PKG=<name>
+#             special name for the debian development package
 #           - DEV_DIST_PKG=<name>
 #             if the name of the development package is different
 #
@@ -732,11 +759,6 @@ EOF
 AC_DEFUN([AX_PKG_REQUIRE], [
   PKG_PROG_PKG_CONFIG
   optional_flags="$5"
-  $6
-  if test -n "$DEV_DIST_PKG"; then
-    DEV_DEB_DIST_PKG=${DEV_DIST_PKG}-dev
-    DEV_RPM_DIST_PKG=${DEV_DIST_PKG}-devel
-  fi
   $1_found=no
   secondpar="m4_default([$2], [$1])"
   PKG_CHECK_MODULES([$1], [m4_default([$2], [$1])], [
@@ -816,10 +838,6 @@ AC_DEFUN([AX_PKG_REQUIRE], [
       AC_MSG_ERROR([Feature $1 not found please install module $secondpar])
     fi
   fi
-  AX_DEB_BUILD_DEPEND([${DEV_DEB_DIST_PKG:-${DEB_DIST_PKG:-${DIST_PKG:-${$1_found}-dev}}}])
-  AX_RPM_BUILD_DEPEND([${DEV_RPM_DIST_PKG:-${RPM_DIST_PKG:-${DIST_PKG:-${$1_found}-devel}}}])
-  AX_DEB_DEPEND([${DEB_DIST_PKG:-${DIST_PKG:-${$1_found}}}])
-  AX_RPM_DEPEND([${RPM_DIST_PKG:-${DIST_PKG:-${$1_found}}}])
   [$1]_CPPFLAGS="${$1_CFLAGS}"
   [$1]_CXXFLAGS="${$1_CFLAGS}"
   AC_SUBST([$1]_CPPFLAGS)
@@ -832,6 +850,33 @@ AC_DEFUN([AX_PKG_REQUIRE], [
   else
     AC_MSG_NOTICE([To enable $1, add $1_CPPFLAGS, $1_CXXFLAGS and $1_LIBS])
   fi
+  
+  DEV_DEB_DIST_PKG=
+  DEV_RPM_DIST_PKG=
+  DEV_DIST_PKG=
+  pkg=m4_default([$2], [$1])
+  $6
+  dep_pkg=${DEV_DEB_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-dev}
+  rpm_pkg=${DEV_RPM_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-devel}
+  if test -n "$4"; then
+    for f in $pkg $4; do
+      if test -n "$(apt-cache policy -q ${f}-dev 2> /dev/null)"; then
+        deb_pkg=${f}-dev
+        break
+      fi
+    done
+    for f in $pkg $4; do
+      if (test -x /usr/bin/zypper && zypper search -x "${f}-devel" 1>&2 > /dev/null) || \
+            (test -x /usr/bin/dnf && dnf list -q "${f}-devel" 1>&2 > /dev/null) || \
+            (test -x /usr/bin/yum && yum list -q "${f}-devel" 1>&2 > /dev/null) || \
+            (test -x /usr/sbin/urpmq && urpmq "${f}-devel" 1>&2 > /dev/null); then
+        rpm_pkg=${f}-devel
+        break
+      fi
+    done
+  fi
+  AX_DEB_BUILD_DEPEND([$deb_pkg])
+  AX_RPM_BUILD_DEPEND([$rpm_pkg])
 ])
 
 # check if a specific package exists
@@ -841,12 +886,10 @@ AC_DEFUN([AX_PKG_REQUIRE], [
 #     $3 = optional flags:
 #          manualflags if CXXFLAGS, CPPFLAGS, LIBS should remain unchanged
 #     $4 = optional parameters, allowed are (evaluated in this order):
-#           - RPM_DIST_PKG=<name>
-#             special name for the RPM package
-#           - DEB_DIST_PKG=<name>
-#             special name for the debian package
-#           - DIST_PKG=<name>
-#             if the name of the package is different
+#           - DEV_RPM_DIST_PKG=<name>
+#             special name for the RPM development package
+#           - DEV_DEB_DIST_PKG=<name>
+#             special name for the debian development package
 #           - DEV_DIST_PKG=<name>
 #             if the name of the development package is different
 #
@@ -855,11 +898,6 @@ AC_DEFUN([AX_PKG_REQUIRE], [
 # sets all flags, so that the module can be used everywhere
 AC_DEFUN([AX_PKG_CHECK], [
   optional_flags="$3"
-  $4
-  if test -n "$DEV_DIST_PKG"; then
-    DEV_DEB_DIST_PKG=${DEV_DIST_PKG}-dev
-    DEV_RPM_DIST_PKG=${DEV_DIST_PKG}-devel
-  fi
   PKG_PROG_PKG_CONFIG
   PKG_CHECK_MODULES([$1], [m4_default([$2], [$1])], [
     HAVE_$1=1
@@ -883,15 +921,29 @@ AC_DEFUN([AX_PKG_CHECK], [
   ], [
     HAVE_$1=0
   ])
-  AX_DEB_BUILD_DEPEND([${DEV_DEB_DIST_PKG:-${DEB_DIST_PKG:-${DIST_PKG:-m4_default([$2], [$1])-dev}}}])
-  AX_RPM_BUILD_DEPEND([${DEV_RPM_DIST_PKG:-${RPM_DIST_PKG:-${DIST_PKG:-m4_default([$2], [$1])-devel}}}])
-  AX_DEB_DEPEND([${DEB_DIST_PKG:-${DIST_PKG:-m4_default([$2], [$1])}}])
-  AX_RPM_DEPEND([${RPM_DIST_PKG:-${DIST_PKG:-m4_default([$2], [$1])}}])
   AM_CONDITIONAL(HAVE_$1, test $HAVE_[$1] -eq 1)
   AC_SUBST(HAVE_$1)
   AC_SUBST(CPPFLAGS)
   AC_SUBST(CXXFLAGS)
   AC_SUBST(PKG_REQUIREMENTS)
+  
+  DEV_DEB_DIST_PKG=
+  DEV_RPM_DIST_PKG=
+  DEV_DIST_PKG=
+  pkg=m4_default([$2], [$1])
+  $4
+  dep_pkg=${DEV_DEB_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-dev}
+  rpm_pkg=${DEV_RPM_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-devel}
+  if test -n "$(apt-cache policy -q ${deb_pkg} 2> /dev/null)"; then
+    AX_DEB_BUILD_DEPEND([$deb_pkg])
+  fi
+  if (test -x /usr/bin/zypper && zypper search -x "$rpm_pkg" 1>&2 > /dev/null) || \
+            (test -x /usr/bin/dnf && dnf list -q "$rpm_pkg" 1>&2 > /dev/null) || \
+            (test -x /usr/bin/yum && yum list -q "$rpm_pkg" 1>&2 > /dev/null) || \
+            (test -x /usr/sbin/urpmq && urpmq "$rpm_pkg" 1>&2 > /dev/null); then
+    AX_RPM_BUILD_DEPEND([$rpm_pkg])
+  fi
+)
 ])
 
 # make sure, a specific header exists
@@ -1176,4 +1228,5 @@ AC_DEFUN([AX_OUTPUT], [
   AX_DEB_RESOLVE
   AX_RPM_RESOLVE
   AC_OUTPUT
+  AX_INIT_QT
 ])

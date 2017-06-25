@@ -35,13 +35,53 @@ TO_INSTALL=
 DEPS=
 
 if test -e debian/control.in -a ! -e debian/control; then
+    function pkg_exists() {
+        test -n "$(${DO} apt-cache policy -q ${1})"
+    }
+    function AX_PKG_CHECK() {
+        local DEV_DEB_DIST_PKG=
+        local DEV_DIST_PKG=
+        local pkg=
+        eval $4
+        if test -z "$2"; then
+            pkg=$1
+        else
+            pkg=$2
+        fi
+        pkg=${DEV_DEB_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-dev}
+        if pkg_exists "${pkg}"; then
+            echo $pkg
+        fi
+    }
+    function AX_PKG_REQUIRE() {
+        local DEV_DEB_DIST_PKG=
+        local DEV_DIST_PKG=
+        local pkg=
+        eval $6
+        if test -z "$2"; then
+            pkg=$1
+        else
+            pkg=$2
+        fi
+        if test -n "$4"; then
+            for f in $pkg $4; do
+                if pkg_exists "${f}-dev"; then
+                    pkg=$f
+                    break
+                fi
+            done
+        fi
+        echo ${DEV_DEB_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-dev}
+    }
+    DEPS+=" $(eval $(sed -n '/^ *AX_PKG_REQUIRE/{s,^ *\(AX_PKG_REQUIRE\) *(\(.*\)).*,\1 \2,;s.\[\([^]]*\)\],\?."\1".g;s,$,;,g;p}' configure.ac))"
+    DEPS+=" $(eval $(sed -n '/^ *AX_PKG_CHECK/{s,^ *\(AX_PKG_CHECK\) *(\(.*\)).*,\1 \2,;s.\[\([^]]*\)\],\?."\1".g;s,$,;,g;p}' configure.ac))"
     for f in $(sed -n 's, *AX_\(DEB\|ALL\)_DEPEND_IFEXISTS(\([^)]*\)).*,\2,p' configure.ac); do
-        if test -n "$(${DO} apt-cache policy -q ${f})" && ((! $(${DO} apt-cache policy ${f} 2>&1 | grep -q 'N: Unable to locate package')) && (! ${DO} dpkg -l "${f}")); then
+        if pkg_exists "${f}"; then
             DEPS+=" ${f}"
         fi
     done
     for f in $(sed -n 's, *AX_\(DEB\|ALL\)_DEPEND_IFEXISTS_DEV(\([^)]*\)).*,\2,p' configure.ac); do
-        if test -n "$(${DO} apt-cache policy -q ${f}-dev)" && ((! $(${DO} apt-cache policy ${f}-dev 2>&1 | grep -q 'N: Unable to locate package')) && (! ${DO} dpkg -l "${f}-dev")); then
+        if pkg_exists "${f}-dev"; then
             DEPS+=" ${f}-dev"
         fi
     done
@@ -57,10 +97,11 @@ if test -e debian/control.in -a ! -e debian/control; then
 fi
 
 install dpkg-dev
+
 DEPS+=" $(LANG= ${DO} dpkg-checkbuilddeps 2>&1 | sed -n '/Unmet build dependencies/ { s,.*Unmet build dependencies: ,,g; s, ([^)]*),,g; s, *| *,|,g; p}')"
 
 for pa in ${DEPS}; do
-    if test ${pa//|/} = ${pa}; then
+    if test "${pa//|/}" = "${pa}"; then
         TO_INSTALL+=" ${pa}"
         continue;
     fi
@@ -80,6 +121,12 @@ done
 
 if test -n "${TO_INSTALL}" && ! install ${TO_INSTALL}; then
     echo "**** Error: Installation Failed: ${TO_INSTALL}"
+    exit 1
+fi
+
+FILES="$(LANG= ${DO} dpkg-checkbuilddeps 2>&1 | sed -n '/Unmet build dependencies/ { s,.*Unmet build dependencies: ,,g; s, ([^)]*),,g; s, *| *,|,g; p}')"
+if test -n "${FILES}"; then
+    echo "**** ERROR: Cannot install: " $FILES
     exit 1
 fi
 

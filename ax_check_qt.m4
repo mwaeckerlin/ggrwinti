@@ -230,6 +230,7 @@ AC_DEFUN([AX_CHECK_QT], [
   AC_SUBST(CXXFLAGS)
   AC_SUBST(PKG_REQUIREMENTS)
   AX_ADDITIONAL_QT_RULES_HACK='
+#### Begin: Appended by $0
 
 LANGUAGE_FILE_BASE ?= translations
 
@@ -241,7 +242,6 @@ moc_%.cxx: %.hxx
 
 qrc_%.cxx: %.qrc
 	$(RCC) -o [$][@] -name ${<:%.qrc=%} $<
-  AC_SUBST(AX_ADDITIONAL_QT_RULES_HACK)
 
 #%.qrc: %
 #	cwd=$$(pwd) && cd $< && $(RCC) -project -o $${cwd}/[$][@]
@@ -249,12 +249,15 @@ qrc_%.cxx: %.qrc
 %.qm: %.ts
 	${LRELEASE} $< -qm [$][@]
 
-%.ts: ${LANGUAGE_FILES:%=%}
+%.ts: ${LANGUAGE_FILES}
 	${LUPDATE} -no-obsolete \
-	           -target-language ${@:${LANGUAGE_FILE_BASE}_%.ts=%} \
-	           -ts [$][@] $<
+	           -target-language [$]{@:${LANGUAGE_FILE_BASE}_%.ts=%} \
+                   [$][^] \
+	           -ts [$][@]
 
-'])
+#### End: $0
+'
+])
 
 AC_DEFUN([AX_REQUIRE_QT], [
   AX_CHECK_QT([$1], [$2], [$3], [$4])
@@ -268,4 +271,12 @@ AC_DEFUN([AX_REQUIRE_QT], [
 #     AX_QT_NO_KEYWORDS
 AC_DEFUN([AX_QT_NO_KEYWORDS], [
   CPPFLAGS+=" -DQT_NO_KEYWORDS"
+])
+
+AC_DEFUN([AX_INIT_QT], [
+  if test -n "${AX_ADDITIONAL_QT_RULES_HACK}"; then
+    test -f src/makefile.in && cat >> src/makefile.in <<EOF
+${AX_ADDITIONAL_QT_RULES_HACK}
+EOF
+  fi
 ])

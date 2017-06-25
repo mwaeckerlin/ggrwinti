@@ -1,5 +1,18 @@
 2017-06-25  Marc Wäckerlin <marc@jupiter>
 
+	* AUTHORS: build fixed
+
+2017-06-25  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, ax_check_qt.m4, ax_cxx_compile_stdcxx_11.m4,
+	ax_init_standard_project.m4, bootstrap.sh, build-in-docker.conf,
+	build-in-docker.sh, configure.ac, debian/control.in,
+	doc/footer.html.in, doc/header.html.in, doc/style.css,
+	makefile_test.inc.am, resolve-debbuilddeps.sh,
+	resolve-rpmbuilddeps.sh, rpmsign.exp, sql-to-dot.sed: build fixed
+
+2017-06-25  Marc Wäckerlin <marc@jupiter>
+
 	* docker/Dockerfile, html/appinfo/info.xml.in: fix name
 
 2016-08-21  Marc Wäckerlin <marc@waeckerlin.org>

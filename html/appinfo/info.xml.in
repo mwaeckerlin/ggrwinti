@@ -4,7 +4,7 @@
     <name>GGRWinti</name>
     <description>@DESCRIPTION@</description>
     <licence>AGPL</licence>
-    <author>@AUTHOR@</author>
+    <author>@AUTHOR_NAME@ (@AUTHOR_URL@) &lt;@AUTHOR_MAIL@;gt;</author>
     <version>@VERSION@</version>
     <namespace>GgrWinti</namespace>
     <category>other</category>

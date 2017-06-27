@@ -12,7 +12,7 @@ EXTRA_DIST = ${www_DATA} ${wwwdirs}
 
 wwwdir = ${htmldir}/owncloud/apps/@PACKAGE_NAME@
 
-wwwdirs = appinfo img controller css js templates tests
+wwwdirs = appinfo img controller css js templates db
 
 www_DATA = CHANGELOG.md COPYING phpunit.integration.xml README.md	\
            AUTHORS.md phpunit.xml

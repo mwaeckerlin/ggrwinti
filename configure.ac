@@ -36,6 +36,7 @@ AX_BUILD_HTML
 AC_CONFIG_FILES(html/appinfo/info.xml)
 
 AX_DEB_SECTION(web)
+AX_ALL_DEPEND([xml2, sqlite3])
 
 # create output
 AX_OUTPUT

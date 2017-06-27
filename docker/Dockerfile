@@ -1,4 +1,4 @@
-FROM mwaeckerlin/owncloud
+FROM mwaeckerlin/nextcloud
 MAINTAINER mwaeckerlin
 
 ENV APPS "ggrwinti"

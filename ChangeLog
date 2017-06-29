@@ -1,33 +1,41 @@
-2017-06-26  Marc WÃ¤ckerlin <marc@jupiter>
+2017-06-27  Marc Wäckerlin <marc@tech.swisssign.net>
+
+	* COPYING, ChangeLog, INSTALL, configure.ac, docker/Dockerfile,
+	docker/cronjob.sh, html/appinfo/info.xml.in,
+	html/appinfo/routes.php, html/controller/pagecontroller.php,
+	html/makefile.am, makefile.am, scripts/makefile.am,
+	scripts/update-db.sh: switch to nextcloud
+
+2017-06-26  Marc Wäckerlin <marc@jupiter>
 
 	* html/appinfo/info.xml.in: less-than and greater-than not allowed
 	in XML - typo
 
-2017-06-26  Marc WÃ¤ckerlin <marc@jupiter>
+2017-06-26  Marc Wäckerlin <marc@jupiter>
 
 	* html/appinfo/info.xml.in: less-than and greater-than not allowed
 	in XML
 
-2017-06-26  Marc WÃ¤ckerlin <marc@tech.swisssign.net>
+2017-06-26  Marc Wäckerlin <marc@tech.swisssign.net>
 
 	* docker/Dockerfile: typo fixed
 
-2017-06-25  Marc WÃ¤ckerlin <marc@jupiter>
+2017-06-25  Marc Wäckerlin <marc@jupiter>
 
 	* ChangeLog, ax_check_qt.m4, ax_init_standard_project.m4,
 	bootstrap.sh, build-in-docker.sh, dependency-graph.sh,
 	resolve-debbuilddeps.sh, resolve-rpmbuilddeps.sh, template.sh: build
 	updated
 
-2017-06-25  Marc WÃ¤ckerlin <marc@jupiter>
+2017-06-25  Marc Wäckerlin <marc@jupiter>
 
 	* ChangeLog, configure.ac: build fixed
 
-2017-06-25  Marc WÃ¤ckerlin <marc@jupiter>
+2017-06-25  Marc Wäckerlin <marc@jupiter>
 
 	* AUTHORS: build fixed
 
-2017-06-25  Marc WÃ¤ckerlin <marc@jupiter>
+2017-06-25  Marc Wäckerlin <marc@jupiter>
 
 	* ChangeLog, ax_check_qt.m4, ax_cxx_compile_stdcxx_11.m4,
 	ax_init_standard_project.m4, bootstrap.sh, build-in-docker.conf,
@@ -36,20 +44,20 @@
 	makefile_test.inc.am, resolve-debbuilddeps.sh,
 	resolve-rpmbuilddeps.sh, rpmsign.exp, sql-to-dot.sed: build fixed
 
-2017-06-25  Marc WÃ¤ckerlin <marc@jupiter>
+2017-06-25  Marc Wäckerlin <marc@jupiter>
 
 	* docker/Dockerfile, html/appinfo/info.xml.in: fix name
 
-2016-08-21  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-08-21  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* README, README.md, configure.ac, html/appinfo/info.xml,
 	html/appinfo/info.xml.in: auto generate info.xml
 
-2016-08-21  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-08-21  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* scripts/update-db.sh: added support for next session - typo fixed
 
-2016-08-20  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-08-20  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* COPYING, INSTALL, docker/Dockerfile, docker/cronjob.sh,
 	html/appinfo/database.xml, html/db/geschaaefte.php,
@@ -57,72 +65,72 @@
 	html/db/geschaeftemapper.php, scripts/sitzungen.awk,
 	scripts/update-db.sh: added support for next session
 
-2016-07-29  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-07-29  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* docker/ggrwinti.json, html/appinfo/app.php,
 	html/controller/pagecontroller.php, html/templates/part.content.php: 
 	current status
 
-2016-06-15  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-15  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* README.md, html/controller/pagecontroller.php,
 	html/css/style.css, html/templates/part.content.php: show table with
 	all items
 
-2016-06-15  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-15  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* README.md, debian/control.in, html/appinfo/database.xml,
 	html/appinfo/info.xml, scripts/html2sql.sed, scripts/update-db.sh: 
 	import half successful
 
-2016-06-14  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-14  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* configure.ac: increase version
 
-2016-06-13  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-13  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* docker/Dockerfile: add ggrwinti to default APPS, it must be
 	initialized later
 
-2016-06-12  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* build-in-docker.sh: if the userid already exists in the docker
 	image, we need to set HOME
 
-2016-06-12  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* build-in-docker.sh: if the userid already exists in the docker
 	image, we need to set HOME
 
-2016-06-12  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* AUTHORS: fixed AUTHOR
 
-2016-06-12  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* AUTHORS: author fixed
 
-2016-06-12  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* README.md, bootstrap.sh, docker/Dockerfile,
 	html/appinfo/database.xml, html/appinfo/info.xml,
 	scripts/html2sql.sed, scripts/makefile.am, scripts/update-db.sh: 
 	database
 
-2016-05-16  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* debian/control.in: fixed build
 
-2016-05-16  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* ax_init_standard_project.m4, bootstrap.sh, build-in-docker.conf,
 	build-in-docker.sh, resolve-rpmbuilddeps.sh: fixed build
 
-2016-05-16  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* debian/rules, html/makefile.am: debian package build
 
-2016-05-16  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* debian/control.in, debian/rules, docker/Dockerfile,
 	html/AUTHORS.md, html/CHANGELOG.md, html/COPYING,
@@ -426,7 +434,7 @@
 	html/tests/integration/AppTest.php,
 	html/tests/unit/controller/PageControllerTest.php: add owncloud app
 
-2016-05-16  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* html/bin/ocdev, html/ocdev/Jinja2-2.8.dist-info/DESCRIPTION.rst,
 	html/ocdev/Jinja2-2.8.dist-info/METADATA,
@@ -720,7 +728,7 @@
 	environment in html, start: PYTHONPATH=$(pwd)/ocdev bin/ocdev
 	--version
 
-2016-04-28  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-04-28  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* AUTHORS, COPYING, ChangeLog, INSTALL, NEWS, README, autogen.sh,
 	ax_check_qt.m4, ax_cxx_compile_stdcxx_11.m4,
@@ -732,7 +740,7 @@
 	resolve-debbuilddeps.sh, resolve-rpmbuilddeps.sh,
 	scripts/makefile.am, sql-to-dot.sed: project bootstrap
 
-2016-04-28  Marc WÃ¤ckerlin <marc@waeckerlin.org>
+2016-04-28  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* Initial commit
 

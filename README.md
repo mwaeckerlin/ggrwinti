@@ -1,26 +1,75 @@
 # NextCloud App für die Fraktionsarbeit im Winterthurer Gemeinderat
 
+## Developers
+
 For testing purposes, start docker containers, e.g.:
 
-    LOCAL_GIT=~/git/ggrwinti/html
-    docker run -d --name ggrwinti-mysql-volume mysql sleep infinity
-    docker run -d --name ggrwinti-mysql --volumes-from ggrwinti-mysql-volume -e MYSQL_DATABASE=nextcloud -e MYSQL_USER=nextcloud -e MYSQL_PASSWORD=ert456 -e MYSQL_RANDOM_ROOT_PASSWORD=1 mysql
-    docker run -d --name ggrwinti-volume mwaeckerlin/ggrwinti sleep infinity
-    docker run -d -p 7777:80 --name ggrwinti --volumes-from ggrwinti-volume -v ${LOCAL_GIT}:/var/www/nextcloud/apps/ggrwinti:ro --link ggrwinti-mysql:mysql mwaeckerlin/ggrwinti
+    git pull https://github.com/mwaeckerlin/ggrwinti
+    cd ggrwinti
+    docker build --rm --force-rm -t mwaeckerlin/ggrwinti docker
+    ./bootstrap.sh -a
+    docker rm -f ggrwinti-mysql
+    docker run -d --name ggrwinti-mysql \
+               -e MYSQL_DATABASE=nextcloud \
+               -e MYSQL_USER=nextcloud \
+               -e MYSQL_PASSWORD=$(pwgen 20 1) \
+               -e MYSQL_RANDOM_ROOT_PASSWORD=1 \
+               mysql
+    docker rm -f ggrwinti
+    docker run -it --name ggrwinti \
+               -p 9999:80 \
+               --link ggrwinti-mysql:mysql \
+               -v $(pwd)/html:/var/www/nextcloud/apps/ggrwinti \
+               mwaeckerlin/ggrwinti bash
 
-Or withoz volumes:
+## Run in Production
 
-    LOCAL_GIT=~/git/ggrwinti/html
-    docker run -d --name ggrwinti-mysql -e MYSQL_DATABASE=nextcloud -e MYSQL_USER=nextcloud -e MYSQL_PASSWORD=ert456 -e MYSQL_RANDOM_ROOT_PASSWORD=1 mysql
-    docker run -d -p 7777:80 --name ggrwinti -v ${LOCAL_GIT}:/var/www/nextcloud/apps/ggrwinti:ro --link ggrwinti-mysql:mysql mwaeckerlin/ggrwinti
+    docker run -d --restart unless-stopped \
+               --name ggrwinti-mysql-volume \
+               mysql sleep infinity
+    docker run -d --restart unless-stopped \
+               --name ggrwinti-mysql \
+               --volumes-from ggrwinti-mysql-volume \
+               -e MYSQL_DATABASE=nextcloud \
+               -e MYSQL_USER=nextcloud \
+               -e MYSQL_PASSWORD=$(pwgen 20 1) \
+               -e MYSQL_RANDOM_ROOT_PASSWORD=1 \
+               mysql
+    docker run -d --restart unless-stopped \
+                  --name ggrwinti-volume \
+                  mwaeckerlin/ggrwinti sleep infinity
+    docker run -d --restart unless-stopped \
+               --name ggrwinti \
+               --volumes-from ggrwinti-volume \
+               --link ggrwinti-mysql:mysql \
+               mwaeckerlin/ggrwinti
+    docker run -d --restart unless-stopped \
+                  --name reverse-proxy \
+                  -p 80:80 -p 443:443 \
+                  --link ggrwinti:my.ggr.cloud
+                  mwaeckerlin/reverse-proxy
 
+## Problem
 
-Fillup the MySQL database:
+```
+Error	index	OCP\AppFramework\QueryException: Could not resolve AppName! Class AppName does not exist
 
-    docker exec -it ggrwinti bash
-    update-db.sh | mysql -h mysql -u${MYSQL_ENV_MYSQL_USER} -p${MYSQL_ENV_MYSQL_PASSWORD} ${MYSQL_ENV_MYSQL_DATABASE}
+    /var/www/nextcloud/lib/private/AppFramework/Utility/SimpleContainer.php - line 117: OC\AppFramework\Utility\SimpleContainer->resolve('AppName')
+    /var/www/nextcloud/lib/private/ServerContainer.php - line 132: OC\AppFramework\Utility\SimpleContainer->query('AppName')
+    /var/www/nextcloud/lib/private/AppFramework/Utility/SimpleContainer.php - line 66: OC\ServerContainer->query('AppName')
+    /var/www/nextcloud/lib/private/AppFramework/Utility/SimpleContainer.php - line 96: OC\AppFramework\Utility\SimpleContainer->buildClass(Object(ReflectionClass))
+    /var/www/nextcloud/lib/private/AppFramework/Utility/SimpleContainer.php - line 117: OC\AppFramework\Utility\SimpleContainer->resolve('OCA\\GgrWinti\\Co...')
+    /var/www/nextcloud/lib/private/ServerContainer.php - line 132: OC\AppFramework\Utility\SimpleContainer->query('OCA\\GgrWinti\\Co...')
+    /var/www/nextcloud/lib/private/AppFramework/DependencyInjection/DIContainer.php - line 410: OC\ServerContainer->query('OCA\\GgrWinti\\Co...')
+    /var/www/nextcloud/lib/private/AppFramework/App.php - line 101: OC\AppFramework\DependencyInjection\DIContainer->query('OCA\\GgrWinti\\Co...')
+    /var/www/nextcloud/lib/private/AppFramework/Routing/RouteActionHandler.php - line 47: OC\AppFramework\App main('OCA\\GgrWinti\\Co...', 'index', Object(OC\AppFramework\DependencyInjection\DIContainer), Array)
+    [internal function] OC\AppFramework\Routing\RouteActionHandler->__invoke(Array)
+    /var/www/nextcloud/lib/private/Route/Router.php - line 299: call_user_func(Object(OC\AppFramework\Routing\RouteActionHandler), Array)
+    /var/www/nextcloud/lib/base.php - line 1000: OC\Route\Router->match('/apps/ggrwinti/')
+    /var/www/nextcloud/index.php - line 40: OC handleRequest()
+    {main}
+```
 
-If you want to see the values interactively, use:
+simple logging:
 
-    docker exec -it ggrwinti bash
-    update-db.sh | tee | mysql -h mysql -u${MYSQL_ENV_MYSQL_USER} -p${MYSQL_ENV_MYSQL_PASSWORD} ${MYSQL_ENV_MYSQL_DATABASE}
+    file_put_contents("/tmp/log", "...\n", FILE_APPEND);

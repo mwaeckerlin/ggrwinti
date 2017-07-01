@@ -17,6 +17,10 @@ dist_noinst_DATA = ax_check_qt.m4 bootstrap.sh				\
                    build-resource-file.sh ax_init_standard_project.m4	\
                    mac-create-app-bundle.sh resolve-debbuilddeps.sh	\
                    sql-to-dot.sed
-dist_doc_DATA = AUTHORS NEWS README COPYING INSTALL ChangeLog
+dist_doc_DATA = AUTHORS NEWS README.md COPYING INSTALL ChangeLog
 
+README: README.md
+	pandoc -f markdown -t plain --wrap=none $< -o $@
+
+CLEANFILES = README
 MAINTAINERCLEANFILES = makefile.in

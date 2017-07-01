@@ -171,7 +171,7 @@ AC_DEFUN([AX_INIT_STANDARD_PROJECT], [
   AX_SUBST(HOME)
   if test -f README.md; then
     README=$(tail -n +3 README.md)
-    DESCRIPTION=$(head -1 README.md)
+    DESCRIPTION=$(head -1 README.md | sed 's,^#\+ *,,;s, *#\+$,,')
   else
     README=$(tail -n +3 README)
     DESCRIPTION=$(head -1 README)

@@ -17,7 +17,9 @@ For testing purposes, start docker containers, e.g.:
                mysql
     docker rm -f ggrwinti
     docker run -it --name ggrwinti \
+               --rm \
                -p 9999:80 \
+               -e ADMIN_PWD=ert456 \
                --link ggrwinti-mysql:mysql \
                -v $(pwd)/html:/var/www/nextcloud/apps/ggrwinti \
                mwaeckerlin/ggrwinti bash
@@ -40,6 +42,7 @@ For testing purposes, start docker containers, e.g.:
                   mwaeckerlin/ggrwinti sleep infinity
     docker run -d --restart unless-stopped \
                --name ggrwinti \
+               -e ADMIN_PWD=$(pwgen 20 1) \
                --volumes-from ggrwinti-volume \
                --link ggrwinti-mysql:mysql \
                mwaeckerlin/ggrwinti

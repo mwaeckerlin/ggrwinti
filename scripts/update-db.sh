@@ -37,7 +37,8 @@ success() {
 }
 
 # commandline parameter evaluation
-SQL_BEFORE="pragma busy_timeout=20000; insert into"
+TRANSACTION="start transaction;"
+SQL_BEFORE="insert into"
 SQL_AFTER=" on duplicate key update id = values(id), title = values(title), ggrnr = values(ggrnr), type = values(type), status = values(status), datum = values(datum)"
 PREFIX=${PREFIX:-oc_}
 basis="http://gemeinderat.winterthur.ch/de/"
@@ -48,11 +49,13 @@ while test $# -gt 0; do
     case "$1" in
         (--prefix|-p) shift; PREFIX=$1;;
         (--mysql|-m)
+            TRANSACTION="start transaction;"
             SQL_BEFORE="insert into"
             SQL_AFTER=" on duplicate key update id = values(id), title = values(title), ggrnr = values(ggrnr), type = values(type), status = values(status), datum = values(datum)"
             ;;
         (--sqlite|-s)
-            SQL_BEFORE="insert or replace into"
+            TRANSACTION="begin transaction;"
+            SQL_BEFORE="pragma busy_timeout=20000; insert or replace into"
             SQL_AFTER=""
             ;;
         (--help|-h) less <<EOF
@@ -177,7 +180,7 @@ for geschaeft in ${geschaefte}; do
     fi
 done
 
-echo "begin transaction;"
+echo "${TRANSACTION}"
 echo "delete from ${PREFIX}ggrwinti_sitzung;"
 naechste=$(wget -qO- http://gemeinderat.winterthur.ch/de/sitzung/ | html2 2> /dev/null | sed -n 's,.*tbody/tr/td/span/a/@href=,,p' | head -1)
 echo "insert into ${PREFIX}ggrwinti_sitzung (nr, ggrnr) values"

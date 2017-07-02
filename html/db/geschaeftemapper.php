@@ -10,7 +10,12 @@ class GeschaefteMapper extends Mapper {
     parent::__construct($db, 'ggrwinti_geschaefte', '\OCA\GgrWinti\Db\Geschaefte');
   }
   
-  public function findAll() {
+  public function find($id, $userId) {
+    $sql = 'SELECT * FROM *PREFIX*ggrwinti_geschaefte WHERE id = ?';
+    return $this->findEntity($sql, [$id]);
+  }
+
+  public function findAll($userId) {
     $sql = 'SELECT * FROM *PREFIX*ggrwinti_geschaefte WHERE status!=\'Erledigt\'';
     return $this->findEntities($sql);
   }

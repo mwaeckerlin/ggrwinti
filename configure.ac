@@ -37,6 +37,7 @@ AC_CONFIG_FILES(html/appinfo/info.xml)
 
 AX_DEB_SECTION(web)
 AX_ALL_DEPEND(xml2)
+AX_ALL_DEPEND(mysql-client)
 AX_ALL_DEPEND(sqlite3)
 
 # create output

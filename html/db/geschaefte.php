@@ -1,9 +1,11 @@
 <?php
 namespace OCA\GgrWinti\Db;
 
+use JsonSerializable;
+
 use OCP\AppFramework\Db\Entity;
 
-class Geschaefte extends Entity {
+class Geschaefte extends Entity implements JsonSerializable {
   
   protected $title;
   protected $ggrnr;
@@ -25,6 +27,17 @@ class Geschaefte extends Entity {
   }
   public function datum() {
     return $this->datum;
+  }
+  
+  public function jsonSerialize() {
+    return [
+      'id' => $this->id,
+      'title' => $this->title,
+      'ggrnr' => $this->ggrnr,
+      'type' => $this->type,
+      'status' => $this->status,
+      'datum' => $this->datum
+    ];
   }
 }
 ?>

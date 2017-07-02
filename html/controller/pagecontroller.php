@@ -13,7 +13,7 @@ namespace OCA\GgrWinti\Controller;
 
 use OCP\IRequest;
 use OCP\AppFramework\Http\TemplateResponse;
-//use OCP\AppFramework\Http\DataResponse;
+use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
 
 use OCA\GgrWinti\Db\Geschaefte;
@@ -25,10 +25,10 @@ class PageController extends Controller {
   private $userId;
   private $mapper;
 
-  public function __construct($AppName, IRequest $request, GeschaefteMapper $mapper, $UserId){
+  public function __construct($AppName, IRequest $request, GeschaefteMapper $mapper, $UserId) {
     parent::__construct($AppName, $request);
-    $this->userId = $UserId;
-    $this->mapper = $mapper;
+    //$this->userId = $UserId;
+    //$this->mapper = $mapper;
   }
 
   /**
@@ -44,7 +44,7 @@ class PageController extends Controller {
   public function index() {
     $params = [
       'user' => $this->userId,
-      'data' => $this->mapper->findAll(),
+      //'data' => $this->mapper->findAll(),
       'test' => 'Marc Wäckerlin'
     ];
     return new TemplateResponse('ggrwinti', 'main', $params);  // templates/main.php

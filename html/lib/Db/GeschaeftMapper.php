@@ -4,10 +4,10 @@ namespace OCA\GgrWinti\Db;
 use OCP\IDb;
 use OCP\AppFramework\Db\Mapper;
 
-class GeschaefteMapper extends Mapper {
+class GeschaeftMapper extends Mapper {
   
   public function __construct(IDb $db) {
-    parent::__construct($db, 'ggrwinti_geschaefte', '\OCA\GgrWinti\Db\Geschaefte');
+    parent::__construct($db, 'ggrwinti_geschaefte', '\OCA\GgrWinti\Db\Geschaeft');
   }
   
   public function find($id, $userId) {

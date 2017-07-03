@@ -1,3 +1,11 @@
+2017-07-02  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, README.md, configure.ac, docker/Dockerfile,
+	html/controller/pagecontroller.php, html/db/geschaaefte.php,
+	html/db/geschaaeftemapper.php, html/db/geschaefte.php,
+	html/db/geschaeftemapper.php, scripts/update-db.sh: before reinstall
+	standard app
+
 2017-07-01  Marc Wäckerlin <marc@jupiter>
 
 	* COPYING, ChangeLog, INSTALL, README, ax_init_standard_project.m4,

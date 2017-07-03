@@ -1,15 +1,23 @@
 <?xml version="1.0"?>
-<info>
+<info xmlns:xsi= "http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://apps.nextcloud.com/schema/apps/info.xsd">
     <id>ggrwinti</id>
     <name>GGR Winti</name>
-    <description>@DESCRIPTION@</description>
-    <licence>AGPL</licence>
-    <author>@AUTHOR_NAME@ (@AUTHOR_URL@) &lt;@AUTHOR_MAIL@&gt;</author>
+    <summary>@DESCRIPTION@</summary>
+    <description><![CDATA[@README@]]></description>
+    <licence>agpl</licence>
+    <author mail="@AUTHOR_MAIL@" homepage="@AUTHOR_URL@">@AUTHOR_NAME@</author>
     <version>@VERSION@</version>
     <namespace>GgrWinti</namespace>
-    <category>other</category>
+    <category>organization</category>
+    <bugs>https://github.com/mwaeckerlin/ggrwinti</bugs>
     <dependencies>
-        <owncloud min-version="8.0" />
-        <nextcloud min-version="9" />
+        <nextcloud min-version="9"/>
     </dependencies>
+    <navigations>
+        <navigation>
+            <name>GGR Winti</name>
+            <route>ggrwinti.page.index</route>
+        </navigation>
+    </navigations>
 </info>

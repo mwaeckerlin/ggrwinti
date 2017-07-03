@@ -1,9 +1,9 @@
 # This file is licensed under the Affero General Public License version 3 or
 # later. See the COPYING file.
 # @author Bernhard Posselt <dev@bernhard-posselt.com>
-# @copyright Bernhard Posselt 2012, 2014
+# @copyright Bernhard Posselt 2016
 
-# Generic Makefile for building and packaging an ownCloud app which uses npm and
+# Generic Makefile for building and packaging a Nextcloud app which uses npm and
 # Composer.
 #
 # Dependencies:
@@ -113,22 +113,19 @@ dist:
 # Builds the source package
 .PHONY: source
 source:
-	make build
-	make test
 	rm -rf $(source_build_directory)
 	mkdir -p $(source_build_directory)
 	tar cvzf $(source_package_name).tar.gz ../$(app_name) \
 	--exclude-vcs \
 	--exclude="../$(app_name)/build" \
 	--exclude="../$(app_name)/js/node_modules" \
+	--exclude="../$(app_name)/node_modules" \
 	--exclude="../$(app_name)/*.log" \
 	--exclude="../$(app_name)/js/*.log" \
 
 # Builds the source package for the app store, ignores php and js tests
 .PHONY: appstore
 appstore:
-	make build
-	make test
 	rm -rf $(appstore_build_directory)
 	mkdir -p $(appstore_build_directory)
 	tar cvzf $(appstore_package_name).tar.gz ../$(app_name) \
@@ -172,6 +169,6 @@ ifeq (, $(shell which phpunit 2> /dev/null))
 	php $(build_tools_directory)/phpunit.phar -c phpunit.xml
 	php $(build_tools_directory)/phpunit.phar -c phpunit.integration.xml
 else
-	phpunit -c phpunit.xml
-	phpunit -c phpunit.integration.xml
+	phpunit -c phpunit.xml --coverage-clover build/php-unit.clover
+	phpunit -c phpunit.integration.xml --coverage-clover build/php-unit.clover
 endif

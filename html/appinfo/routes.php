@@ -1,15 +1,5 @@
 <?php
 /**
- * ownCloud - ggrwinti
- *
- * This file is licensed under the Affero General Public License version 3 or
- * later. See the COPYING file.
- *
- * @author Marc Wäckerlin <marc.waeckerlin@piratenpartei.ch>
- * @copyright Marc Wäckerlin 2016
- */
-
-/**
  * Create your routes in here. The name is the lowercase name of the controller
  * without the controller part, the stuff after the hash is the method.
  * e.g. page#index -> OCA\GgrWinti\Controller\PageController->index()
@@ -20,7 +10,10 @@
 return [
     'routes' => [
 	   ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-//	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST'],
+           ['name' => 'geschaeft#index', 'url' => '/geschaefte', 'verb' => 'GET'],
+           ['name' => 'geschaeft#show', 'url' => '/geschaefte/{id}', 'verb' => 'GET'],
+           ['name' => 'geschaeft#create', 'url' => '/geschaefte', 'verb' => 'POST'],
+           ['name' => 'geschaeft#update', 'url' => '/geschaefte/{id}', 'verb' => 'PUT'],
+	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST']
     ]
 ];
-?>

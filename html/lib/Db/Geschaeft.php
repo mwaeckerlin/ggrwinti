@@ -5,7 +5,7 @@ use JsonSerializable;
 
 use OCP\AppFramework\Db\Entity;
 
-class Geschaefte extends Entity implements JsonSerializable {
+class Geschaeft extends Entity implements JsonSerializable {
   
   protected $title;
   protected $ggrnr;

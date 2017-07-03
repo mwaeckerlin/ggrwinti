@@ -1,5 +1,9 @@
 2017-07-03  Marc Wäckerlin <marc@jupiter>
 
+	* ChangeLog, html/makefile.am: fix build
+
+2017-07-03  Marc Wäckerlin <marc@jupiter>
+
 	* ChangeLog, html/.travis.yml, html/COPYING, html/Makefile.bak,
 	html/README.md, html/appinfo/autoload.php,
 	html/appinfo/info.xml.in, html/appinfo/routes.php,

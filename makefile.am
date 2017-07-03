@@ -20,7 +20,8 @@ dist_noinst_DATA = ax_check_qt.m4 bootstrap.sh				\
 dist_doc_DATA = AUTHORS NEWS README.md COPYING INSTALL ChangeLog
 
 README: README.md
-	pandoc -f markdown -t plain --wrap=none $< -o $@
+	pandoc -f markdown -t plain --wrap=none $< -o $@ \
+	|| pandoc -f markdown -t plain $< -o $@
 
 CLEANFILES = README
 MAINTAINERCLEANFILES = makefile.in

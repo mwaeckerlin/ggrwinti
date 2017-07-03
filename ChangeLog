@@ -1,3 +1,25 @@
+2017-07-03  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, html/.travis.yml, html/COPYING, html/Makefile.bak,
+	html/README.md, html/appinfo/autoload.php,
+	html/appinfo/info.xml.in, html/appinfo/routes.php,
+	html/controller/pagecontroller.php, html/css/style.css,
+	html/db/geschaefte.php, html/db/geschaeftemapper.php,
+	html/img/app.svg, html/js/script.js,
+	html/lib/Controller/GeschaeftController.php,
+	html/lib/Controller/PageController.php, html/lib/Db/Geschaeft.php,
+	html/lib/Db/GeschaeftMapper.php, html/phpunit.integration.xml,
+	html/phpunit.xml, html/templates/content/index.php,
+	html/templates/index.php, html/templates/main.php,
+	html/templates/navigation/index.php,
+	html/templates/part.content.php,
+	html/templates/part.navigation.php,
+	html/templates/part.settings.php,
+	html/templates/settings/index.php,
+	html/tests/Integration/AppTest.php,
+	html/tests/Unit/Controller/PageControllerTest.php,
+	html/tests/bootstrap.php: testing cannot find mapping problem
+
 2017-07-02  Marc Wäckerlin <marc@jupiter>
 
 	* ChangeLog, README.md, configure.ac, docker/Dockerfile,

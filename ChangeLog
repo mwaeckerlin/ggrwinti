@@ -1,5 +1,9 @@
 2017-07-03  Marc Wäckerlin <marc@jupiter>
 
+	* ChangeLog, makefile.am: fix build on olf trusty
+
+2017-07-03  Marc Wäckerlin <marc@jupiter>
+
 	* ChangeLog, html/makefile.am: fix build
 
 2017-07-03  Marc Wäckerlin <marc@jupiter>

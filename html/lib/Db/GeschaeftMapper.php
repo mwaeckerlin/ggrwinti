@@ -1,7 +1,7 @@
 <?php
 namespace OCA\GgrWinti\Db;
 
-use OCP\IDb;
+use OCP\IDbConnection;
 use OCP\AppFramework\Db\Mapper;
 
 class GeschaeftMapper extends Mapper {

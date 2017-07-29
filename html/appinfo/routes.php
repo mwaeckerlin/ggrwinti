@@ -12,8 +12,6 @@ return [
 	   ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
            ['name' => 'geschaeft#index', 'url' => '/geschaefte', 'verb' => 'GET'],
            ['name' => 'geschaeft#show', 'url' => '/geschaefte/{id}', 'verb' => 'GET'],
-           ['name' => 'geschaeft#create', 'url' => '/geschaefte', 'verb' => 'POST'],
            ['name' => 'geschaeft#update', 'url' => '/geschaefte/{id}', 'verb' => 'PUT'],
-	   ['name' => 'page#do_echo', 'url' => '/echo', 'verb' => 'POST']
     ]
 ];

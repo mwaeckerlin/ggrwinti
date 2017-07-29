@@ -10,7 +10,7 @@
 
 EXTRA_DIST = ${www_DATA} ${wwwdirs}
 
-wwwdir = ${htmldir}/owncloud/apps/@PACKAGE_NAME@
+wwwdir = ${htmldir}/nextcloud/apps/@PACKAGE_NAME@
 
 wwwdirs = appinfo img lib css js templates
 

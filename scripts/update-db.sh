@@ -1,7 +1,5 @@
 #!/bin/bash -e
 
-# template for bash scripts
-
 # internal use only
 append_msg() {
     if test $# -ne 0; then

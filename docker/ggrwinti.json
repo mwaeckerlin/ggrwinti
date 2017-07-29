@@ -4,8 +4,8 @@
     "image": "mysql",
     "ports": [],
     "env": [
-      "MYSQL_DATABASE=owncloud",
-      "MYSQL_USER=owncloud",
+      "MYSQL_DATABASE=nextcloud",
+      "MYSQL_USER=nextcloud",
       "MYSQL_PASSWORD=ert456",
       "MYSQL_RANDOM_ROOT_PASSWORD=1",
       "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin",
@@ -41,10 +41,10 @@
       "ADMIN_PWD=",
       "URL=",
       "APPS=",
-      "INSTDIR=/var/www/owncloud",
-      "DATADIR=/var/www/owncloud/data",
-      "CONFDIR=/var/www/owncloud/config",
-      "SOURCE=download.owncloud.org/download/repositories/stable/Ubuntu_"
+      "INSTDIR=/var/www/nextcloud",
+      "DATADIR=/var/www/nextcloud/data",
+      "CONFDIR=/var/www/nextcloud/config",
+      "SOURCE=download.nextcloud.org/download/repositories/stable/Ubuntu_"
     ],
     "cmd": [
       "/bin/sh",

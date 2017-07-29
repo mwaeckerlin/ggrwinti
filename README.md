@@ -1,6 +1,14 @@
-# NextCloud App für die Fraktionsarbeit im Winterthurer Gemeinderat
+NextCloud App für die Fraktionsarbeit im Winterthurer Gemeinderat
+=================================================================
 
-## Developers
+Organisiere Deine Fraktion in Nextcloud: Füge Deine Gemeinderäte als Mitglied hinzu, definiere eine Gruppe, dann weise die Geschäfte den Personen zu und dokumentiere die Entscheidungen. Teile einen Pfad und lade Berichte zu den Geschäften hoch, indem Du die Geschäftsnummer im Dateinamen verwendest.
+
+Überprüft täglich die [Webseite des Gemeinderats Winterthur](http://gemeinderat.winterthur.ch) und gleicht [Geschäfte](http://gemeinderat.winterthur.ch/de/politbusiness) und [Sitzungen](http://gemeinderat.winterthur.ch/de/sitzung/) in der lokalen Datenbank ab.
+
+Entwickelt vom Gemeinderat der Piratenpartei Marc Wäckerlin für die grünliberale-/Piratenpartei-Fraktion.
+
+Developers
+----------
 
 For testing purposes, start docker containers, e.g.:
 
@@ -12,7 +20,7 @@ For testing purposes, start docker containers, e.g.:
     docker run -d --name ggrwinti-mysql \
                -e MYSQL_DATABASE=nextcloud \
                -e MYSQL_USER=nextcloud \
-               -e MYSQL_PASSWORD=$(pwgen 20 1) \
+               -e MYSQL_PASSWORD=ert456 \
                -e MYSQL_RANDOM_ROOT_PASSWORD=1 \
                mysql
     docker rm -f ggrwinti
@@ -24,7 +32,8 @@ For testing purposes, start docker containers, e.g.:
                -v $(pwd)/html:/var/www/nextcloud/apps/ggrwinti \
                mwaeckerlin/ggrwinti bash
 
-## Run in Production
+Run in Production
+-----------------
 
     docker run -d --restart unless-stopped \
                --name ggrwinti-mysql-volume \
@@ -52,7 +61,8 @@ For testing purposes, start docker containers, e.g.:
                   --link ggrwinti:my.ggr.cloud
                   mwaeckerlin/reverse-proxy
 
-## Problem
+Problem
+-------
 
 ```
 Error	index	OCP\AppFramework\QueryException: Could not resolve AppName! Class AppName does not exist

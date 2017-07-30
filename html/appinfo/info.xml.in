@@ -12,12 +12,6 @@
     <category>organization</category>
     <bugs>https://github.com/mwaeckerlin/ggrwinti</bugs>
     <dependencies>
-        <nextcloud min-version="9"/>
+        <nextcloud min-version="9" max-version="12" />
     </dependencies>
-    <!-- <navigations>
-        <navigation>
-            <name>GGR-Winti</name>
-            <route>ggrwinti.page.index</route>
-        </navigation>
-    </navigations> -->
 </info>

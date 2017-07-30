@@ -43,6 +43,7 @@ basis="http://gemeinderat.winterthur.ch/de/"
 overview="${basis}politbusiness/"
 sitzungen="${basis}sitzung/"
 detail="http://gemeinderat.winterthur.ch/de/politbusiness/?action=showinfo&info_id="
+only=
 while test $# -gt 0; do
     case "$1" in
         (--prefix|-p) shift; PREFIX=$1;;
@@ -56,6 +57,8 @@ while test $# -gt 0; do
             SQL_BEFORE="pragma busy_timeout=20000; insert or replace into"
             SQL_AFTER=""
             ;;
+        (--geschaefte|-g) only=g;;
+        (--sitzungen|-x) only=s;;
         (--help|-h) less <<EOF
 SYNOPSIS
 
@@ -67,6 +70,8 @@ OPTIONS
   --prefix, -p <prefix>      database table prefix
   --mysql, -m                mysql mode
   --sqlite, -s               sqlite mode
+  --geschaefte, -g           only update geschaefte table
+  --sitzungen, -x            only update sitzungen table
 
 DESCRIPTION
 
@@ -142,9 +147,9 @@ trap 'traperror "$? ${PIPESTATUS[@]}" $LINENO $BASH_LINENO "$BASH_COMMAND" "${FU
 ##########################################################################################
 
 
-HTML2SQL=$(which html2sql.sed)
+HTML2SQL=${0%/*}/html2sql.sed
 if ! test -x "$HTML2SQL"; then
-    HTML2SQL=${0%/*}/html2sql.sed
+    HTML2SQL=$(which html2sql.sed)
     if ! test -x "$HTML2SQL"; then
         HTML2SQL=html2sql.sed
         if ! test -x "$HTML2SQL"; then
@@ -153,9 +158,9 @@ if ! test -x "$HTML2SQL"; then
         fi
     fi
 fi
-SITZUNGENAWK=$(which sitzungen.awk)
+SITZUNGENAWK=${0%/*}/sitzungen.awk
 if ! test -x "$SITZUNGENAWK"; then
-    SITZUNGENAWK=${0%/*}/sitzungen.awk
+    SITZUNGENAWK=$(which sitzungen.awk)
     if ! test -x "$SITZUNGENAWK"; then
         SITZUNGENAWK=sitzungen.awk
         if ! test -x "$SITZUNGENAWK"; then
@@ -165,22 +170,25 @@ if ! test -x "$SITZUNGENAWK"; then
     fi
 fi
 
+if test "$only" != "s"; then
+    geschaefte=$(wget -qO- "${overview}" | sed -n 's,^.*?action=showinfo&info_id=\([0-9]*\).*$,\1,p')
+    for geschaeft in ${geschaefte}; do
+        values=$(wget -qO- "${detail}${geschaeft}" | html2 \
+                        | sed -nf ${HTML2SQL} | sed "s,','',g" | sed "s/^.*$/,'&'/")
+        if test $(echo "$values" | wc -l) -eq 5; then
+            echo "${SQL_BEFORE} ${PREFIX}ggrwinti_geschaefte (id, title, ggrnr, type, status, datum) values ("
+            echo "${geschaeft}"
+            echo "$values"
+            echo ")${SQL_AFTER};"
+        fi
+    done
+fi
 
-geschaefte=$(wget -qO- "${overview}" | sed -n 's,^.*?action=showinfo&info_id=\([0-9]*\).*$,\1,p')
-for geschaeft in ${geschaefte}; do
-    values=$(wget -qO- "${detail}${geschaeft}" | html2 \
-             | sed -nf ${HTML2SQL} | sed "s,','',g" | sed "s/^.*$/,'&'/")
-    if test $(echo "$values" | wc -l) -eq 5; then
-        echo "${SQL_BEFORE} ${PREFIX}ggrwinti_geschaefte (id, title, ggrnr, type, status, datum) values ("
-        echo "${geschaeft}"
-        echo "$values"
-        echo ")${SQL_AFTER};"
-    fi
-done
-
-echo "${TRANSACTION}"
-echo "delete from ${PREFIX}ggrwinti_sitzung;"
-naechste=$(wget -qO- http://gemeinderat.winterthur.ch/de/sitzung/ | html2 2> /dev/null | sed -n 's,.*tbody/tr/td/span/a/@href=,,p' | head -1)
-echo "insert into ${PREFIX}ggrwinti_sitzung (nr, ggrnr) values"
-wget -qO- "${sitzungen}${naechste}" | html2 2> /dev/null | ${SITZUNGENAWK}
-echo "commit;"
+if test "$only" != "g"; then
+    echo "${TRANSACTION}"
+    echo "delete from ${PREFIX}ggrwinti_sitzung;"
+    naechste=$(wget -qO- http://gemeinderat.winterthur.ch/de/sitzung/ | html2 2> /dev/null | sed -n 's,.*tbody/tr/td/span/a/@href=,,p' | head -1)
+    echo "insert into ${PREFIX}ggrwinti_sitzung (nr, ggrnr) values"
+    wget -qO- "${sitzungen}${naechste}" | html2 2> /dev/null | ${SITZUNGENAWK}
+    echo "commit;"
+fi

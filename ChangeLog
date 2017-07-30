@@ -1,3 +1,12 @@
+2017-07-30  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, html/appinfo/app.php, html/appinfo/routes.php,
+	html/lib/AppInfo/Application.php,
+	html/lib/Controller/GeschaeftController.php,
+	html/templates/content/index.php,
+	html/templates/navigation/index.php: first working release that
+	shows all topics, no functionality
+
 2017-07-30  Marc Wäckerlin <marc@waeckerlin.org>
 
 	* : Merge pull request #1 from mwaeckerlin/test-daita Fixes Server Error

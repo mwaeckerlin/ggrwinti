@@ -28,6 +28,6 @@
 /div=Eingangsdatum/ {
   :e
   n
-  s,.*table/tr/td/div/div/div/div=,,p
+  s,.*table/tr/td/div/div/div/div=\(..\)\.\(..\)\.\(....\),\3-\2-\1,p
   Te
 }

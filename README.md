@@ -12,6 +12,7 @@ Developers
 
 For testing purposes, start docker containers, e.g.:
 
+    docker pull mwaeckerlin/ggrwinti
     git pull https://github.com/mwaeckerlin/ggrwinti
     cd ggrwinti
     docker build --rm --force-rm -t mwaeckerlin/ggrwinti docker
@@ -24,13 +25,42 @@ For testing purposes, start docker containers, e.g.:
                -e MYSQL_RANDOM_ROOT_PASSWORD=1 \
                mysql
     docker rm -f ggrwinti
-    docker run -it --name ggrwinti \
-               --rm \
+    docker run -d --name ggrwinti \
                -p 9999:80 \
                -e ADMIN_PWD=ert456 \
                --link ggrwinti-mysql:mysql \
-               -v $(pwd)/html:/var/www/nextcloud/apps/ggrwinti \
+               -v $(pwd)/html:/var/www/nextcloud/apps/ggrwinti:ro \
+               -v $(pwd):/workdir:ro \
                mwaeckerlin/ggrwinti bash
+
+Go to http://localhost:9999 and login with user `admin` and password `ert456`. Local changes in html will immediately appear on the web. If you change in `scripts` or somewhere else, you need to copy the changed files manually from `/workdir`.
+
+### More Commands ###
+
+Fillup database, type:
+
+    docker exec -it ggrwinti /etc/cron.daily/update-db
+
+Enter the virtual machine as `root` (use `sudo -u www-data` for accessing webserver data; emacs is available):
+
+    docker exec -it ggrwinti bash
+
+Access the database:
+
+    docker exec -it ggrwinti bash
+    mysql -h mysql -u nextcloud -pert456 nextcloud
+
+Test a locally changed `script/update-database.sh`:
+
+    docker exec -it ggrwinti bash
+    /workdir/scripts/update-db.sh --help
+    /workdir/scripts/update-db.sh -m \
+      | mysql -h mysql -u nextcloud -pert456 nextcloud
+
+Activate a locally changed `script/update-database.sh`:
+
+    docker exec -it ggrwinti cp /workdir/scripts/update-db.sh /usr/sbin/
+
 
 Run in Production
 -----------------
@@ -54,6 +84,7 @@ Run in Production
                -e ADMIN_PWD=$(pwgen 20 1) \
                --volumes-from ggrwinti-volume \
                --link ggrwinti-mysql:mysql \
+               -e URL=my.ggr.cloud \
                mwaeckerlin/ggrwinti
     docker run -d --restart unless-stopped \
                   --name reverse-proxy \

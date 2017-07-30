@@ -4,6 +4,7 @@ namespace OCA\GgrWinti\AppInfo;
 
 
 use OCA\GgrWinti\Controller\GeschaeftController;
+use OCA\GgrWinti\Controller\FraktionController;
 use OCA\GgrWinti\Controller\PageController;
 use OCA\GgrWinti\Db\GeschaeftMapper;
 use OCP\AppFramework\App;
@@ -56,6 +57,13 @@ class Application extends App {
 	return new GeschaeftController(
 	  $c->query('AppName'), $c->query('Request'), $c->query('GeschaeftMapper'),
 	  $c->query('UserId')
+	);
+      }
+    );
+    $container->registerService(
+      'FraktionController', function(IAppContainer $c) {
+	return new FraktionController(
+	  $c->query('AppName'), $c->query('Request'), $c->query('UserId')
 	);
       }
     );

@@ -5,8 +5,10 @@ namespace OCA\GgrWinti\Controller;
 use Exception;
 use OCA\GgrWinti\Db\GeschaeftMapper;
 use OCP\AppFramework\Controller;
-use OCP\AppFramework\Http;
-use OCP\AppFramework\Http\DataResponse;
+//use OCP\AppFramework\Http;
+//use OCP\AppFramework\Http\DataResponse;
+//use OCP\AppFramework\Http\TemplateResponse;
+use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 
 class GeschaeftController extends Controller {
@@ -41,23 +43,7 @@ class GeschaeftController extends Controller {
 	 * @return DataResponse
 	 */
 	public function index() {
-		return new DataResponse($this->geschaeftMapper->findAll($this->userId));
-	}
-
-
-	/**
-	 * @NoAdminRequired
-	 *
-	 * @param int $id
-	 *
-	 * @return DataResponse
-	 */
-	public function show($id) {
-		try {
-			return new DataResponse($this->geschaeftMapper->find($id, $this->userId));
-		} catch (Exception $e) {
-			return new DataResponse([], Http::STATUS_NOT_FOUND);
-		}
+		return new TemplateResponse('ggrwinti', 'index', array('data' => $this->geschaeftMapper->findAll($this->userId)));
 	}
 
 }

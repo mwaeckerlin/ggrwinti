@@ -9,9 +9,8 @@
  */
 return [
     'routes' => [
-	   ['name' => 'page#index', 'url' => '/', 'verb' => 'GET'],
-           ['name' => 'geschaeft#index', 'url' => '/geschaefte', 'verb' => 'GET'],
-           ['name' => 'geschaeft#show', 'url' => '/geschaefte/{id}', 'verb' => 'GET'],
-           ['name' => 'geschaeft#update', 'url' => '/geschaefte/{id}', 'verb' => 'PUT'],
+      ['name' => 'geschaeft#index', 'url' => '/', 'verb' => 'GET'],
+      ['name' => 'geschaeft#index', 'url' => '/geschaefte', 'verb' => 'GET'],
+      ['name' => 'geschaeft#update', 'url' => '/geschaefte/{id}', 'verb' => 'PUT'],
     ]
 ];

@@ -1,3 +1,22 @@
+2017-07-30  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* : Merge pull request #1 from mwaeckerlin/test-daita Fixes Server Error
+
+2017-07-29  Marc Wäckerlin <marc@jupiter>
+
+	* docker/Dockerfile, html/templates/navigation/index.php: test
+	version
+
+2017-07-29  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, README.md, docker/cronjob.sh, docker/ggrwinti.json,
+	html/appinfo/app.php, html/appinfo/autoload.php,
+	html/appinfo/info.xml.in, html/appinfo/routes.php,
+	html/lib/Controller/GeschaeftController.php,
+	html/lib/Db/GeschaeftMapper.php, html/makefile.am,
+	html/templates/navigation/index.php, scripts/testenv.sh,
+	scripts/update-db.sh: trying to fix bugs
+
 2017-07-03  Marc Wäckerlin <marc@jupiter>
 
 	* ChangeLog, makefile.am: fix build on olf trusty

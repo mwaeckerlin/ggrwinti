@@ -1,12 +1,12 @@
 <?php
 namespace OCA\GgrWinti\Db;
 
-use OCP\IDbConnection;
+use OC\DB\Connection;
 use OCP\AppFramework\Db\Mapper;
 
 class GeschaeftMapper extends Mapper {
   
-  public function __construct(IDb $db) {
+  public function __construct(Connection $db) {
     parent::__construct($db, 'ggrwinti_geschaefte', '\OCA\GgrWinti\Db\Geschaeft');
   }
   
@@ -21,4 +21,3 @@ class GeschaeftMapper extends Mapper {
   }
   
 }
-?>

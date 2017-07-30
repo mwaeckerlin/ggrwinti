@@ -14,10 +14,10 @@
     <dependencies>
         <nextcloud min-version="9"/>
     </dependencies>
-    <navigations>
+    <!-- <navigations>
         <navigation>
             <name>GGR-Winti</name>
             <route>ggrwinti.page.index</route>
         </navigation>
-    </navigations>
+    </navigations> -->
 </info>

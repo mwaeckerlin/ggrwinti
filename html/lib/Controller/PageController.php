@@ -1,22 +1,26 @@
 <?php
 namespace OCA\GgrWinti\Controller;
 
-use OCP\IRequest;
-use OCP\AppFramework\Http\TemplateResponse;
-use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Controller;
-
-use OCA\GgrWinti\Db\Geschaeft;
-use OCA\GgrWinti\Db\GeschaeftMapper;
+use OCP\AppFramework\Http\TemplateResponse;
+use OCP\IRequest;
 
 class PageController extends Controller {
-  private $userId;
-  private $mapper;
 
-  public function __construct(string $AppName, IRequest $request, $UserId) {
-    parent::__construct($AppName, $request);
-    $this->userId = $UserId;
-  }
+	/** @var string */
+	private $userId;
+
+	/**
+	 * PageController constructor.
+	 *
+	 * @param string $AppName
+	 * @param IRequest $request
+	 * @param string $userId
+	 */
+	public function __construct($AppName, IRequest $request, $userId) {
+		parent::__construct($AppName, $request);
+		$this->userId = $userId;
+	}
 
 	/**
 	 * CAUTION: the @Stuff turns off security checks; for this page no admin is
@@ -33,4 +37,4 @@ class PageController extends Controller {
 	}
 
 }
-?>
+

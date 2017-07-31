@@ -37,7 +37,7 @@ success() {
 # commandline parameter evaluation
 TRANSACTION="start transaction;"
 SQL_BEFORE="insert into"
-SQL_AFTER=" on duplicate key update id = values(id), title = values(title), ggrnr = values(ggrnr), type = values(type), status = values(status), datum = values(datum)"
+SQL_AFTER=" on duplicate key update id = values(id), title = values(title), ggrnr = values(ggrnr), type = values(type), status = values(status), date = values(date)"
 PREFIX=${PREFIX:-oc_}
 basis="http://gemeinderat.winterthur.ch/de/"
 overview="${basis}politbusiness/"
@@ -50,7 +50,7 @@ while test $# -gt 0; do
         (--mysql|-m)
             TRANSACTION="start transaction;"
             SQL_BEFORE="insert into"
-            SQL_AFTER=" on duplicate key update id = values(id), title = values(title), ggrnr = values(ggrnr), type = values(type), status = values(status), datum = values(datum)"
+            SQL_AFTER=" on duplicate key update id = values(id), title = values(title), ggrnr = values(ggrnr), type = values(type), status = values(status), date = values(date)"
             ;;
         (--sqlite|-s)
             TRANSACTION="begin transaction;"
@@ -176,7 +176,7 @@ if test "$only" != "s"; then
         values=$(wget -qO- "${detail}${geschaeft}" | html2 \
                         | sed -nf ${HTML2SQL} | sed "s,','',g" | sed "s/^.*$/,'&'/")
         if test $(echo "$values" | wc -l) -eq 5; then
-            echo "${SQL_BEFORE} ${PREFIX}ggrwinti_geschaefte (id, title, ggrnr, type, status, datum) values ("
+            echo "${SQL_BEFORE} ${PREFIX}ggrwinti_geschaefte (id, title, ggrnr, type, status, date) values ("
             echo "${geschaeft}"
             echo "$values"
             echo ")${SQL_AFTER};"
@@ -187,7 +187,7 @@ fi
 if test "$only" != "g"; then
     echo "${TRANSACTION}"
     echo "delete from ${PREFIX}ggrwinti_sitzung;"
-    naechste=$(wget -qO- http://gemeinderat.winterthur.ch/de/sitzung/ | html2 2> /dev/null | sed -n 's,.*tbody/tr/td/span/a/@href=,,p' | head -1)
+    naechste=$(wget -qO- http://gemeinderat.winterthur.ch/de/sitzung/ | html2 2> /dev/null | sed -n 's,.*tbody/tr/td/span/a/@href=,,p')
     echo "insert into ${PREFIX}ggrwinti_sitzung (nr, ggrnr) values"
     wget -qO- "${sitzungen}${naechste}" | html2 2> /dev/null | ${SITZUNGENAWK}
     echo "commit;"

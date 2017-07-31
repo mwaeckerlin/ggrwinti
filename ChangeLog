@@ -1,5 +1,15 @@
 2017-07-30  Marc Wäckerlin <marc@jupiter>
 
+	* ChangeLog, README.md, html/appinfo/info.xml.in,
+	html/appinfo/routes.php, html/lib/AppInfo/Application.php,
+	html/lib/Controller/FraktionssitzungController.php,
+	html/templates/content/fraktionssitzung.php,
+	html/templates/fraktionssitzung.php,
+	html/templates/navigation/index.php, scripts/html2sql.sed,
+	scripts/update-db.sh: fixed date format; new tab for meetngs
+
+2017-07-30  Marc Wäckerlin <marc@jupiter>
+
 	* ChangeLog, html/appinfo/app.php, html/appinfo/routes.php,
 	html/lib/AppInfo/Application.php,
 	html/lib/Controller/GeschaeftController.php,

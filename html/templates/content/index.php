@@ -17,7 +17,7 @@
 	echo "<td>" . $data->ggrnr() . "</td>";
 	echo "<td>" . $data->title() . "</td>";
 	echo "<td>" . $data->type() . "</td>";
-	echo "<td>" . $data->datum() . "</td>";
+	echo "<td>" . $data->date() . "</td>";
 	echo "</tr>";
       }
     }

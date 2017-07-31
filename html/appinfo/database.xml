@@ -1,7 +1,7 @@
 <database>
     <name>*dbname*</name>
     <create>true</create>
-    <overwrite>false</overwrite>
+    <overwrite>true</overwrite>
     <charset>utf8</charset>
     <table>
         <name>*dbprefix*ggrwinti_geschaefte</name>
@@ -12,7 +12,6 @@
                 <notnull>true</notnull>
                 <unsigned>true</unsigned>
                 <primary>true</primary>
-                <length>8</length>
             </field>
             <field>
                 <name>title</name>
@@ -39,7 +38,7 @@
                 <notnull>true</notnull>
             </field>
             <field>
-                <name>datum</name>
+                <name>date</name>
                 <type>date</type>
                 <notnull>true</notnull>
             </field>
@@ -49,11 +48,21 @@
         <name>*dbprefix*ggrwinti_sitzung</name>
         <declaration>
             <field>
-                <name>nr</name>
-                <type>string</type>
+                <name>id</name>
+                <type>integer</type>
                 <notnull>true</notnull>
+                <unsigned>true</unsigned>
                 <primary>true</primary>
-                <length>4</length>
+            </field>
+            <field>
+                <name>date</name>
+                <type>date</type>
+                <notnull>true</notnull>
+            </field>
+            <field>
+                <name>nr</name>
+                <type>integer</type>
+                <notnull>true</notnull>
             </field>
             <field>
                 <name>ggrnr</name>
@@ -62,5 +71,30 @@
                 <notnull>true</notnull>
             </field>
         </declaration>
+    </table>
+    <table>
+      <name>*dbprefix*ggrwinti_job_assignment</name>
+      <declaration>
+        <field>
+          <name>id</name>
+          <type>integer</type>
+          <notnull>true</notnull>
+          <unsigned>true</unsigned>
+          <primary>true</primary>
+        </field>
+        <field>
+          <name>ggrid</name>
+          <type>integer</type>
+          <notnull>true</notnull>
+          <unsigned>true</unsigned>
+          <comments>foreign key to ggrwinti_geschaefte.id</comments>
+        </field>
+        <field>
+          <name>type</name>
+          <type>text</type>
+          <length>100</length>
+          <notnull>false</notnull>
+        </field>
+      </declaration>
     </table>
 </database>

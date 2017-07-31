@@ -31,7 +31,7 @@ For testing purposes, start docker containers, e.g.:
                --link ggrwinti-mysql:mysql \
                -v $(pwd)/html:/var/www/nextcloud/apps/ggrwinti:ro \
                -v $(pwd):/workdir:ro \
-               mwaeckerlin/ggrwinti bash
+               mwaeckerlin/ggrwinti
 
 Go to http://localhost:9999 and login with user `admin` and password `ert456`. Local changes in html will immediately appear on the web. If you change in `scripts` or somewhere else, you need to copy the changed files manually from `/workdir`.
 
@@ -47,8 +47,7 @@ Enter the virtual machine as `root` (use `sudo -u www-data` for accessing webser
 
 Access the database:
 
-    docker exec -it ggrwinti bash
-    mysql -h mysql -u nextcloud -pert456 nextcloud
+    docker exec -it ggrwinti mysql -h mysql -u nextcloud -pert456 nextcloud
 
 Test a locally changed `script/update-database.sh`:
 
@@ -91,29 +90,3 @@ Run in Production
                   -p 80:80 -p 443:443 \
                   --link ggrwinti:my.ggr.cloud
                   mwaeckerlin/reverse-proxy
-
-Problem
--------
-
-```
-Error	index	OCP\AppFramework\QueryException: Could not resolve AppName! Class AppName does not exist
-
-    /var/www/nextcloud/lib/private/AppFramework/Utility/SimpleContainer.php - line 117: OC\AppFramework\Utility\SimpleContainer->resolve('AppName')
-    /var/www/nextcloud/lib/private/ServerContainer.php - line 132: OC\AppFramework\Utility\SimpleContainer->query('AppName')
-    /var/www/nextcloud/lib/private/AppFramework/Utility/SimpleContainer.php - line 66: OC\ServerContainer->query('AppName')
-    /var/www/nextcloud/lib/private/AppFramework/Utility/SimpleContainer.php - line 96: OC\AppFramework\Utility\SimpleContainer->buildClass(Object(ReflectionClass))
-    /var/www/nextcloud/lib/private/AppFramework/Utility/SimpleContainer.php - line 117: OC\AppFramework\Utility\SimpleContainer->resolve('OCA\\GgrWinti\\Co...')
-    /var/www/nextcloud/lib/private/ServerContainer.php - line 132: OC\AppFramework\Utility\SimpleContainer->query('OCA\\GgrWinti\\Co...')
-    /var/www/nextcloud/lib/private/AppFramework/DependencyInjection/DIContainer.php - line 410: OC\ServerContainer->query('OCA\\GgrWinti\\Co...')
-    /var/www/nextcloud/lib/private/AppFramework/App.php - line 101: OC\AppFramework\DependencyInjection\DIContainer->query('OCA\\GgrWinti\\Co...')
-    /var/www/nextcloud/lib/private/AppFramework/Routing/RouteActionHandler.php - line 47: OC\AppFramework\App main('OCA\\GgrWinti\\Co...', 'index', Object(OC\AppFramework\DependencyInjection\DIContainer), Array)
-    [internal function] OC\AppFramework\Routing\RouteActionHandler->__invoke(Array)
-    /var/www/nextcloud/lib/private/Route/Router.php - line 299: call_user_func(Object(OC\AppFramework\Routing\RouteActionHandler), Array)
-    /var/www/nextcloud/lib/base.php - line 1000: OC\Route\Router->match('/apps/ggrwinti/')
-    /var/www/nextcloud/index.php - line 40: OC handleRequest()
-    {main}
-```
-
-simple logging:
-
-    file_put_contents("/tmp/log", "...\n", FILE_APPEND);

@@ -11,7 +11,7 @@ class Geschaeft extends Entity implements JsonSerializable {
   protected $ggrnr;
   protected $type;
   protected $status;
-  protected $datum;
+  protected $date;
 
   public function title() {
     return $this->title;
@@ -25,8 +25,8 @@ class Geschaeft extends Entity implements JsonSerializable {
   public function status() {
     return $this->status;
   }
-  public function datum() {
-    return $this->datum;
+  public function date() {
+    return $this->date;
   }
   
   public function jsonSerialize() {
@@ -36,7 +36,7 @@ class Geschaeft extends Entity implements JsonSerializable {
       'ggrnr' => $this->ggrnr,
       'type' => $this->type,
       'status' => $this->status,
-      'datum' => $this->datum
+      'date' => $this->date
     ];
   }
 }

@@ -7,6 +7,11 @@ Organisiere Deine Fraktion in Nextcloud: Füge Deine Gemeinderäte als Mitglied 
 
 Entwickelt vom Gemeinderat der Piratenpartei Marc Wäckerlin für die grünliberale-/Piratenpartei-Fraktion.
 
+Configuration
+-------------
+
+See [mwaeckerlin/nextcloud](https://github.com/mwaeckerlin/nextcloud).
+
 Developers
 ----------
 

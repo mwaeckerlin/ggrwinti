@@ -21,33 +21,21 @@
   <option value="marc"></option>
 </datalist>
 
-<h1>Offene Geschäfte</h1>
+<h2>Offene Geschäfte</h2>
 
-<table id="geschaefte">
-  <thead>
-    <tr>
-      <th>GGR-Nr.</th>
-      <th>Titel</th>
-      <th>Zuständig</th>
-      <th>Antrag</th>
-      <th>Entscheid</th>
-      <th>Kommentar</th>
-    </tr>
-  </thead>
-  <tbody>
-    <?php
-    if (key_exists('data', $_)) {
-      foreach ($_['data'] as $data) {
-	echo '<form action=""><tr title="'.$data->date().': '.$data->type().'">';
-        echo "<td>" . $data->ggrnr() . "</td>";
-	echo "<td>" . $data->type().': '.$data->title() . "</td>";
-	echo '<td><input class="edit" data-field="responsible" data-id="'.$data->id().'" type="text" name="responsible" list="users" value="' . $data->responsible() . '" /></td>';
-	echo '<td><input class="edit" data-field="suggestion" data-id="'.$data->id().'" type="text" name="suggestion" list="decisions" value="' . $data->suggestion() . '" /></td>';
-	echo '<td><input class="edit" data-field="decision" data-id="'.$data->id().'" type="text" name="decision" list="decisions" value="' . $data->decision() . '" /></td>';
-	echo '<td><textarea class="edit" data-field="comment" data-id="'.$data->id().'" name="comment">' . $data->comment() . "</textarea></td>";
-	echo "</tr></form>";
-      }
+<form action="" id="geschaefte">
+  <?php
+  if (key_exists('data', $_)) {
+    foreach ($_['data'] as $data) {
+      echo '<div class="geschaeft" title="'.$data->date().': '.$data->type().'">';
+      echo "<div>" . $data->ggrnr() . "</div>";
+      echo "<div>" . $data->type().': '.$data->title() . "</div>";
+      echo '<div><input placeholder="Zuständig" class="edit" data-field="responsible" data-id="'.$data->id().'" type="text" name="responsible" list="users" maxlength="255" value="' . $data->responsible() . '" /></div>';
+      echo '<div><input placeholder="Antrag" class="edit" data-field="suggestion" data-id="'.$data->id().'" type="text" name="suggestion" list="decisions" maxlength="255" value="' . $data->suggestion() . '" /></div>';
+      echo '<div><input placeholder="Entscheid" class="edit" data-field="decision" data-id="'.$data->id().'" type="text" name="decision" list="decisions" maxlength="255" value="' . $data->decision() . '" /></div>';
+      echo '<div><textarea placeholder="Kommentar" class="edit" data-field="comment" data-id="'.$data->id().'" maxlength="255" name="comment">' . $data->comment() . "</textarea></div>";
+      echo "</div>";
     }
-    ?>
-  </tbody>
-</table>
+  }
+  ?>
+</form>

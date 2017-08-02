@@ -1,24 +1,38 @@
 var baseurl = OC.generateUrl('/apps/ggrwinti')
-
-$(document).ready(function () {
-  $(".edit").on("change input", function(e) {
-    try {
-      $.ajax({
-        url: baseurl+'/geschaefte/'+$(this).attr("data-id"),
-        type: 'PUT',
-        contentType: 'application/json',
-        data: JSON.stringify({
-          field: $(this).attr("data-field"),
-          value: $(this).val()
-        })
-      }).done(function (response) {
-        console.log("success:", response)
-      }).fail(function (response, code) {
-        console.log("failed:", response, code)
+ var timer = {}
+function changed(obj) {
+  try {
+    $.ajax({
+      url: baseurl+'/geschaefte/'+obj.attr("data-id"),
+      type: 'PUT',
+      contentType: 'application/json',
+      data: JSON.stringify({
+        field: obj.attr("data-field"),
+        value: obj.val()
       })
-    } catch (e) {
-      console.log("exception:", e)
-    }
+    }).done(function (response) {
+      obj.parent().parent()
+         .css('background-color', 'inherit').css('border-color', 'inherit')
+         .effect('highlight', {color: '#7F7'}, 1000)
+      console.log("success", response)
+    }).fail(function (response, code) {
+      obj.parent().parent()
+         .css('background-color', '#F77').css('border-color', 'red')
+      console.log("failed:", response, code)
+    })
+  } catch (e) {
+    console.log("exception:", e)
+  }
+}
+$(document).ready(function () {
+  $(".edit").on("input", function(e) {
+    var obj = $(this)
+    clearTimeout(timer[obj.attr("data-field")+obj.attr("data-id")])
+    timer[obj.attr("data-field")+obj.attr("data-id")] = setTimeout(function() {changed(obj)}, 2000)
+  }).on("change", function(e) {
+    var obj = $(this)
+    clearTimeout(timer[obj.attr("data-field")+obj.attr("data-id")])
+    changed(obj)
   })
-
+  
 })

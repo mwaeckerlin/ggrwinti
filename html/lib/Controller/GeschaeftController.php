@@ -61,8 +61,8 @@ class GeschaeftController extends Controller {
   public function update($id, $field, $value) {
     try {
       if (!in_array($field, array('responsible', 'suggestion', 'decision', 'comment')))
-        return new DataResponse([], Http::STATUS_NOT_FOUND);
-      $fn = 'set'.ucfirst($field);
+        return new DataResponse([], Http::STATUS_NOT_FOUND); // prevent hacking
+      $fn = 'set'.ucfirst($field); // create function name, e.g. 'getResponsible'
       $geschaeft = $this->mapper->find($id, $this->userId);
       $geschaeft->$fn($value);
       $this->mapper->update($geschaeft);

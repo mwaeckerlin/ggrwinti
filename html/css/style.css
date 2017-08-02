@@ -1,11 +1,21 @@
-#hello {
-	color: red;
-}
-
-table {
+#geschaefte {
+  display: table;
   width: 100%;
-  max-width: 100%; !important
 }
-table, table th, table td {
-  white-space: normal;
+#geschaefte > .geschaeft {
+  display: table-row;
+  border: 1px solid black;
+}
+#geschaefte .geschaeft div {
+  display: table-cell;
+  vertical-align: top;
+  padding: 0 1ex;
+}
+#geschaefte .geschaeft div textarea {
+  height: 2em;
+}
+#geschaefte .geschaeft div textarea:hover,
+#geschaefte .geschaeft div textarea:focus,
+#geschaefte .geschaeft div textarea:active {
+  height: 10em;
 }

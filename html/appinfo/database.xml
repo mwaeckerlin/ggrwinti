@@ -42,6 +42,22 @@
                 <type>date</type>
                 <notnull>true</notnull>
             </field>
+            <field>
+                <name>responsible</name>
+                <type>text</type>
+            </field>
+            <field>
+                <name>suggestion</name>
+                <type>text</type>
+            </field>
+            <field>
+                <name>decision</name>
+                <type>text</type>
+            </field>
+            <field>
+                <name>comment</name>
+                <type>text</type>
+            </field>
         </declaration>
     </table>
     <table>

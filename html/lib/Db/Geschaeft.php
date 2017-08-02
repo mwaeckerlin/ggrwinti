@@ -51,7 +51,7 @@ class Geschaeft extends Entity implements JsonSerializable {
   public function comment() {
     return $this->comment;
   }
-  
+
   public function jsonSerialize() {
     return [
       'id' => $this->id,

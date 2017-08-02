@@ -45,6 +45,9 @@ class Application extends App {
    */
   private static function registerControllers(IAppContainer &$container) {
     
+    $container->registerService('Logger', function($c) {
+      return $c->query('ServerContainer')->getLogger();
+    });
     $container->registerService(
       'PageController', function(IAppContainer $c) {
 	return new PageController(
@@ -54,10 +57,9 @@ class Application extends App {
     );
     $container->registerService(
       'GeschaeftController', function(IAppContainer $c) {
-	return new GeschaeftController(
-	  $c->query('AppName'), $c->query('Request'), $c->query('GeschaeftMapper'),
-	  $c->query('UserId')
-	);
+	return new GeschaeftController($c->query('Logger'), $c->query('AppName'),
+                                       $c->query('Request'), $c->query('GeschaeftMapper'),
+                                       $c->query('UserId'));
       }
     );
     $container->registerService(

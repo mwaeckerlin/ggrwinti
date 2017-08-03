@@ -1,0 +1,880 @@
+2017-08-03  Marc Wäckerlin <marc@dev0001.int.swisssign.net>
+
+	* configure.ac, html/appinfo/database.xml, html/appinfo/routes.php,
+	html/lib/AppInfo/Application.php,
+	html/lib/Controller/GgrsitzungenController.php,
+	html/lib/Db/Ggrsitzungen.php, html/lib/Db/GgrsitzungenMapper.php,
+	html/templates/content/ggrsitzungen.php,
+	html/templates/ggrsitzungen.php,
+	html/templates/navigation/index.php, scripts/html2sql.sed,
+	scripts/update-db.sh: Liste der GGR Sitzungen
+
+2017-08-02  Marc Wäckerlin <marc@dev0001.int.swisssign.net>
+
+	* html/css/style.css, html/js/script.js,
+	html/lib/Controller/GeschaeftController.php,
+	html/templates/content/index.php: styling
+
+2017-08-02  Marc Wäckerlin <marc@dev0001.int.swisssign.net>
+
+	* ChangeLog, html/js/script.js, html/lib/AppInfo/Application.php,
+	html/lib/Controller/GeschaeftController.php,
+	html/lib/Db/Geschaeft.php, html/templates/content/index.php: first
+	working version including db updates
+
+2017-08-02  Marc Wäckerlin <marc@dev0001.int.swisssign.net>
+
+	* : commit 1fb128e22b5cca1b788c84f96dfa7c7cce5f69fb Author: Marc
+	WÃ¤ckerlin <marc@dev0001.int.swisssign.net> Date:   Wed Aug 2
+	10:30:16 2017 +0200
+
+2017-08-02  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, html/appinfo/database.xml, html/js/script.js,
+	html/lib/Db/Geschaeft.php, html/templates/content/index.php: more
+	fields for topics
+
+2017-07-31  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, README.md, html/appinfo/database.xml,
+	html/appinfo/database.xsd, html/lib/Db/Geschaeft.php,
+	html/templates/content/index.php, scripts/update-db.sh: rename
+	database datum to date
+
+2017-07-30  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, README.md, html/appinfo/info.xml.in,
+	html/appinfo/routes.php, html/lib/AppInfo/Application.php,
+	html/lib/Controller/FraktionssitzungController.php,
+	html/templates/content/fraktionssitzung.php,
+	html/templates/fraktionssitzung.php,
+	html/templates/navigation/index.php, scripts/html2sql.sed,
+	scripts/update-db.sh: fixed date format; new tab for meetngs
+
+2017-07-30  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, html/appinfo/app.php, html/appinfo/routes.php,
+	html/lib/AppInfo/Application.php,
+	html/lib/Controller/GeschaeftController.php,
+	html/templates/content/index.php,
+	html/templates/navigation/index.php: first working release that
+	shows all topics, no functionality
+
+2017-07-30  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* : Merge pull request #1 from mwaeckerlin/test-daita Fixes Server Error
+
+2017-07-29  Marc Wäckerlin <marc@jupiter>
+
+	* docker/Dockerfile, html/templates/navigation/index.php: test
+	version
+
+2017-07-29  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, README.md, docker/cronjob.sh, docker/ggrwinti.json,
+	html/appinfo/app.php, html/appinfo/autoload.php,
+	html/appinfo/info.xml.in, html/appinfo/routes.php,
+	html/lib/Controller/GeschaeftController.php,
+	html/lib/Db/GeschaeftMapper.php, html/makefile.am,
+	html/templates/navigation/index.php, scripts/testenv.sh,
+	scripts/update-db.sh: trying to fix bugs
+
+2017-07-03  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, makefile.am: fix build on olf trusty
+
+2017-07-03  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, html/makefile.am: fix build
+
+2017-07-03  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, html/.travis.yml, html/COPYING, html/Makefile.bak,
+	html/README.md, html/appinfo/autoload.php,
+	html/appinfo/info.xml.in, html/appinfo/routes.php,
+	html/controller/pagecontroller.php, html/css/style.css,
+	html/db/geschaefte.php, html/db/geschaeftemapper.php,
+	html/img/app.svg, html/js/script.js,
+	html/lib/Controller/GeschaeftController.php,
+	html/lib/Controller/PageController.php, html/lib/Db/Geschaeft.php,
+	html/lib/Db/GeschaeftMapper.php, html/phpunit.integration.xml,
+	html/phpunit.xml, html/templates/content/index.php,
+	html/templates/index.php, html/templates/main.php,
+	html/templates/navigation/index.php,
+	html/templates/part.content.php,
+	html/templates/part.navigation.php,
+	html/templates/part.settings.php,
+	html/templates/settings/index.php,
+	html/tests/Integration/AppTest.php,
+	html/tests/Unit/Controller/PageControllerTest.php,
+	html/tests/bootstrap.php: testing cannot find mapping problem
+
+2017-07-02  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, README.md, configure.ac, docker/Dockerfile,
+	html/controller/pagecontroller.php, html/db/geschaaefte.php,
+	html/db/geschaaeftemapper.php, html/db/geschaefte.php,
+	html/db/geschaeftemapper.php, scripts/update-db.sh: before reinstall
+	standard app
+
+2017-07-01  Marc Wäckerlin <marc@jupiter>
+
+	* COPYING, ChangeLog, INSTALL, README, ax_init_standard_project.m4,
+	bootstrap.sh, debian/docs, makefile.am: cleaned up README, keep
+	README.md
+
+2017-06-30  Marc Wäckerlin <marc@tech.swisssign.net>
+
+	* COPYING, ChangeLog, INSTALL, README, README.md: to be debugged
+
+2017-06-29  Marc Wäckerlin <marc@jupiter>
+
+	* COPYING, ChangeLog, INSTALL, README.md, configure.ac: fix package
+	dependencies
+
+2017-06-27  Marc Wäckerlin <marc@tech.swisssign.net>
+
+	* COPYING, ChangeLog, INSTALL, configure.ac, docker/Dockerfile,
+	docker/cronjob.sh, html/appinfo/info.xml.in,
+	html/appinfo/routes.php, html/controller/pagecontroller.php,
+	html/makefile.am, makefile.am, scripts/makefile.am,
+	scripts/update-db.sh: switch to nextcloud
+
+2017-06-26  Marc Wäckerlin <marc@jupiter>
+
+	* html/appinfo/info.xml.in: less-than and greater-than not allowed
+	in XML - typo
+
+2017-06-26  Marc Wäckerlin <marc@jupiter>
+
+	* html/appinfo/info.xml.in: less-than and greater-than not allowed
+	in XML
+
+2017-06-26  Marc Wäckerlin <marc@tech.swisssign.net>
+
+	* docker/Dockerfile: typo fixed
+
+2017-06-25  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, ax_check_qt.m4, ax_init_standard_project.m4,
+	bootstrap.sh, build-in-docker.sh, dependency-graph.sh,
+	resolve-debbuilddeps.sh, resolve-rpmbuilddeps.sh, template.sh: build
+	updated
+
+2017-06-25  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, configure.ac: build fixed
+
+2017-06-25  Marc Wäckerlin <marc@jupiter>
+
+	* AUTHORS: build fixed
+
+2017-06-25  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, ax_check_qt.m4, ax_cxx_compile_stdcxx_11.m4,
+	ax_init_standard_project.m4, bootstrap.sh, build-in-docker.conf,
+	build-in-docker.sh, configure.ac, debian/control.in,
+	doc/footer.html.in, doc/header.html.in, doc/style.css,
+	makefile_test.inc.am, resolve-debbuilddeps.sh,
+	resolve-rpmbuilddeps.sh, rpmsign.exp, sql-to-dot.sed: build fixed
+
+2017-06-25  Marc Wäckerlin <marc@jupiter>
+
+	* docker/Dockerfile, html/appinfo/info.xml.in: fix name
+
+2016-08-21  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* README, README.md, configure.ac, html/appinfo/info.xml,
+	html/appinfo/info.xml.in: auto generate info.xml
+
+2016-08-21  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* scripts/update-db.sh: added support for next session - typo fixed
+
+2016-08-20  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* COPYING, INSTALL, docker/Dockerfile, docker/cronjob.sh,
+	html/appinfo/database.xml, html/db/geschaaefte.php,
+	html/db/geschaaeftemapper.php, html/db/geschaefte.php,
+	html/db/geschaeftemapper.php, scripts/sitzungen.awk,
+	scripts/update-db.sh: added support for next session
+
+2016-07-29  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* docker/ggrwinti.json, html/appinfo/app.php,
+	html/controller/pagecontroller.php, html/templates/part.content.php: 
+	current status
+
+2016-06-15  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* README.md, html/controller/pagecontroller.php,
+	html/css/style.css, html/templates/part.content.php: show table with
+	all items
+
+2016-06-15  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* README.md, debian/control.in, html/appinfo/database.xml,
+	html/appinfo/info.xml, scripts/html2sql.sed, scripts/update-db.sh: 
+	import half successful
+
+2016-06-14  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* configure.ac: increase version
+
+2016-06-13  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* docker/Dockerfile: add ggrwinti to default APPS, it must be
+	initialized later
+
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* build-in-docker.sh: if the userid already exists in the docker
+	image, we need to set HOME
+
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* build-in-docker.sh: if the userid already exists in the docker
+	image, we need to set HOME
+
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* AUTHORS: fixed AUTHOR
+
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* AUTHORS: author fixed
+
+2016-06-12  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* README.md, bootstrap.sh, docker/Dockerfile,
+	html/appinfo/database.xml, html/appinfo/info.xml,
+	scripts/html2sql.sed, scripts/makefile.am, scripts/update-db.sh: 
+	database
+
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* debian/control.in: fixed build
+
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* ax_init_standard_project.m4, bootstrap.sh, build-in-docker.conf,
+	build-in-docker.sh, resolve-rpmbuilddeps.sh: fixed build
+
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* debian/rules, html/makefile.am: debian package build
+
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* debian/control.in, debian/rules, docker/Dockerfile,
+	html/AUTHORS.md, html/CHANGELOG.md, html/COPYING,
+	html/Makefile.bak, html/README.md, html/appinfo/app.php,
+	html/appinfo/autoload.php, html/appinfo/info.xml,
+	html/appinfo/routes.php, html/bin/ocdev,
+	html/controller/pagecontroller.php, html/css/style.css,
+	html/img/app.svg, html/js/script.js, html/makefile.am,
+	html/ocdev/Jinja2-2.8.dist-info/DESCRIPTION.rst,
+	html/ocdev/Jinja2-2.8.dist-info/METADATA,
+	html/ocdev/Jinja2-2.8.dist-info/RECORD,
+	html/ocdev/Jinja2-2.8.dist-info/WHEEL,
+	html/ocdev/Jinja2-2.8.dist-info/entry_points.txt,
+	html/ocdev/Jinja2-2.8.dist-info/metadata.json,
+	html/ocdev/Jinja2-2.8.dist-info/top_level.txt,
+	html/ocdev/MarkupSafe-0.23.egg-info/PKG-INFO,
+	html/ocdev/MarkupSafe-0.23.egg-info/SOURCES.txt,
+	html/ocdev/MarkupSafe-0.23.egg-info/dependency_links.txt,
+	html/ocdev/MarkupSafe-0.23.egg-info/installed-files.txt,
+	html/ocdev/MarkupSafe-0.23.egg-info/not-zip-safe,
+	html/ocdev/MarkupSafe-0.23.egg-info/top_level.txt,
+	html/ocdev/jinja2/__init__.py, html/ocdev/jinja2/_compat.py,
+	html/ocdev/jinja2/_stringdefs.py, html/ocdev/jinja2/bccache.py,
+	html/ocdev/jinja2/compiler.py, html/ocdev/jinja2/constants.py,
+	html/ocdev/jinja2/debug.py, html/ocdev/jinja2/defaults.py,
+	html/ocdev/jinja2/environment.py, html/ocdev/jinja2/exceptions.py,
+	html/ocdev/jinja2/ext.py, html/ocdev/jinja2/filters.py,
+	html/ocdev/jinja2/lexer.py, html/ocdev/jinja2/loaders.py,
+	html/ocdev/jinja2/meta.py, html/ocdev/jinja2/nodes.py,
+	html/ocdev/jinja2/optimizer.py, html/ocdev/jinja2/parser.py,
+	html/ocdev/jinja2/runtime.py, html/ocdev/jinja2/sandbox.py,
+	html/ocdev/jinja2/tests.py, html/ocdev/jinja2/utils.py,
+	html/ocdev/jinja2/visitor.py, html/ocdev/markupsafe/__init__.py,
+	html/ocdev/markupsafe/_compat.py,
+	html/ocdev/markupsafe/_constants.py,
+	html/ocdev/markupsafe/_native.py,
+	html/ocdev/markupsafe/_speedups.c, html/ocdev/markupsafe/tests.py,
+	html/ocdev/ocdev-0.2.2.egg-info/PKG-INFO,
+	html/ocdev/ocdev-0.2.2.egg-info/SOURCES.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/dependency_links.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/entry_points.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/installed-files.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/requires.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/top_level.txt,
+	html/ocdev/ocdev/__init__.py, html/ocdev/ocdev/__main__.py,
+	html/ocdev/ocdev/application.py, html/ocdev/ocdev/config.py,
+	html/ocdev/ocdev/plugins/__init__.py,
+	html/ocdev/ocdev/plugins/appstore/__init__.py,
+	html/ocdev/ocdev/plugins/appstore/appstore.py,
+	html/ocdev/ocdev/plugins/appstore/infoparser.py,
+	html/ocdev/ocdev/plugins/appstore/invalidconfigerror.py,
+	html/ocdev/ocdev/plugins/ci/__init__.py,
+	html/ocdev/ocdev/plugins/ci/ci.py,
+	html/ocdev/ocdev/plugins/ci/templates/autoconfig/mysql.php,
+	html/ocdev/ocdev/plugins/ci/templates/autoconfig/postgresql.php,
+	html/ocdev/ocdev/plugins/ci/templates/autoconfig/sqlite.php,
+	html/ocdev/ocdev/plugins/devup/__init__.py,
+	html/ocdev/ocdev/plugins/devup/devup.py,
+	html/ocdev/ocdev/plugins/plugin.py,
+	html/ocdev/ocdev/plugins/pluginerror.py,
+	html/ocdev/ocdev/plugins/server/__init__.py,
+	html/ocdev/ocdev/plugins/server/server.py,
+	html/ocdev/ocdev/plugins/setup/__init__.py,
+	html/ocdev/ocdev/plugins/setup/dependencyerror.py,
+	html/ocdev/ocdev/plugins/setup/setup.py,
+	html/ocdev/ocdev/plugins/startapp/__init__.py,
+	html/ocdev/ocdev/plugins/startapp/startapp.py,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/.travis.yml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/AUTHORS.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/CHANGELOG.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/COPYING,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/Makefile,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/README.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/appinfo/app.php
+	,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/appinfo/info.xm
+	l,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/appinfo/routes.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/controller/page
+	controller.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/css/style.css,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/img/app.svg,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/js/script.js,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/phpunit.integra
+	tion.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/phpunit.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/templates/main.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/templates/part.
+	content.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/templates/part.
+	navigation.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/templates/part.
+	settings.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/tests/unit/auto
+	loader.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/tests/unit/cont
+	roller/PageControllerTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/.travis.yml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/AUTHORS.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/CHANGELOG.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/COPYING,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/Makefile,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/README.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/appinfo/app.php
+	,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/appinfo/info.xm
+	l,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/appinfo/routes.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/controller/page
+	controller.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/css/style.css,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/img/app.svg,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/js/script.js,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/phpunit.integra
+	tion.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/phpunit.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/templates/main.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/templates/part.
+	content.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/templates/part.
+	navigation.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/templates/part.
+	settings.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/tests/integrati
+	on/AppTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/tests/travis/ph
+	p.ini,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/tests/unit/cont
+	roller/PageControllerTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/.travis.yml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/AUTHORS.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/CHANGELOG.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/COPYING,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/Makefile,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/README.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/appinfo/app.php
+	,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/appinfo/info.xm
+	l,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/appinfo/routes.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/controller/page
+	controller.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/css/style.css,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/img/app.svg,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/js/script.js,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/phpunit.integra
+	tion.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/phpunit.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/templates/main.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/templates/part.
+	content.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/templates/part.
+	navigation.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/templates/part.
+	settings.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/tests/integrati
+	on/AppTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/tests/travis/ph
+	p.ini,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/tests/unit/cont
+	roller/PageControllerTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/.travis.yml,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/AUTHORS.md,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/CHANGELOG.md,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/COPYING,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/Makefile,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/README.md,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/appinfo/app.php
+	,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/appinfo/autoloa
+	d.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/appinfo/info.xm
+	l,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/appinfo/routes.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/controller/page
+	controller.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/css/style.css,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/img/app.svg,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/js/script.js,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/phpunit.integra
+	tion.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/phpunit.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/templates/main.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/templates/part.
+	content.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/templates/part.
+	navigation.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/templates/part.
+	settings.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/tests/bootstrap
+	.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/tests/integrati
+	on/AppTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/tests/unit/cont
+	roller/PageControllerTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/includes/licenses/agpl.
+	header.php,
+	html/ocdev/ocdev/plugins/startapp/templates/includes/licenses/agpl.
+	txt,
+	html/ocdev/ocdev/plugins/startapp/templates/includes/licenses/mit.h
+	eader.php,
+	html/ocdev/ocdev/plugins/startapp/templates/includes/licenses/mit.t
+	xt, html/ocdev/ocdev/plugins/validators.py,
+	html/ocdev/ocdev/version.py, html/ocdev/ocdev/version.txt,
+	html/ocdev/requests-2.10.0.dist-info/DESCRIPTION.rst,
+	html/ocdev/requests-2.10.0.dist-info/METADATA,
+	html/ocdev/requests-2.10.0.dist-info/RECORD,
+	html/ocdev/requests-2.10.0.dist-info/WHEEL,
+	html/ocdev/requests-2.10.0.dist-info/metadata.json,
+	html/ocdev/requests-2.10.0.dist-info/top_level.txt,
+	html/ocdev/requests/__init__.py, html/ocdev/requests/adapters.py,
+	html/ocdev/requests/api.py, html/ocdev/requests/auth.py,
+	html/ocdev/requests/cacert.pem, html/ocdev/requests/certs.py,
+	html/ocdev/requests/compat.py, html/ocdev/requests/cookies.py,
+	html/ocdev/requests/exceptions.py, html/ocdev/requests/hooks.py,
+	html/ocdev/requests/models.py,
+	html/ocdev/requests/packages/__init__.py,
+	html/ocdev/requests/packages/chardet/__init__.py,
+	html/ocdev/requests/packages/chardet/big5freq.py,
+	html/ocdev/requests/packages/chardet/big5prober.py,
+	html/ocdev/requests/packages/chardet/chardetect.py,
+	html/ocdev/requests/packages/chardet/chardistribution.py,
+	html/ocdev/requests/packages/chardet/charsetgroupprober.py,
+	html/ocdev/requests/packages/chardet/charsetprober.py,
+	html/ocdev/requests/packages/chardet/codingstatemachine.py,
+	html/ocdev/requests/packages/chardet/compat.py,
+	html/ocdev/requests/packages/chardet/constants.py,
+	html/ocdev/requests/packages/chardet/cp949prober.py,
+	html/ocdev/requests/packages/chardet/escprober.py,
+	html/ocdev/requests/packages/chardet/escsm.py,
+	html/ocdev/requests/packages/chardet/eucjpprober.py,
+	html/ocdev/requests/packages/chardet/euckrfreq.py,
+	html/ocdev/requests/packages/chardet/euckrprober.py,
+	html/ocdev/requests/packages/chardet/euctwfreq.py,
+	html/ocdev/requests/packages/chardet/euctwprober.py,
+	html/ocdev/requests/packages/chardet/gb2312freq.py,
+	html/ocdev/requests/packages/chardet/gb2312prober.py,
+	html/ocdev/requests/packages/chardet/hebrewprober.py,
+	html/ocdev/requests/packages/chardet/jisfreq.py,
+	html/ocdev/requests/packages/chardet/jpcntx.py,
+	html/ocdev/requests/packages/chardet/langbulgarianmodel.py,
+	html/ocdev/requests/packages/chardet/langcyrillicmodel.py,
+	html/ocdev/requests/packages/chardet/langgreekmodel.py,
+	html/ocdev/requests/packages/chardet/langhebrewmodel.py,
+	html/ocdev/requests/packages/chardet/langhungarianmodel.py,
+	html/ocdev/requests/packages/chardet/langthaimodel.py,
+	html/ocdev/requests/packages/chardet/latin1prober.py,
+	html/ocdev/requests/packages/chardet/mbcharsetprober.py,
+	html/ocdev/requests/packages/chardet/mbcsgroupprober.py,
+	html/ocdev/requests/packages/chardet/mbcssm.py,
+	html/ocdev/requests/packages/chardet/sbcharsetprober.py,
+	html/ocdev/requests/packages/chardet/sbcsgroupprober.py,
+	html/ocdev/requests/packages/chardet/sjisprober.py,
+	html/ocdev/requests/packages/chardet/universaldetector.py,
+	html/ocdev/requests/packages/chardet/utf8prober.py,
+	html/ocdev/requests/packages/urllib3/__init__.py,
+	html/ocdev/requests/packages/urllib3/_collections.py,
+	html/ocdev/requests/packages/urllib3/connection.py,
+	html/ocdev/requests/packages/urllib3/connectionpool.py,
+	html/ocdev/requests/packages/urllib3/contrib/__init__.py,
+	html/ocdev/requests/packages/urllib3/contrib/appengine.py,
+	html/ocdev/requests/packages/urllib3/contrib/ntlmpool.py,
+	html/ocdev/requests/packages/urllib3/contrib/pyopenssl.py,
+	html/ocdev/requests/packages/urllib3/contrib/socks.py,
+	html/ocdev/requests/packages/urllib3/exceptions.py,
+	html/ocdev/requests/packages/urllib3/fields.py,
+	html/ocdev/requests/packages/urllib3/filepost.py,
+	html/ocdev/requests/packages/urllib3/packages/__init__.py,
+	html/ocdev/requests/packages/urllib3/packages/ordered_dict.py,
+	html/ocdev/requests/packages/urllib3/packages/six.py,
+	html/ocdev/requests/packages/urllib3/packages/ssl_match_hostname/__
+	init__.py,
+	html/ocdev/requests/packages/urllib3/packages/ssl_match_hostname/_i
+	mplementation.py,
+	html/ocdev/requests/packages/urllib3/poolmanager.py,
+	html/ocdev/requests/packages/urllib3/request.py,
+	html/ocdev/requests/packages/urllib3/response.py,
+	html/ocdev/requests/packages/urllib3/util/__init__.py,
+	html/ocdev/requests/packages/urllib3/util/connection.py,
+	html/ocdev/requests/packages/urllib3/util/request.py,
+	html/ocdev/requests/packages/urllib3/util/response.py,
+	html/ocdev/requests/packages/urllib3/util/retry.py,
+	html/ocdev/requests/packages/urllib3/util/ssl_.py,
+	html/ocdev/requests/packages/urllib3/util/timeout.py,
+	html/ocdev/requests/packages/urllib3/util/url.py,
+	html/ocdev/requests/sessions.py,
+	html/ocdev/requests/status_codes.py,
+	html/ocdev/requests/structures.py, html/ocdev/requests/utils.py,
+	html/phpunit.integration.xml, html/phpunit.xml,
+	html/templates/main.php, html/templates/part.content.php,
+	html/templates/part.navigation.php,
+	html/templates/part.settings.php, html/tests/bootstrap.php,
+	html/tests/integration/AppTest.php,
+	html/tests/unit/controller/PageControllerTest.php: add owncloud app
+
+2016-05-16  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* html/bin/ocdev, html/ocdev/Jinja2-2.8.dist-info/DESCRIPTION.rst,
+	html/ocdev/Jinja2-2.8.dist-info/METADATA,
+	html/ocdev/Jinja2-2.8.dist-info/RECORD,
+	html/ocdev/Jinja2-2.8.dist-info/WHEEL,
+	html/ocdev/Jinja2-2.8.dist-info/entry_points.txt,
+	html/ocdev/Jinja2-2.8.dist-info/metadata.json,
+	html/ocdev/Jinja2-2.8.dist-info/top_level.txt,
+	html/ocdev/MarkupSafe-0.23.egg-info/PKG-INFO,
+	html/ocdev/MarkupSafe-0.23.egg-info/SOURCES.txt,
+	html/ocdev/MarkupSafe-0.23.egg-info/dependency_links.txt,
+	html/ocdev/MarkupSafe-0.23.egg-info/installed-files.txt,
+	html/ocdev/MarkupSafe-0.23.egg-info/not-zip-safe,
+	html/ocdev/MarkupSafe-0.23.egg-info/top_level.txt,
+	html/ocdev/jinja2/__init__.py, html/ocdev/jinja2/_compat.py,
+	html/ocdev/jinja2/_stringdefs.py, html/ocdev/jinja2/bccache.py,
+	html/ocdev/jinja2/compiler.py, html/ocdev/jinja2/constants.py,
+	html/ocdev/jinja2/debug.py, html/ocdev/jinja2/defaults.py,
+	html/ocdev/jinja2/environment.py, html/ocdev/jinja2/exceptions.py,
+	html/ocdev/jinja2/ext.py, html/ocdev/jinja2/filters.py,
+	html/ocdev/jinja2/lexer.py, html/ocdev/jinja2/loaders.py,
+	html/ocdev/jinja2/meta.py, html/ocdev/jinja2/nodes.py,
+	html/ocdev/jinja2/optimizer.py, html/ocdev/jinja2/parser.py,
+	html/ocdev/jinja2/runtime.py, html/ocdev/jinja2/sandbox.py,
+	html/ocdev/jinja2/tests.py, html/ocdev/jinja2/utils.py,
+	html/ocdev/jinja2/visitor.py, html/ocdev/markupsafe/__init__.py,
+	html/ocdev/markupsafe/_compat.py,
+	html/ocdev/markupsafe/_constants.py,
+	html/ocdev/markupsafe/_native.py,
+	html/ocdev/markupsafe/_speedups.c, html/ocdev/markupsafe/tests.py,
+	html/ocdev/ocdev-0.2.2.egg-info/PKG-INFO,
+	html/ocdev/ocdev-0.2.2.egg-info/SOURCES.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/dependency_links.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/entry_points.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/installed-files.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/requires.txt,
+	html/ocdev/ocdev-0.2.2.egg-info/top_level.txt,
+	html/ocdev/ocdev/__init__.py, html/ocdev/ocdev/__main__.py,
+	html/ocdev/ocdev/application.py, html/ocdev/ocdev/config.py,
+	html/ocdev/ocdev/plugins/__init__.py,
+	html/ocdev/ocdev/plugins/appstore/__init__.py,
+	html/ocdev/ocdev/plugins/appstore/appstore.py,
+	html/ocdev/ocdev/plugins/appstore/infoparser.py,
+	html/ocdev/ocdev/plugins/appstore/invalidconfigerror.py,
+	html/ocdev/ocdev/plugins/ci/__init__.py,
+	html/ocdev/ocdev/plugins/ci/ci.py,
+	html/ocdev/ocdev/plugins/ci/templates/autoconfig/mysql.php,
+	html/ocdev/ocdev/plugins/ci/templates/autoconfig/postgresql.php,
+	html/ocdev/ocdev/plugins/ci/templates/autoconfig/sqlite.php,
+	html/ocdev/ocdev/plugins/devup/__init__.py,
+	html/ocdev/ocdev/plugins/devup/devup.py,
+	html/ocdev/ocdev/plugins/plugin.py,
+	html/ocdev/ocdev/plugins/pluginerror.py,
+	html/ocdev/ocdev/plugins/server/__init__.py,
+	html/ocdev/ocdev/plugins/server/server.py,
+	html/ocdev/ocdev/plugins/setup/__init__.py,
+	html/ocdev/ocdev/plugins/setup/dependencyerror.py,
+	html/ocdev/ocdev/plugins/setup/setup.py,
+	html/ocdev/ocdev/plugins/startapp/__init__.py,
+	html/ocdev/ocdev/plugins/startapp/startapp.py,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/.travis.yml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/AUTHORS.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/CHANGELOG.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/COPYING,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/Makefile,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/README.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/appinfo/app.php
+	,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/appinfo/info.xm
+	l,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/appinfo/routes.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/controller/page
+	controller.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/css/style.css,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/img/app.svg,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/js/script.js,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/phpunit.integra
+	tion.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/phpunit.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/templates/main.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/templates/part.
+	content.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/templates/part.
+	navigation.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/templates/part.
+	settings.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/tests/unit/auto
+	loader.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.0/app/tests/unit/cont
+	roller/PageControllerTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/.travis.yml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/AUTHORS.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/CHANGELOG.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/COPYING,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/Makefile,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/README.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/appinfo/app.php
+	,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/appinfo/info.xm
+	l,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/appinfo/routes.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/controller/page
+	controller.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/css/style.css,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/img/app.svg,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/js/script.js,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/phpunit.integra
+	tion.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/phpunit.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/templates/main.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/templates/part.
+	content.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/templates/part.
+	navigation.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/templates/part.
+	settings.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/tests/integrati
+	on/AppTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/tests/travis/ph
+	p.ini,
+	html/ocdev/ocdev/plugins/startapp/templates/8.1/app/tests/unit/cont
+	roller/PageControllerTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/.travis.yml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/AUTHORS.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/CHANGELOG.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/COPYING,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/Makefile,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/README.md,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/appinfo/app.php
+	,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/appinfo/info.xm
+	l,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/appinfo/routes.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/controller/page
+	controller.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/css/style.css,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/img/app.svg,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/js/script.js,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/phpunit.integra
+	tion.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/phpunit.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/templates/main.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/templates/part.
+	content.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/templates/part.
+	navigation.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/templates/part.
+	settings.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/tests/integrati
+	on/AppTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/tests/travis/ph
+	p.ini,
+	html/ocdev/ocdev/plugins/startapp/templates/8.2/app/tests/unit/cont
+	roller/PageControllerTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/.travis.yml,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/AUTHORS.md,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/CHANGELOG.md,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/COPYING,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/Makefile,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/README.md,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/appinfo/app.php
+	,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/appinfo/autoloa
+	d.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/appinfo/info.xm
+	l,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/appinfo/routes.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/controller/page
+	controller.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/css/style.css,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/img/app.svg,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/js/script.js,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/phpunit.integra
+	tion.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/phpunit.xml,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/templates/main.
+	php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/templates/part.
+	content.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/templates/part.
+	navigation.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/templates/part.
+	settings.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/tests/bootstrap
+	.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/tests/integrati
+	on/AppTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/9.0/app/tests/unit/cont
+	roller/PageControllerTest.php,
+	html/ocdev/ocdev/plugins/startapp/templates/includes/licenses/agpl.
+	header.php,
+	html/ocdev/ocdev/plugins/startapp/templates/includes/licenses/agpl.
+	txt,
+	html/ocdev/ocdev/plugins/startapp/templates/includes/licenses/mit.h
+	eader.php,
+	html/ocdev/ocdev/plugins/startapp/templates/includes/licenses/mit.t
+	xt, html/ocdev/ocdev/plugins/validators.py,
+	html/ocdev/ocdev/version.py, html/ocdev/ocdev/version.txt,
+	html/ocdev/requests-2.10.0.dist-info/DESCRIPTION.rst,
+	html/ocdev/requests-2.10.0.dist-info/METADATA,
+	html/ocdev/requests-2.10.0.dist-info/RECORD,
+	html/ocdev/requests-2.10.0.dist-info/WHEEL,
+	html/ocdev/requests-2.10.0.dist-info/metadata.json,
+	html/ocdev/requests-2.10.0.dist-info/top_level.txt,
+	html/ocdev/requests/__init__.py, html/ocdev/requests/adapters.py,
+	html/ocdev/requests/api.py, html/ocdev/requests/auth.py,
+	html/ocdev/requests/cacert.pem, html/ocdev/requests/certs.py,
+	html/ocdev/requests/compat.py, html/ocdev/requests/cookies.py,
+	html/ocdev/requests/exceptions.py, html/ocdev/requests/hooks.py,
+	html/ocdev/requests/models.py,
+	html/ocdev/requests/packages/__init__.py,
+	html/ocdev/requests/packages/chardet/__init__.py,
+	html/ocdev/requests/packages/chardet/big5freq.py,
+	html/ocdev/requests/packages/chardet/big5prober.py,
+	html/ocdev/requests/packages/chardet/chardetect.py,
+	html/ocdev/requests/packages/chardet/chardistribution.py,
+	html/ocdev/requests/packages/chardet/charsetgroupprober.py,
+	html/ocdev/requests/packages/chardet/charsetprober.py,
+	html/ocdev/requests/packages/chardet/codingstatemachine.py,
+	html/ocdev/requests/packages/chardet/compat.py,
+	html/ocdev/requests/packages/chardet/constants.py,
+	html/ocdev/requests/packages/chardet/cp949prober.py,
+	html/ocdev/requests/packages/chardet/escprober.py,
+	html/ocdev/requests/packages/chardet/escsm.py,
+	html/ocdev/requests/packages/chardet/eucjpprober.py,
+	html/ocdev/requests/packages/chardet/euckrfreq.py,
+	html/ocdev/requests/packages/chardet/euckrprober.py,
+	html/ocdev/requests/packages/chardet/euctwfreq.py,
+	html/ocdev/requests/packages/chardet/euctwprober.py,
+	html/ocdev/requests/packages/chardet/gb2312freq.py,
+	html/ocdev/requests/packages/chardet/gb2312prober.py,
+	html/ocdev/requests/packages/chardet/hebrewprober.py,
+	html/ocdev/requests/packages/chardet/jisfreq.py,
+	html/ocdev/requests/packages/chardet/jpcntx.py,
+	html/ocdev/requests/packages/chardet/langbulgarianmodel.py,
+	html/ocdev/requests/packages/chardet/langcyrillicmodel.py,
+	html/ocdev/requests/packages/chardet/langgreekmodel.py,
+	html/ocdev/requests/packages/chardet/langhebrewmodel.py,
+	html/ocdev/requests/packages/chardet/langhungarianmodel.py,
+	html/ocdev/requests/packages/chardet/langthaimodel.py,
+	html/ocdev/requests/packages/chardet/latin1prober.py,
+	html/ocdev/requests/packages/chardet/mbcharsetprober.py,
+	html/ocdev/requests/packages/chardet/mbcsgroupprober.py,
+	html/ocdev/requests/packages/chardet/mbcssm.py,
+	html/ocdev/requests/packages/chardet/sbcharsetprober.py,
+	html/ocdev/requests/packages/chardet/sbcsgroupprober.py,
+	html/ocdev/requests/packages/chardet/sjisprober.py,
+	html/ocdev/requests/packages/chardet/universaldetector.py,
+	html/ocdev/requests/packages/chardet/utf8prober.py,
+	html/ocdev/requests/packages/urllib3/__init__.py,
+	html/ocdev/requests/packages/urllib3/_collections.py,
+	html/ocdev/requests/packages/urllib3/connection.py,
+	html/ocdev/requests/packages/urllib3/connectionpool.py,
+	html/ocdev/requests/packages/urllib3/contrib/__init__.py,
+	html/ocdev/requests/packages/urllib3/contrib/appengine.py,
+	html/ocdev/requests/packages/urllib3/contrib/ntlmpool.py,
+	html/ocdev/requests/packages/urllib3/contrib/pyopenssl.py,
+	html/ocdev/requests/packages/urllib3/contrib/socks.py,
+	html/ocdev/requests/packages/urllib3/exceptions.py,
+	html/ocdev/requests/packages/urllib3/fields.py,
+	html/ocdev/requests/packages/urllib3/filepost.py,
+	html/ocdev/requests/packages/urllib3/packages/__init__.py,
+	html/ocdev/requests/packages/urllib3/packages/ordered_dict.py,
+	html/ocdev/requests/packages/urllib3/packages/six.py,
+	html/ocdev/requests/packages/urllib3/packages/ssl_match_hostname/__
+	init__.py,
+	html/ocdev/requests/packages/urllib3/packages/ssl_match_hostname/_i
+	mplementation.py,
+	html/ocdev/requests/packages/urllib3/poolmanager.py,
+	html/ocdev/requests/packages/urllib3/request.py,
+	html/ocdev/requests/packages/urllib3/response.py,
+	html/ocdev/requests/packages/urllib3/util/__init__.py,
+	html/ocdev/requests/packages/urllib3/util/connection.py,
+	html/ocdev/requests/packages/urllib3/util/request.py,
+	html/ocdev/requests/packages/urllib3/util/response.py,
+	html/ocdev/requests/packages/urllib3/util/retry.py,
+	html/ocdev/requests/packages/urllib3/util/ssl_.py,
+	html/ocdev/requests/packages/urllib3/util/timeout.py,
+	html/ocdev/requests/packages/urllib3/util/url.py,
+	html/ocdev/requests/sessions.py,
+	html/ocdev/requests/status_codes.py,
+	html/ocdev/requests/structures.py, html/ocdev/requests/utils.py,
+	scripts/makefile.am, scripts/testenv.sh: owncloud development
+	environment in html, start: PYTHONPATH=$(pwd)/ocdev bin/ocdev
+	--version
+
+2016-04-28  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* AUTHORS, COPYING, ChangeLog, INSTALL, NEWS, README, autogen.sh,
+	ax_check_qt.m4, ax_cxx_compile_stdcxx_11.m4,
+	ax_init_standard_project.m4, bootstrap.sh, build-in-docker.sh,
+	build-resource-file.sh, configure.ac, debian/changelog.in,
+	debian/compat, debian/control.in, debian/docs, debian/rules,
+	doc/doxyfile.in, doc/makefile.am, ggrwinti.desktop.in,
+	html/makefile.am, mac-create-app-bundle.sh, makefile.am,
+	resolve-debbuilddeps.sh, resolve-rpmbuilddeps.sh,
+	scripts/makefile.am, sql-to-dot.sed: project bootstrap
+
+2016-04-28  Marc Wäckerlin <marc@waeckerlin.org>
+
+	* Initial commit
+

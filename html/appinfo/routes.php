@@ -13,6 +13,7 @@ return [
       ['name' => 'geschaeft#index', 'url' => '/geschaefte', 'verb' => 'GET'],
       ['name' => 'geschaeft#update', 'url' => '/geschaefte/{id}', 'verb' => 'PUT'],
       ['name' => 'ggrsitzungen#index', 'url' => '/ggrsitzungen', 'verb' => 'GET'],
-      ['name' => 'fraktionssitzungen#index', 'url' => '/fraktionssitzung', 'verb' => 'GET'],
+      ['name' => 'geschaeft#ggrsitzung', 'url' => '/ggrsitzung/{id}', 'verb' => 'GET'],
+      ['name' => 'fraktionssitzungen#index', 'url' => '/fraktionssitzungen', 'verb' => 'GET'],
     ]
 ];

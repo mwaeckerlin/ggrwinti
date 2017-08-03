@@ -21,13 +21,14 @@
   <option value="marc"></option>
 </datalist>
 
-<h2>Offene Geschäfte</h2>
+<h2>Geschäftsliste: <?php  echo $_['title']; ?></h2>
 
 <form action="" id="geschaefte">
   <?php
   if (key_exists('data', $_)) {
     foreach ($_['data'] as $data) {
-      echo '<div class="geschaeft" title="'.$data->date().': '.$data->type().'">';
+      $status=preg_replace('/[^a-z]+/', '_', strtolower($data->status()));
+      echo '<div class="geschaeft '.$status.'" title="'.$data->date().': '.$data->type().'">';
       echo "<div>" . $data->ggrnr() . "</div>";
       echo "<div>" . $data->type().': '.$data->title() . "</div>";
       echo '<div><input placeholder="Zuständig" class="edit" data-field="responsible" data-id="'.$data->id().'" type="text" name="responsible" list="users" maxlength="255" value="' . $data->responsible() . '" /></div>';

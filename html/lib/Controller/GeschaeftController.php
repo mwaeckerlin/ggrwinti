@@ -48,7 +48,26 @@ class GeschaeftController extends Controller {
   public function index() {
     $this->logger->debug('index');
     return new TemplateResponse('ggrwinti', 'index',
-                                array('data' => $this->mapper->findAll($this->userId)));
+                                array('data' => $this->mapper->findAll($this->userId),
+                                      'title' => 'Offene Geschäfte'));
+  }
+
+  /**
+   * @NoAdminRequired
+   * @NoCSRFRequired
+   *
+   * @return DataResponse
+   */
+  public function ggrsitzung($id) {
+    $this->logger->debug('index');
+    try {
+      $date = $this->mapper->sitzungsDatum($id);
+      return new TemplateResponse('ggrwinti', 'index',
+                                  array('data' => $this->mapper->findSitzung($id, $this->userId),
+                                        'title' => 'Sitzungstraktanden vom '.date("d.m.Y", strtotime($date->date))));
+    } catch (Exception $e) {
+      return new DataResponse([], Http::STATUS_NOT_FOUND);
+    }
   }
 
   /**

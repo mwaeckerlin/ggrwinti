@@ -1,6 +1,7 @@
 #geschaefte {
   display: table;
   width: 100%;
+  border-collapse: collapse;
 }
 #geschaefte > .geschaeft {
   display: table-row;
@@ -18,4 +19,7 @@
 #geschaefte .geschaeft div textarea:focus,
 #geschaefte .geschaeft div textarea:active {
   height: 10em;
+}
+#geschaefte .geschaeft.erledigt {
+  background-color: #eee;
 }

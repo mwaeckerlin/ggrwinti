@@ -5,8 +5,9 @@ namespace OCA\GgrWinti\AppInfo;
 
 use OCA\GgrWinti\Controller\GeschaeftController;
 use OCA\GgrWinti\Controller\FraktionController;
-use OCA\GgrWinti\Controller\PageController;
+use OCA\GgrWinti\Controller\GgrsitzungenController;
 use OCA\GgrWinti\Db\GeschaeftMapper;
+use OCA\GgrWinti\Db\GgrsitzungenMapper;
 use OCP\AppFramework\App;
 use OCP\AppFramework\IAppContainer;
 
@@ -49,10 +50,11 @@ class Application extends App {
       return $c->query('ServerContainer')->getLogger();
     });
     $container->registerService(
-      'PageController', function(IAppContainer $c) {
-	return new PageController(
-	  $c->query('AppName'), $c->query('Request'), $c->query('UserId')
-	);
+      'GgrsitzungenController', function(IAppContainer $c) {
+	return new GgrsitzungenController($c->query('Logger'), $c->query('AppName'),
+                                          $c->query('Request'),
+                                          $c->query('GgrsitzungenMapper'),
+                                          $c->query('UserId'));
       }
     );
     $container->registerService(
@@ -78,6 +80,14 @@ class Application extends App {
    */
   private static function registerMappers(IAppContainer &$container) {
     
+    $container->registerService(
+      'GgrsitzungenMapper', function(IAppContainer $c) {
+	return new GgrsitzungenMapper(
+	  $c->query('ServerContainer')
+	    ->getDatabaseConnection()
+	);
+      }
+    );
     $container->registerService(
       'GeschaeftMapper', function(IAppContainer $c) {
 	return new GeschaeftMapper(

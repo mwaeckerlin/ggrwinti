@@ -35,28 +35,18 @@ success() {
 }
 
 # commandline parameter evaluation
-TRANSACTION="start transaction;"
-SQL_BEFORE="insert into"
-SQL_AFTER=" on duplicate key update id = values(id), title = values(title), ggrnr = values(ggrnr), type = values(type), status = values(status), date = values(date)"
 PREFIX=${PREFIX:-oc_}
 basis="http://gemeinderat.winterthur.ch/de/"
 overview="${basis}politbusiness/"
 sitzungen="${basis}sitzung/"
 detail="http://gemeinderat.winterthur.ch/de/politbusiness/?action=showinfo&info_id="
 only=
+db=mysql
 while test $# -gt 0; do
     case "$1" in
         (--prefix|-p) shift; PREFIX=$1;;
-        (--mysql|-m)
-            TRANSACTION="start transaction;"
-            SQL_BEFORE="insert into"
-            SQL_AFTER=" on duplicate key update id = values(id), title = values(title), ggrnr = values(ggrnr), type = values(type), status = values(status), date = values(date)"
-            ;;
-        (--sqlite|-s)
-            TRANSACTION="begin transaction;"
-            SQL_BEFORE="pragma busy_timeout=20000; insert or replace into"
-            SQL_AFTER=""
-            ;;
+        (--mysql|-m) db=mysql;;
+        (--sqlite|-s) db=sqlite;;
         (--geschaefte|-g) only=g;;
         (--sitzungen|-x) only=s;;
         (--help|-h) less <<EOF
@@ -170,25 +160,86 @@ if ! test -x "$SITZUNGENAWK"; then
     fi
 fi
 
+join() {
+    local IFS="$1"
+    shift
+    echo -n "$*"
+}
+
+sql() {
+    declare -a arg2=("${!2}")
+    declare -a arg3=("${!3}")
+    case "$db" in
+        (mysql)
+            declare -a nms
+            for t in "${arg2[@]}"; do
+                nms+=("$t=values($t)")
+            done
+            echo -n "insert into ${PREFIX}ggrwinti_${1} ("
+            join ',' "${arg2[@]}"
+            echo -n ") values ("
+            join ',' "${arg3[@]}"
+            echo -n ") on duplicate key update "
+            join ',' "${nms[@]}"
+        ;;
+        (sqlite)
+            echo -n "pragma busy_timeout=20000; "
+            echo -n "insert or replace into ${PREFIX}ggrwinti_${1} ("
+            join ',' "${arg2[@]}"
+            echo -n ") values ("
+            join ',' "${arg3[@]}"
+            echo -n ")"
+            
+        ;;
+        (*)
+            error unknown database
+            ;;
+    esac
+    echo ';'
+}
+
+export LANG=de_CH.ISO-8859-1
+
 if test "$only" != "s"; then
     geschaefte=$(wget -qO- "${overview}" | sed -n 's,^.*?action=showinfo&info_id=\([0-9]*\).*$,\1,p')
     for geschaeft in ${geschaefte}; do
-        values=$(wget -qO- "${detail}${geschaeft}" | html2 \
-                        | sed -nf ${HTML2SQL} | sed "s,','',g" | sed "s/^.*$/,'&'/")
-        if test $(echo "$values" | wc -l) -eq 5; then
-            echo "${SQL_BEFORE} ${PREFIX}ggrwinti_geschaefte (id, title, ggrnr, type, status, date) values ("
-            echo "${geschaeft}"
-            echo "$values"
-            echo ")${SQL_AFTER};"
+        declare -a values=()
+        mapfile -t values < <(echo $geschaeft; wget -qO- "${detail}${geschaeft}" | html2 | sed -nf ${HTML2SQL} | sed "s,','',g")
+        if test ${#values[@]} -eq 6; then
+            declare -a vals=()
+            for v in "${values[@]}"; do
+                vals+=("'${v//'\\'}'")
+            done
+            names=( 'id' 'title' 'ggrnr' 'type' 'status' 'date' )
+            sql geschaefte names[@]  vals[@]
         fi
     done
 fi
 
 if test "$only" != "g"; then
-    echo "${TRANSACTION}"
-    echo "delete from ${PREFIX}ggrwinti_sitzung;"
-    naechste=$(wget -qO- http://gemeinderat.winterthur.ch/de/sitzung/ | html2 2> /dev/null | sed -n 's,.*tbody/tr/td/span/a/@href=,,p')
-    echo "insert into ${PREFIX}ggrwinti_sitzung (nr, ggrnr) values"
-    wget -qO- "${sitzungen}${naechste}" | html2 2> /dev/null | ${SITZUNGENAWK}
-    echo "commit;"
+    sitzungen=$(wget -qO- 'http://gemeinderat.winterthur.ch/de/sitzung/?show=all' | sed -n 's,.*href="?action=showevent&amp;event_id=\([0-9]\+\).*,\1,p')
+    for id in $sitzungen; do
+        url='http://gemeinderat.winterthur.ch/de/sitzung/?action=showevent&event_id='$id
+        content=$(wget -qO- "$url" | sed 's,<[^>]*>,\n,g')
+        date=$(sed -n 's/^\([0-9][0-9]\)\.\([0-9][0-9]\)\.\(20[0-9][0-9]\)/\3-\2-\1/p' <<<"$content")
+        if test -z "$date"; then
+            error wget -qO- "'$url'"
+            break
+        fi
+        names=('id' 'date')
+        values=("$id" "'$date'")
+        sql ggrsitzungen names[@] values[@]
+        traktanden=$(sed -n '/^\([0-9]\+\)\.$/{s,,\1,;h;:a;n;/20[0-9][0-9]\.[0-9]\{1,3\}$/!b a;:g;s/^\([0-9]\{4\}\.\)\([0-9]\{1,2\}\)$/\10\2/;tg;H;x;s/\n/,/p}' <<<"$content")
+        oldifs="$IFS"
+        for traktandum in ${traktanden}; do
+            IFS=","
+            read -a values <<<"${traktandum}"
+            values[1]="(select id from ${PREFIX}ggrwinti_geschaefte where ggrnr='${values[1]}' limit 1)"
+            values[2]=$id
+            values[3]=$(($id*100+${values[0]}))
+            names=('nr' 'geschaeft' 'ggrsitzung' 'id')
+            sql ggrsitzung_traktanden names[@] values[@]
+        done
+        IFS="$oldifs"
+    done
 fi

@@ -10,7 +10,7 @@
 
 m4_define(x_package_name, ggrwinti) # project's name
 m4_define(x_major, 0) # project's major version
-m4_define(x_minor, 1) # project's minor version
+m4_define(x_minor, 2) # project's minor version
 m4_include(ax_init_standard_project.m4)
 AC_INIT(x_package_name, x_version, x_bugreport, x_package_name)
 AM_INIT_AUTOMAKE([1.9 tar-pax])

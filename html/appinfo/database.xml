@@ -61,7 +61,7 @@
         </declaration>
     </table>
     <table>
-        <name>*dbprefix*ggrwinti_sitzung</name>
+        <name>*dbprefix*ggrwinti_ggrsitzungen</name>
         <declaration>
             <field>
                 <name>id</name>
@@ -75,21 +75,37 @@
                 <type>date</type>
                 <notnull>true</notnull>
             </field>
+        </declaration>
+    </table>
+    <table>
+        <name>*dbprefix*ggrwinti_ggrsitzung_traktanden</name>
+        <declaration>
+            <field>
+                <name>id</name>
+                <type>integer</type>
+                <notnull>true</notnull>
+                <unsigned>true</unsigned>
+                <primary>true</primary>
+            </field>
             <field>
                 <name>nr</name>
                 <type>integer</type>
-                <notnull>true</notnull>
+                <unsigned>true</unsigned>
             </field>
             <field>
-                <name>ggrnr</name>
-                <type>text</type>
-                <length>10</length>
-                <notnull>true</notnull>
+                <name>ggrsitzung</name>
+                <type>integer</type>
+                <unsigned>true</unsigned>
+            </field>
+            <field>
+                <name>geschaeft</name>
+                <type>integer</type>
+                <unsigned>true</unsigned>
             </field>
         </declaration>
     </table>
     <table>
-      <name>*dbprefix*ggrwinti_job_assignment</name>
+      <name>*dbprefix*ggrwinti_fraktionssitzung</name>
       <declaration>
         <field>
           <name>id</name>
@@ -97,19 +113,6 @@
           <notnull>true</notnull>
           <unsigned>true</unsigned>
           <primary>true</primary>
-        </field>
-        <field>
-          <name>ggrid</name>
-          <type>integer</type>
-          <notnull>true</notnull>
-          <unsigned>true</unsigned>
-          <comments>foreign key to ggrwinti_geschaefte.id</comments>
-        </field>
-        <field>
-          <name>type</name>
-          <type>text</type>
-          <length>100</length>
-          <notnull>false</notnull>
         </field>
       </declaration>
     </table>

@@ -10,8 +10,12 @@
 /div=Geschäftsnummer/ {
   :a
   n
-  s,.*table/tr/td/div/div/div/div=,,p
+  s,.*table/tr/td/div/div/div/div=,,
   Ta
+  :g
+  s/^\([0-9]\{4\}\.\)\([0-9]\{1,2\}\)$/\10\2/
+  tg
+  p
 }
 /div=Geschäftsart/ {
   :b

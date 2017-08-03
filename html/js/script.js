@@ -34,5 +34,13 @@ $(document).ready(function () {
     clearTimeout(timer[obj.attr("data-field")+obj.attr("data-id")])
     changed(obj)
   })
-  
+  $('.filter input').on('input', function(e) {
+    all = $(this).parent().parent().parent().children('.geschaeft')
+                     .find('[data-field="'+$(this).attr('data-field')+'"]')
+    matches = all.filter(':contains("'+$(this).val()+'"),[value*="'+$(this).val()+'"]')
+    nonmatches = all.not(':contains("'+$(this).val()+'"),[value*="'+$(this).val()+'"]')
+    nonmatches.closest('div').parent().hide()
+    matches.closest('div').parent().show()
+    console.log(matches)
+  })  
 })

@@ -1,3 +1,11 @@
+2017-08-03  Marc W‰ckerlin <marc@jupiter>
+
+	* ChangeLog, html/appinfo/routes.php, html/css/style.css,
+	html/lib/Controller/GeschaeftController.php,
+	html/lib/Db/GeschaeftMapper.php, html/templates/content/index.php,
+	html/templates/navigation/index.php: funktionierende offene
+	gesch√§fte und ggr sitzungen
+
 2017-08-03  Marc W‰ckerlin <marc@dev0001.int.swisssign.net>
 
 	* configure.ac, html/appinfo/database.xml, html/appinfo/routes.php,

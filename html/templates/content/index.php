@@ -24,13 +24,21 @@
 <h2>Geschäftsliste: <?php  echo $_['title']; ?></h2>
 
 <form action="" id="geschaefte">
+  <div class="filter">
+    <div><input data-field="ggrnr" placeholder="filter" type="text" /></div>
+    <div><input data-field="title" placeholder="filter" type="text" /></div>
+    <div><input data-field="responsible" placeholder="filter" type="text" /></div>
+    <div><input data-field="suggestion" placeholder="filter" type="text" /></div>
+    <div><input data-field="decision" placeholder="filter" type="text" /></div>
+    <div><input data-field="comment" placeholder="filter" type="text" /></div>
+  </div>
   <?php
   if (key_exists('data', $_)) {
     foreach ($_['data'] as $data) {
       $status=preg_replace('/[^a-z]+/', '_', strtolower($data->status()));
       echo '<div class="geschaeft '.$status.'" title="'.$data->date().': '.$data->type().'">';
-      echo "<div>" . $data->ggrnr() . "</div>";
-      echo "<div>" . $data->type().': '.$data->title() . "</div>";
+      echo '<div data-field="ggrnr">' . $data->ggrnr() . "</div>";
+      echo '<div data-field="title">' . $data->type().': '.$data->title() . "</div>";
       echo '<div><input placeholder="Zuständig" class="edit" data-field="responsible" data-id="'.$data->id().'" type="text" name="responsible" list="users" maxlength="255" value="' . $data->responsible() . '" /></div>';
       echo '<div><input placeholder="Antrag" class="edit" data-field="suggestion" data-id="'.$data->id().'" type="text" name="suggestion" list="decisions" maxlength="255" value="' . $data->suggestion() . '" /></div>';
       echo '<div><input placeholder="Entscheid" class="edit" data-field="decision" data-id="'.$data->id().'" type="text" name="decision" list="decisions" maxlength="255" value="' . $data->decision() . '" /></div>';

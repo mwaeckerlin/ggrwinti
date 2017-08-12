@@ -37,7 +37,7 @@
     foreach ($_['data'] as $data) {
       $status=preg_replace('/[^a-z]+/', '_', strtolower($data->status()));
       echo '<div class="geschaeft '.$status.'" title="'.$data->date().': '.$data->type().'">';
-      echo '<div data-field="ggrnr">' . $data->ggrnr() . "</div>";
+      echo '<a href="http://gemeinderat.winterthur.ch/de/politbusiness/?action=showinfo&info_id='.$data->id().'" target="_blank"><div data-field="ggrnr">' . $data->ggrnr() . "</div></a>";
       echo '<div data-field="title">' . $data->type().': '.$data->title() . "</div>";
       echo '<div><input placeholder="Zuständig" class="edit" data-field="responsible" data-id="'.$data->id().'" type="text" name="responsible" list="users" maxlength="255" value="' . $data->responsible() . '" /></div>';
       echo '<div><input placeholder="Antrag" class="edit" data-field="suggestion" data-id="'.$data->id().'" type="text" name="suggestion" list="decisions" maxlength="255" value="' . $data->suggestion() . '" /></div>';

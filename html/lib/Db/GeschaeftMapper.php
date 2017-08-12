@@ -17,7 +17,7 @@ class GeschaeftMapper extends Mapper {
   }
 
   public function findAll($userId) {
-    $sql = 'SELECT * FROM *PREFIX*ggrwinti_geschaefte WHERE status!=\'Erledigt\'';
+    $sql = 'SELECT * FROM *PREFIX*ggrwinti_geschaefte WHERE status!=\'Erledigt\' order by ggrnr';
     return $this->findEntities($sql);
   }
   

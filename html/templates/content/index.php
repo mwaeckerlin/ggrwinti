@@ -48,3 +48,5 @@
   }
   ?>
 </form>
+
+<p><a class="table-export" data-table="#geschaefte" download="geschaefte.csv">exportieren</a></p>

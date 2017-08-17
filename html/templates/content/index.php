@@ -34,11 +34,27 @@
   </div>
   <?php
   if (key_exists('data', $_)) {
-    foreach ($_['data'] as $data) {
+    foreach ($_['data']['items'] as $data) {
+      $docs = $_['data']['docs'][$data->ggrnr()];
       $status=preg_replace('/[^a-z]+/', '_', strtolower($data->status()));
       echo '<div class="geschaeft '.$status.'" title="'.$data->date().': '.$data->type().'">';
       echo '<a href="http://gemeinderat.winterthur.ch/de/politbusiness/?action=showinfo&info_id='.$data->id().'" target="_blank"><div data-field="ggrnr">' . $data->ggrnr() . "</div></a>";
-      echo '<div data-field="title">' . $data->type().': '.$data->title() . "</div>";
+      switch (count($docs)) {
+        case 0:
+          echo '<div data-field="title"><del>' . $data->type().': '.$data->title() . "</del></div>";
+          break;
+        case 1:
+          echo '<div data-field="title"><a href="/remote.php/webdav/'.$docs[0]->getPath().'">' . $data->type().': '.$data->title() . "</a></div>";
+          break;
+        default:
+          echo '<div data-field="title"><a href="/remote.php/webdav/'.$docs[0]->getPath().'">' . $data->type().': '.$data->title() . "</a>";
+          $i=0;
+          foreach ($docs as $doc) {
+            echo '<a href="/remote.php/webdav/'.$docs[0]->getPath().'">['.(++$i).']</a> ';
+          }
+          echo "</div>";
+          break;
+      }
       echo '<div><input placeholder="Zuständig" class="edit" data-field="responsible" data-id="'.$data->id().'" type="text" name="responsible" list="users" maxlength="255" value="' . $data->responsible() . '" /></div>';
       echo '<div><input placeholder="Antrag" class="edit" data-field="suggestion" data-id="'.$data->id().'" type="text" name="suggestion" list="decisions" maxlength="255" value="' . $data->suggestion() . '" /></div>';
       echo '<div><input placeholder="Entscheid" class="edit" data-field="decision" data-id="'.$data->id().'" type="text" name="decision" list="decisions" maxlength="255" value="' . $data->decision() . '" /></div>';

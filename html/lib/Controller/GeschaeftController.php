@@ -10,6 +10,7 @@ use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\Http\TemplateResponse;
 use OCP\IRequest;
 use OCP\ILogger;
+use OCP\Files\IRootFolder;
 
 class GeschaeftController extends Controller {
 
@@ -22,6 +23,8 @@ class GeschaeftController extends Controller {
   /** @var string */
   private $userId;
 
+  private $root;
+
   /**
    * GeschaeftController constructor.
    *
@@ -31,11 +34,12 @@ class GeschaeftController extends Controller {
    * @param string $userId
    */
   public function __construct(ILogger $logger, $AppName, IRequest $request,
-                              GeschaeftMapper $mapper, $userId) {
+                              GeschaeftMapper $mapper, IRootFolder $root, $userId) {
     parent::__construct($AppName, $request);
     $this->logger = $logger;
     $this->mapper = $mapper;
     $this->userId = $userId;
+    $this->root = $root;
   }
 
 
@@ -48,7 +52,8 @@ class GeschaeftController extends Controller {
   public function index() {
     $this->logger->debug('index');
     return new TemplateResponse('ggrwinti', 'index',
-                                array('data' => $this->mapper->findAll($this->userId),
+                                array('data' => $this->mapper->findAll($this->userId, $this->root),
+                                      'root' => $this->root,
                                       'title' => 'Offene Geschäfte'));
   }
 
@@ -63,7 +68,8 @@ class GeschaeftController extends Controller {
     try {
       $date = $this->mapper->sitzungsDatum($id);
       return new TemplateResponse('ggrwinti', 'index',
-                                  array('data' => $this->mapper->findSitzung($id, $this->userId),
+                                  array('data' => $this->mapper->findSitzung($id, $this->userId, $this->root),
+                                        'root' => $this->root,
                                         'title' => 'Sitzungstraktanden vom '.date("d.m.Y", strtotime($date->date))));
     } catch (Exception $e) {
       return new DataResponse([], Http::STATUS_NOT_FOUND);

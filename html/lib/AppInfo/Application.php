@@ -61,6 +61,7 @@ class Application extends App {
       'GeschaeftController', function(IAppContainer $c) {
 	return new GeschaeftController($c->query('Logger'), $c->query('AppName'),
                                        $c->query('Request'), $c->query('GeschaeftMapper'),
+                                       $c->query('RootFolder'),
                                        $c->query('UserId'));
       }
     );

@@ -54,6 +54,7 @@ class GeschaeftController extends Controller {
     return new TemplateResponse('ggrwinti', 'index',
                                 array('data' => $this->mapper->findAll($this->userId, $this->root),
                                       'root' => $this->root,
+                                      'user' => $this->userId,
                                       'title' => 'Offene Geschäfte'));
   }
 
@@ -70,6 +71,7 @@ class GeschaeftController extends Controller {
       return new TemplateResponse('ggrwinti', 'index',
                                   array('data' => $this->mapper->findSitzung($id, $this->userId, $this->root),
                                         'root' => $this->root,
+                                        'user' => $this->userId,
                                         'title' => 'Sitzungstraktanden vom '.date("d.m.Y", strtotime($date->date))));
     } catch (Exception $e) {
       return new DataResponse([], Http::STATUS_NOT_FOUND);

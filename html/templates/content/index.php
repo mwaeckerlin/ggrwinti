@@ -44,13 +44,13 @@
           echo '<div data-field="title"><del>' . $data->type().': '.$data->title() . "</del></div>";
           break;
         case 1:
-          echo '<div data-field="title"><a href="/remote.php/webdav/'.$docs[0]->getPath().'">' . $data->type().': '.$data->title() . "</a></div>";
+          echo '<div data-field="title"><a href="/remote.php/webdav'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">' . $data->type().': '.$data->title() . "</a></div>";
           break;
         default:
-          echo '<div data-field="title"><a href="/remote.php/webdav/'.$docs[0]->getPath().'">' . $data->type().': '.$data->title() . "</a>";
+          echo '<div data-field="title"><a href="/remote.php/webdav'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">' . $data->type().': '.$data->title() . "</a>";
           $i=0;
           foreach ($docs as $doc) {
-            echo '<a href="/remote.php/webdav/'.$docs[0]->getPath().'">['.(++$i).']</a> ';
+            echo '<a href="/remote.php/webdav/'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">['.(++$i).']</a> ';
           }
           echo "</div>";
           break;

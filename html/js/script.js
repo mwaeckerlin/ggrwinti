@@ -110,13 +110,12 @@ $(document).ready(function () {
 
   // filter rows
   $('.filter input').on('input', function(e) {
-    all = $(this).parent().parent().parent().children('.geschaeft')
+    var all = $(this).parent().parent().parent().children('.geschaeft')
                      .find('[data-field="'+$(this).attr('data-field')+'"]')
-    matches = all.filter(':contains("'+$(this).val()+'"),[value*="'+$(this).val()+'"]')
-    nonmatches = all.not(':contains("'+$(this).val()+'"),[value*="'+$(this).val()+'"]')
+    var matches = all.filter(':contains("'+$(this).val()+'"), *:contains("'+$(this).val()+'"), [value*="'+$(this).val()+'"]')
+    var nonmatches = all.not(':contains("'+$(this).val()+'"), *:contains("'+$(this).val()+'"), [value*="'+$(this).val()+'"]')
     nonmatches.closest('div').parent().closest('div').hide()
     matches.closest('div').parent().closest('div').show()
-    console.log(matches)
   })
 
   // save table

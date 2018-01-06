@@ -1,7 +1,7 @@
 FROM mwaeckerlin/nextcloud
 MAINTAINER mwaeckerlin
 
-ENV APPS "ggrwinti"
+ENV APPS "ggrwinti calendar contacts groupfolders"
 ENV DEBUG "1"
 
 RUN apt-get update -y && apt-get install -y ggrwinti

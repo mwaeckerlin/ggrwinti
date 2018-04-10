@@ -3,8 +3,22 @@
 /h2=/ {
   :f
   n
-  s,^.*table/tr/td/div/h2=,,p
+  s,^.*table/tr/td/div/h2=,,
   Tf
+  h
+  :i
+  n
+  /table\/tr\/td\/div\/h2\/br/ {
+    n
+    s,^.*table/tr/td/div/h2=,,
+    Th
+    H
+    :h
+    ti
+  }
+  g
+  s,\n, ,g
+  p
 }
 
 /div=Geschäftsnummer/ {

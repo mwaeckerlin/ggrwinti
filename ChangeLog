@@ -1,3 +1,71 @@
+2018-04-10  Marc Wäckerlin <marc@merkur.int.swisssign.net>
+
+	* scripts/html2sql.sed: header can be multiline, e.g. 2018.012
+
+2018-03-07  Marc Wäckerlin <marc@jupiter>
+
+	* html/appinfo/info.xml.in: fix max version to 13
+
+2018-01-11  Marc Wäckerlin <marc@jupiter>
+
+	* docker/Dockerfile: keep ggrwinti app
+
+2018-01-06  Marc Wäckerlin <marc@jupiter>
+
+	* : commit 53ad69293129ad52c8483929ba596ffdaf407791 Author: Marc
+	WÃ¤ckerlin <marc@jupiter> Date:   Sat Jan 6 16:53:02 2018 +0100
+
+2017-10-23  mwaeckerlin <marc@waeckerlin.org>
+
+	* docker/cronjob.sh: fixed new variables in cronjob - fixes problem
+	of non-working updates
+
+2017-08-21  Marc Wäckerlin <marc@jupiter>
+
+	* html/js/script.js: fixed search in new structure
+
+2017-08-17  Marc Wäckerlin <marc@jupiter>
+
+	* docker/start-ggrwinti.sh: fixed cron job environment
+
+2017-08-17  Marc Wäckerlin <marc@jupiter>
+
+	* docker/Dockerfile: fixed cron job environment
+
+2017-08-17  Marc Wäckerlin <marc@jupiter>
+
+	* configure.ac, docker/Dockerfile, docker/cronjob.sh: fixed cron job
+	environment
+
+2017-08-17  Marc Wäckerlin <marc@jupiter>
+
+	* html/lib/Controller/GeschaeftController.php,
+	html/templates/content/index.php: link to documents
+
+2017-08-17  Marc Wäckerlin <marc@jupiter>
+
+	* html/js/script.js, html/lib/AppInfo/Application.php,
+	html/lib/Controller/GeschaeftController.php,
+	html/lib/Db/GeschaeftMapper.php, html/templates/content/index.php,
+	html/templates/navigation/index.php: link to documents
+
+2017-08-14  Marc Wäckerlin <marc@jupiter>
+
+	* html/js/script.js, html/templates/content/index.php: fixed filter;
+	export table as csv
+
+2017-08-12  Marc Wäckerlin <marc@jupiter>
+
+	* configure.ac, html/lib/Db/GeschaeftMapper.php,
+	html/templates/content/index.php,
+	html/templates/navigation/index.php: sort by ggr-nr, link to ggr
+	extranet
+
+2017-08-03  Marc Wäckerlin <marc@jupiter>
+
+	* ChangeLog, html/css/style.css, html/js/script.js,
+	html/templates/content/index.php: filter
+
 2017-08-03  Marc Wäckerlin <marc@jupiter>
 
 	* ChangeLog, html/appinfo/routes.php, html/css/style.css,

@@ -1,3 +1,7 @@
+2018-04-11  Marc Wäckerlin <marc@merkur.int.swisssign.net>
+
+	* ChangeLog, configure.ac: fix dependency on buster
+
 2018-04-10  Marc Wäckerlin <marc@merkur.int.swisssign.net>
 
 	* scripts/html2sql.sed: header can be multiline, e.g. 2018.012

@@ -1,42 +1,138 @@
 #!/bin/bash -e
 
-# template for bash scripts
+##########################################################################################
+#### template for bash scripts #### START BELOW ##########################################
+##########################################################################################
 
-# internal use only
+############################################################################ begin logging
+# check if stdout is a terminal...
+if test -t 1; then
+
+    # see if it supports colors...
+    ncolors=$(tput colors)
+
+    if test -n "$ncolors" && test $ncolors -ge 8; then
+        bold="$(tput bold)"
+        underline="$(tput smul)"
+        standout="$(tput smso)"
+        normal="$(tput sgr0)"
+        black="$(tput setaf 0)"
+        red="$(tput setaf 1)"
+        green="$(tput setaf 2)"
+        yellow="$(tput setaf 3)"
+        blue="$(tput setaf 4)"
+        magenta="$(tput setaf 5)"
+        cyan="$(tput setaf 6)"
+        white="$(tput setaf 7)"
+    fi
+fi
+
 append_msg() {
     if test $# -ne 0; then
-        echo -en ":\e[0m \e[1m$*"
+        echo -n ": ${bold}$*"
     fi
-    echo -e "\e[0m"
+    echo "${normal}"
+}
+
+# write a message
+message() {
+    if test $# -eq 0; then
+        return
+    fi
+    echo "${bold}${white}$*${normal}" 1>&2
+}
+
+# write a success message
+success() {
+    echo -n "${bold}${green}success" 1>&2
+    append_msg $* 1>&2
 }
 
 # write a notice
 notice() {
-    if test $# -eq 0; then
-        return
-    fi
-    echo -e "\e[1m$*\e[0m" 1>&3
-}
-
-# write error message
-error() {
-    echo -en "\e[1;31merror" 1>&2
+    echo -n "${bold}${yellow}notice" 1>&2
     append_msg $* 1>&2
 }
 
 # write a warning message
 warning() {
-    echo -en "\e[1;33mwarning" 1>&2
+    echo -en "${bold}${red}warning" 1>&2
     append_msg $* 1>&2
 }
 
-# write a success message
-success() {
-    echo -en "\e[1;32msuccess" 1>&2
+# write error message
+error() {
+    echo -en "${bold}${red}error" 1>&2
     append_msg $* 1>&2
 }
 
-# commandline parameter evaluation
+# run a command, print the result and abort in case of error
+# option: --ignore: ignore the result, continue in case of error
+run() {
+    ignore=1
+    while test $# -gt 0; do
+        case "$1" in
+            (--ignore) ignore=0;;
+            (*) break;;
+        esac
+        shift;
+    done
+    echo -n "${bold}${yellow}running:${white} $*${normal} … "
+    set +e
+    result=$($* 2>&1)
+    res=$?
+    set -e
+    if test $res -ne 0; then
+        if test $ignore -eq 1; then
+            error "failed with return code: $res"
+            if test -n "$result"; then
+                echo "$result"
+            fi
+            exit 1
+        else
+            warning "ignored return code: $res"
+        fi
+    else
+        success
+    fi
+}
+
+############################################################################ error handler
+function traperror() {
+    set +x
+    local err=($1) # error status
+    local line="$2" # LINENO
+    local linecallfunc="$3"
+    local command="$4"
+    local funcstack="$5"
+    IFS=" "
+    for e in ${err[@]}; do
+        if test -n "$e" -a "$e" != "0"; then
+            error "line $line - command '$command' exited with status: $e (${err[@]})"
+            if [ "${funcstack}" != "main" -o "$linecallfunc" != "0" ]; then
+                echo -n "   ... error at ${funcstack} " 1>&2
+                if [ "$linecallfunc" != "" ]; then
+                    echo -n "called at line $linecallfunc" 1>&2
+                fi
+                echo
+            fi
+            exit $e
+        fi
+    done
+    success
+    exit 0
+}
+
+# catch errors
+trap 'traperror "$? ${PIPESTATUS[@]}" $LINENO $BASH_LINENO "$BASH_COMMAND" "${FUNCNAME[@]}" "${FUNCTION}"' ERR SIGINT INT TERM EXIT
+
+
+
+##########################################################################################
+#### START HERE ##########################################################################
+##########################################################################################
+
+######################################################### commandline parameter evaluation
 while test $# -gt 0; do
     case "$1" in
         (--help|-h) less <<EOF
@@ -60,62 +156,5 @@ EOF
     shift;
 done
 
-# run a command, print the result and abort in case of error
-# option: --no-check: ignore the result, continue in case of error
-run() {
-    check=1
-    while test $# -gt 0; do
-        case "$1" in
-            (--no-check) check=0;;
-            (*) break;;
-        esac
-        shift;
-    done
-    echo -en "\e[1m-> running:\e[0m $* ..."
-    result=$($* 2>&1)
-    res=$?
-    if test $res -ne 0; then
-        if test $check -eq 1; then
-            error "failed with return code: $res"
-            if test -n "$result"; then
-                echo "$result"
-            fi
-            exit 1
-        else
-            warning "ignored return code: $res"
-        fi
-    else
-        success
-    fi
-}
-
-# error handler
-function traperror() {
-    set +x
-    local err=($1) # error status
-    local line="$2" # LINENO
-    local linecallfunc="$3"
-    local command="$4"
-    local funcstack="$5"
-    for e in ${err[@]}; do
-        if test -n "$e" -a "$e" != "0"; then
-            error "line $line - command '$command' exited with status: $e (${err[@]})"
-            if [ "${funcstack}" != "main" -o "$linecallfunc" != "0" ]; then
-                echo -n "   ... error at ${funcstack} "
-                if [ "$linecallfunc" != "" ]; then
-                    echo -n "called at line $linecallfunc"
-                fi
-                echo
-            fi
-            exit $e
-        fi
-    done
-    success
-    exit 0
-}
-
-# catch errors
-trap 'traperror "$? ${PIPESTATUS[@]}" $LINENO $BASH_LINENO "$BASH_COMMAND" "${FUNCNAME[@]}" "${FUNCTION}"' ERR SIGINT INT TERM EXIT
-
-##########################################################################################
+##################################################################################### Main
 

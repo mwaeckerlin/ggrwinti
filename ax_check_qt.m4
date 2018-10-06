@@ -119,10 +119,17 @@ AC_DEFUN([AX_CHECK_QT], [
     AC_DEFINE([HAVE_$1])
     QTDIR=$(${PKG_CONFIG} --variable=prefix Qt5Core)
     qt_host_bins=$(${PKG_CONFIG} --variable=host_bins Qt5Core)
-    if test -d "${qt_host_bins}"; then
-      QT_PLUGIN_PATH=${qt_host_bins}/../plugins
-    else
-      QT_PLUGIN_PATH=${QTDIR}/share/qt5/plugins
+    qt_libdir=$(${PKG_CONFIG} --variable=libdir Qt5Core)
+    if test -d "${qt_libdir}" -a -d "${qt_libdir}/plugins"; then
+      QT_PLUGIN_PATH="${qt_libdir}/plugins"
+    elif test -d "${qt_libdir}/qt5" -a -d "${qt_libdir}/qt5/plugins"; then
+      QT_PLUGIN_PATH="${qt_libdir}/qt5/plugins"
+    elif test -d "${qt_host_bins}" -a -d "${qt_host_bins}/../plugins"; then
+      QT_PLUGIN_PATH="${qt_host_bins}/../plugins"
+    elif test -d "${QTDIR}/plugins; then
+      QT_PLUGIN_PATH="${QTDIR}/plugins"
+    elif test -d "${QTDIR}/share/qt5/plugins; then
+      QT_PLUGIN_PATH="${QTDIR}/share/qt5/plugins"
     fi
     MOC_FLAGS+=" -DHAVE_$1=1 ${[$1]5_CFLAGS}"
     [$1]_CPPFLAGS="${[$1]5_CFLAGS}"
@@ -166,10 +173,17 @@ AC_DEFUN([AX_CHECK_QT], [
       AC_DEFINE([HAVE_$1])
       QTDIR=$(${PKG_CONFIG} --variable=prefix QtCore)
       qt_host_bins=$(${PKG_CONFIG} --variable=host_bins QtCore)
-      if test -d "${qt_host_bins}"; then
-        QT_PLUGIN_PATH=${qt_host_bins}/../plugins
-      else
-        QT_PLUGIN_PATH=${QTDIR}/share/qt/plugins
+      qt_libdir=$(${PKG_CONFIG} --variable=libdir QtCore)
+      if test -d "${qt_libdir}" -a -d "${qt_libdir}/plugins"; then
+        QT_PLUGIN_PATH="${qt_libdir}/plugins"
+      elif test -d "${qt_libdir}/qt5" -a -d "${qt_libdir}/qt5/plugins"; then
+        QT_PLUGIN_PATH="${qt_libdir}/qt5/plugins"
+      elif test -d "${qt_host_bins}" -a -d "${qt_host_bins}/../plugins"; then
+        QT_PLUGIN_PATH="${qt_host_bins}/../plugins"
+      elif test -d "${QTDIR}/plugins; then
+        QT_PLUGIN_PATH="${QTDIR}/plugins"
+      elif test -d "${QTDIR}/share/qt5/plugins; then
+        QT_PLUGIN_PATH="${QTDIR}/share/qt5/plugins"
       fi
       MOC_FLAGS+=" -DHAVE_$1=1 ${$1_CFLAGS}"
       [$1]_CPPFLAGS="${[$1]_CFLAGS}"
@@ -214,9 +228,6 @@ AC_DEFUN([AX_CHECK_QT], [
     AX_CHECK_VALID_CXX_FLAG([-Wl,-subsystem,windows], [windows console flag])
   fi
   test "x$prefix" = xNONE && prefix=$ac_default_prefix
-  if test "${QT_PLUGIN_PATH}" = "${QT_PLUGIN_PATH#${prefix}}"; then
-    QT_PLUGIN_PATH=${prefix}${QT_PLUGIN_PATH#/usr}
-  fi
   AC_ARG_WITH([qt-plugin-path],
               [AS_HELP_STRING([--with-qt-plugin-path=PATH],
                               [define a different qt plugin path, current @<:@default=check@:>@])],
@@ -275,8 +286,10 @@ AC_DEFUN([AX_QT_NO_KEYWORDS], [
 
 AC_DEFUN([AX_INIT_QT], [
   if test -n "${AX_ADDITIONAL_QT_RULES_HACK}"; then
-    test -f src/makefile.in && cat >> src/makefile.in <<EOF
-${AX_ADDITIONAL_QT_RULES_HACK}
+    for f in $(find test examples src -name makefile.in); do
+      test -f "$f" && cat >> "$f" <<EOF
+${AX_ADDITIONAL_QT_RULES_HACK}    
 EOF
+    done
   fi
 ])

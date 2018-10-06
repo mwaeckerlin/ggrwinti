@@ -31,8 +31,9 @@ while test $# -gt 0; do
         (--configure|-c) configure=1;;
         (--docker|-d) docker=1;;
         (--build|-b) configure=1; build=1; buildtarget+=" distcheck";;
-        (--all|-a) shift; configure=1; build=1; buildtarget+=" all";;
-        (--clean) shift; configure=1; build=1; buildtarget+=" maintainer-clean";;
+        (--all|-a) configure=1; build=1; buildtarget+=" all";;
+        (--install|-i) configure=1; build=1; buildtarget+=" all install";;
+        (--clean) configure=1; build=1; buildtarget+=" maintainer-clean";;
         (--target|-t) shift; configure=1; build=1; buildtarget+=" $1";;
         (--overwrite|-o) overwrite=1;;
         (--rebuild|-r) rebuild=1;;
@@ -53,6 +54,7 @@ OPTIONS
   --docker, -d               build and run tests in a docker instance
   --build, -b                build, also call ./configure && make distcheck
   --all, -a                  same as -b, but make target all
+  --install, -i              same as -a, but add make install
   --clean                    same as -b, but make target maintainer-clean
   --target, -t <target>      same as -b, but specify target instead of distcheck
   --overwrite, -o            overwrite all basic files (bootstrap.sh, m4-macros)
@@ -86,7 +88,7 @@ DESCRIPTION
   ${DEFAULT_PROJECT_NAME} as the project name for your project in
   ${PROJECT_PATH}. In the first run, you should call ${MY_NAME} from a
   checked out the bootstrap-build-environment from
-  https://dev.marc.waeckerlin.org/, and the path from where you call
+  https://mrw.sh/, and the path from where you call
   ${MY_NAME} (which is actually ${PROJECT_PATH}) should be the path to
   your newly created project. Please note that your project must be a
   checked out subversion or git repository, since this build
@@ -96,7 +98,7 @@ DESCRIPTION
   subversion on https:/path/to/your/new-project:
 
     cd ~/svn
-    svn co https://dev.marc.waeckerlin.org/svn/bootstrap-build-environment/trunk \\
+    svn co https://svn.mrw.sh/bootstrap-build-environment/trunk \\
            bootstrap-build-environment
     svn co https:/path/to/your/new-project/trunk new-project
     cd new-project
@@ -106,7 +108,7 @@ DESCRIPTION
   git on https:/path/to/your/new-project:
 
     cd ~/svn
-    svn co https://dev.marc.waeckerlin.org/svn/bootstrap-build-environment/trunk \\
+    svn co https://svn.mrw.sh/bootstrap-build-environment/trunk \\
            bootstrap-build-environment
     cd ~/git
     git clone https:/path/to/your/new-project
@@ -302,7 +304,91 @@ EOF
     shift;
 done
 
-echo -en "\e[1m-> checking:\e[0m for version control system ..."
+# check if stdout is a terminal...
+if test -t 1; then
+
+    # see if it supports colors...
+    ncolors=$(tput colors)
+
+    if test -n "$ncolors" && test $ncolors -ge 8; then
+        bold="$(tput bold)"
+        underline="$(tput smul)"
+        standout="$(tput smso)"
+        normal="$(tput sgr0)"
+        black="$(tput setaf 0)"
+        red="$(tput setaf 1)"
+        green="$(tput setaf 2)"
+        yellow="$(tput setaf 3)"
+        blue="$(tput setaf 4)"
+        magenta="$(tput setaf 5)"
+        cyan="$(tput setaf 6)"
+        white="$(tput setaf 7)"
+    fi
+fi
+
+notice() {
+    echo "${yellow}→ notice: ${bold}$*${normal}"
+}
+
+running() {
+    echo -n "${bold}${blue}→ running: ${bold}${white}$*${normal} … "
+}
+
+checking() {
+    echo -n "${bold}${blue}→ checking: ${bold}${white}$*${normal} … "
+}
+
+generating() {
+    echo -n "${bold}${blue}→ generating: ${bold}${white}$*${normal} … "
+}
+
+configuring() {
+    echo -n "${bold}${blue}→ configuring ${bold}${white}$1${normal}:"
+    shift
+    echo -n "${white}$*${normal} … "
+}
+
+ignored() {
+    echo "${bold}${yellow}ignored $*${normal}"
+}
+
+success() {
+    echo "${bold}${green}success $*${normal}"
+}
+
+error() {
+    echo "${bold}${red}→ error: $1${normal}"
+    shift
+    if test -n "$*"; then
+        echo "${bold}$*${normal}"
+    fi
+    exit 1
+}
+
+run() {
+    check=1
+    while test $# -gt 0; do
+        case "$1" in
+            (--no-check) check=0;;
+            (*) break;;
+        esac
+        shift;
+    done
+    running $*
+    result=$($* 2>&1)
+    res=$?
+    if test $res -ne 0; then
+        if test $check -eq 1; then
+            error "Failed with return code: $res" "$result"
+        else
+            ignored
+        fi
+    else
+        success
+    fi
+}
+
+checking for version control system
 VCS=""
 VCSDEPENDS=""
 for path in . .. ../.. ../../..; do
@@ -310,18 +396,18 @@ for path in . .. ../.. ../../..; do
         VCS="svn"
         VCSDEPENDS_DEB="svn2cl, subversion, subversion-tools,"
         VCSDEPENDS_RPM="subversion, "
-        echo -e " \e[32msuccess\e[0m detected ${VCS}"
+        success detected ${VCS}
         break
     elif test -d ${path}/.git; then
         VCS="git"
         VCSDEPENDS_DEB="git2cl, git,"
         VCSDEPENDS_RPM="git, "
-        echo -e " \e[32msuccess\e[0m detected ${VCS}"
+        success detected ${VCS}
         break
     fi
 done
 if test -z "$VCS"; then
-    echo -e " \e[33mignored\e[0m"
+    ignored
 fi
 
 HEADER='## @id '"\$Id\$"'
@@ -348,38 +434,6 @@ CHEADER='/** @id '"\$Id\$"'
 
 
 '
-
-notice() {
-    echo -e "\e[1;33m$*\e[0m"
-}
-
-run() {
-    check=1
-    while test $# -gt 0; do
-        case "$1" in
-            (--no-check) check=0;;
-            (*) break;;
-        esac
-        shift;
-    done
-    echo -en "\e[1m-> running:\e[0m $* ..."
-    result=$($* 2>&1)
-    res=$?
-    if test $res -ne 0; then
-        if test $check -eq 1; then
-            echo -e " \e[31merror\e[0m"
-            echo -e "\e[1m*** Failed with return code: $res\e[0m"
-            if test -n "$result"; then
-                echo "$result"
-            fi
-            exit 1
-        else
-            echo -e " \e[33mignored\e[0m"
-        fi
-    else
-        echo -e " \e[32msuccess\e[0m"
-    fi
-}
 
 testtag() {
     local IFS="|"
@@ -433,18 +487,13 @@ to() {
         return 1
     fi
     checkdir "$(dirname ${1})"
-    echo -en "\e[1m-> generating:\e[0m $1 ..."
+    generating $1
     result=$(cat > "$1" 2>&1)
     res=$?
     if test $res -ne 0; then
-        echo -e " \e[31merror\e[0m"
-        echo -e "\e[1m*** Failed with return code: $res\e[0m"
-        if test -n "$result"; then
-            echo "$result"
-        fi
-        exit 1
+        error "Failed with return code: $res" "$result"
     else
-        echo -e " \e[32msuccess\e[0m"
+        success
     fi
     run chmod $mode $1
     if test $exists -eq 0; then
@@ -486,24 +535,20 @@ copy() {
 }
 
 doxyreplace() {
-    echo -en "\e[1m-> doxyfile:\e[0m configure $1 ..."
+    configuring doxyfile $1
     if sed -i 's|\(^'"$1"' *=\) *.*|\1'" $2"'|g' doc/doxyfile.in; then
-        echo -e " \e[32msuccess\e[0m"
+        success
     else
-        echo -e " \e[31merror\e[0m"
-        echo -e "\e[1m**** command: $0 $*\e[0m"
-        exit 1
+        error $0 $*
     fi
 }
 
 doxyadd() {
-    echo -en "\e[1m-> doxyfile:\e[0m configure $1 ..."
+    configuring  doxyfile $1
     if sed -i '/^'"$1"' *=/a'"$1"' += '"$2" doc/doxyfile.in; then
-        echo -e " \e[32msuccess\e[0m"
+        success
     else
-        echo -e " \e[31merror\e[0m"
-        echo -e "\e[1m**** command: $0 $*\e[0m"
-        exit 1
+        error $0 $*
     fi
 }
 
@@ -514,13 +559,18 @@ vcs2cl() {
     else
         touch "ChangeLog"
     fi
+    if test -x $(which timeout); then
+        local TIMEOUT="timeout 10"
+    else
+        local TIMEOUT=
+    fi
     if test -x $(which ${VCS}2cl); then
         if test "${VCS}" = "git"; then
-            ${VCS}2cl > ChangeLog
+            $TIMEOUT ${VCS}2cl || true > ChangeLog
         elif test "${VCS}" = "svn"; then
-            ${VCS}2cl --break-before-msg -a -i
+            $TIMEOUT ${VCS}2cl --break-before-msg -a -i || true
         elif test -n "${VCS}"; then
-            ${VCS}2cl
+            $TIMEOUT ${VCS}2cl || true
         fi
     fi
     if test $exists -eq 0; then
@@ -1042,20 +1092,21 @@ to --condition AX_USE_NODEJS nodejs/etc/${PACKAGE_NAME}.json <<EOF
       "foo": ["sha256", "fcde2b2edxx56bf408601fb721fe9b5c338d10ee429ea04fae5511b68fbf8fb9"]
     },
     "ldap": {
-      "url": "ldap://dev.marc.waeckerlin.org",
-      "adminDn": "cn=tmp,ou=system,ou=people,dc=dev,dc=marc,dc=waeckerlin,dc=org",
+      "url": "ldap://your.ldap.host",
+      "adminDn": "cn=tmp,ou=system,ou=people,dc=your,dc=ldap,dc=host",
       "adminPassword": "secret",
-      "searchBase": "ou=person,ou=people,dc=dev,dc=marc,dc=waeckerlin,dc=org",
+      "searchBase": "ou=person,ou=people,dc=your,dc=ldap,dc=host",
       "searchFilter": "(uid={{username}})"
     }
   }
 }
 EOF
+PACKAGE_NAME_UPPER=$(echo ${PACKAGE_NAME} | tr '+[:lower:]' 'X[:upper:]' | tr -cd '[[:alnum:]]._-')
 to --condition AX_USE_NODEJS nodejs/etc/default/${PACKAGE_NAME} <<EOF
-#EXEC_${PACKAGE_NAME^^}="/usr/bin/nodejs /usr/share/${PACKAGE_NAME}/nodejs/${PACKAGE_NAME}"
-#${PACKAGE_NAME^^}_LOG="/var/log/${PACKAGE_NAME^^}.log"
-#${PACKAGE_NAME^^}="${PACKAGE_NAME}"
-#${PACKAGE_NAME^^}_PORT="8888"
+#EXEC_${PACKAGE_NAME_UPPER}="/usr/bin/nodejs /usr/share/${PACKAGE_NAME}/nodejs/${PACKAGE_NAME}"
+#${PACKAGE_NAME_UPPER}_LOG="/var/log/${PACKAGE_NAME}.log"
+#${PACKAGE_NAME_UPPER}="${PACKAGE_NAME}"
+#${PACKAGE_NAME_UPPER}_PORT="8888"
 EOF
 to --condition AX_USE_NODEJS nodejs/etc/init/${PACKAGE_NAME}.conf <<EOF
 #!upstart
@@ -1071,30 +1122,30 @@ script
     echo \$\$ > /var/run/${PACKAGE_NAME}.pid
     # there are some useful defaults
     # do not edit this file, overwrite values in /etc/default/${PACKAGE_NAME}
-    EXEC_${PACKAGE_NAME^^}="/usr/bin/nodejs /usr/share/${PACKAGE_NAME}/nodejs/${PACKAGE_NAME}"
-    ${PACKAGE_NAME^^}_LOG="/var/log/${PACKAGE_NAME}.log"
-    ${PACKAGE_NAME^^}_USER="${PACKAGE_NAME}"
-    ${PACKAGE_NAME^^}_PORT=""
+    EXEC_${PACKAGE_NAME_UPPER}="/usr/bin/nodejs /usr/share/${PACKAGE_NAME}/nodejs/${PACKAGE_NAME}"
+    ${PACKAGE_NAME_UPPER}_LOG="/var/log/${PACKAGE_NAME}.log"
+    ${PACKAGE_NAME_UPPER}_USER="${PACKAGE_NAME}"
+    ${PACKAGE_NAME_UPPER}_PORT=""
     [ -r /etc/default/${PACKAGE_NAME} ] && . /etc/default/${PACKAGE_NAME}
-    if test -n "\${${PACKAGE_NAME^^}_USER}"; then
-        exec sudo -u "\${${PACKAGE_NAME^^}_USER}" \${EXEC_${PACKAGE_NAME^^}} \${${PACKAGE_NAME^^}_PORT} >> \${${PACKAGE_NAME^^}_LOG} 2>&1
+    if test -n "\${${PACKAGE_NAME_UPPER}_USER}"; then
+        exec sudo -u "\${${PACKAGE_NAME_UPPER}_USER}" \${EXEC_${PACKAGE_NAME_UPPER}} \${${PACKAGE_NAME_UPPER}_PORT} >> \${${PACKAGE_NAME_UPPER}_LOG} 2>&1
     else
-        exec \${EXEC_${PACKAGE_NAME^^}} \${${PACKAGE_NAME^^}_PORT} >> \${${PACKAGE_NAME^^}_LOG} 2>&1
+        exec \${EXEC_${PACKAGE_NAME_UPPER}} \${${PACKAGE_NAME_UPPER}_PORT} >> \${${PACKAGE_NAME_UPPER}_LOG} 2>&1
     fi
 end script
 
 pre-start script
-    ${PACKAGE_NAME^^}_LOG="/var/log/${PACKAGE_NAME}.log"
+    ${PACKAGE_NAME_UPPER}_LOG="/var/log/${PACKAGE_NAME}.log"
     [ -r /etc/default/${PACKAGE_NAME} ] && . /etc/default/${PACKAGE_NAME}
     # Date format same as (new Date()).toISOString() for consistency
-    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> \${${PACKAGE_NAME^^}_LOG}
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Starting" >> \${${PACKAGE_NAME_UPPER}_LOG}
 end script
 
 pre-stop script
-    ${PACKAGE_NAME^^}_LOG="/var/log/${PACKAGE_NAME}.log"
+    ${PACKAGE_NAME_UPPER}_LOG="/var/log/${PACKAGE_NAME}.log"
     [ -r /etc/default/${PACKAGE_NAME} ] && . /etc/default/${PACKAGE_NAME}
     rm /var/run/${PACKAGE_NAME}.pid
-    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> \${${PACKAGE_NAME^^}_LOG}
+    echo "[`date -u +%Y-%m-%dT%T.%3NZ`] (sys) Stopping" >> \${${PACKAGE_NAME_UPPER}_LOG}
 end script
 EOF
 to --condition AX_USE_NODEJS nodejs/etc/systemd/system/${PACKAGE_NAME}.service <<EOF
@@ -1301,7 +1352,7 @@ ${HEADER}AM_CPPFLAGS = -I\${top_srcdir}/src -I\${top_builddir}/src
 AM_LDFLAGS = -L\${abs_top_builddir}/src/.libs
 LDADD = -l${PACKAGE_NAME#lib}
 
-exampledir = ${docdir}/examples
+exampledir = \${docdir}/examples
 example_DATA = 
 
 MAINTAINERCLEANFILES = makefile.in
@@ -1554,8 +1605,8 @@ if testtag AX_USE_DEBIAN_PACKAGING; then
 
  -- @PACKAGER@  @BUILD_DATE@
 EOF
-    RUN_DEPENDS="$(if testtag AX_USE_NODEJS; then echo -n ", nodejs, npm"; fi)"
-    BUILD_DEPENDS="debhelper, fakeroot, ${VCSDEPENDS_DEB} pkg-config, automake, libtool, autotools-dev, pandoc, lsb-release$(if testtag AX_USE_DOXYGEN; then echo -n ", doxygen, graphviz, mscgen, default-jre-headless|default-jre"; fi; if testtag AX_USE_PERLDOC; then echo -n ", libpod-tree-perl"; fi; if testtag AX_USE_CPPUNIT; then echo -n ", libcppunit-dev"; fi; if testtag AX_CXX_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then echo -n ", qt5-default | libqt4-core | libqtcore4, qt5-qmake | qt4-qmake, qtbase5-dev | libqt4-dev, qtbase5-dev-tools | qt4-dev-tools, qttools5-dev-tools | qt4-dev-tools, qttools5-dev-tools | qt4-dev-tools"; fi)"
+    RUN_DEPENDS="$(if testtag AX_USE_NODEJS; then echo -n ", nodejs, npm,"; fi)"
+    BUILD_DEPENDS="gnupg, debhelper, fakeroot, ${VCSDEPENDS_DEB} pkg-config, automake, libtool, libltdl-dev, autotools-dev, pandoc, lsb-release$(if testtag AX_USE_DOXYGEN; then echo -n ", doxygen, graphviz, mscgen, default-jre-headless|default-jre"; fi; if testtag AX_USE_PERLDOC; then echo -n ", libpod-tree-perl"; fi; if testtag AX_USE_CPPUNIT; then echo -n ", libcppunit-dev"; fi; if testtag AX_CXX_QT || testtag AX_CHECK_QT AX_REQUIRE_QT; then echo -n ", qt5-default | libqt4-core | libqtcore4, qt5-qmake | qt4-qmake, qtbase5-dev | libqt4-dev, qtbase5-dev-tools | qt4-dev-tools, qttools5-dev-tools | qt4-dev-tools, qttools5-dev | qt4-dev,"; fi)"
     to debian/control.in <<EOF
 Source: @PACKAGE_NAME@
 Priority: extra
@@ -1595,6 +1646,9 @@ usr/lib/lib*.so
 usr/lib/pkgconfig/*
 usr/lib/*.la
 usr/share/doc/${PACKAGE_NAME}/html
+$(if testtag AX_BUILD_EXAMPLES; then
+  echo usr/share/doc/${PACKAGE_NAME}/examples
+fi)
 EOF
     to --mode "u=rwx,g=rwx,o=rx" debian/rules <<EOF
 ${HEADER}%:
@@ -1649,20 +1703,28 @@ BuildRequires: lsb-release$(
       echo -n ", libqt5-qtbase-devel, libqt5-qttools, libqt5-linguist-devel, libQt5WebKit5-devel libqt5-qtwebengine-devel libQt5WebKitWidgets-devel";
     fi)
 %else
+%if  0%{?mageia}
+BuildRequires: rpm-sign, lsb-release
+$(
+    if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT; then
+      echo -n "BuildRequires: qtbase5-common-devel, qttools5, lib64qt5webkit-devel, lib64qt5webkitwidgets-devel";
+    fi)
+%else
 $(
     if testtag AX_REQUIRE_QT || testtag AX_CHECK_QT; then
       echo -n "BuildRequires: qt5-qtbase-devel, qt5-qttools-devel, qt5-qtwebkit-devel";
     fi)
-%if  0%{?mageia}
-BuildRequires: rpm-sign, lsb-release
-%else
 BuildRequires: rpm-sign, redhat-lsb
+%global debug_package %{nil}
 %endif
 %endif
 $(
     if testtag AX_USE_DOXYGEN; then cat <<EOS
 %if ! 0%{?centos}
 BuildRequires: mscgen
+%if ! 0%{?mageia}
+BuildRequires: pandoc
+%endif
 %endif
 EOS
     fi
@@ -1710,6 +1772,14 @@ echo '/usr/bin'
 echo '/usr/share/applications'
 fi)
 /usr/share/@PACKAGE_NAME@
+$(if testtag AX_USE_ETC; then
+
+cat <<EOF2
+%config
+/etc
+
+EOF2
+fi)
 %doc
 /usr/share/doc
 
@@ -1781,7 +1851,18 @@ $(case "$VCS" in
 esac)
 fi
 aclocal
-$(if testtag AX_USE_LIBTOOL; then echo libtoolize --force; fi)
+$(if testtag AX_USE_LIBTOOL; then
+cat <<EOF1
+if which libtoolize > /dev/null; then
+  run libtoolize --force;
+elif which glibtoolize > /dev/null; then
+  run glibtoolize --force;
+else
+  echo "error: libtoolize not found" 1>&2
+  exit 1
+fi
+EOF1
+fi)
 automake -a
 autoconf
 EOF
@@ -1804,7 +1885,7 @@ $(if test -e README.md -a ! -e README; then
 cat <<EOF2
 
 README: README.md
-	pandoc -f markdown -t plain --wrap=none $< -o $@
+	cp README.md README
 
 CLEANFILES = README
 EOF2
@@ -1829,9 +1910,9 @@ to build-in-docker.conf <<EOF
 ${HEADER}# Use Ubuntu Universe Repository
 repos+=("ubuntu:::universe")
 
-# Use Marc Wäckerlin's Repository, see https://dev.marc.waeckerlin.org
-repos+=("debian|ubuntu:::https://dev.marc.waeckerlin.org/repository:::https://dev.marc.waeckerlin.org/repository/@DISTRIBUTOR@/marc-waeckerlin.repo")
-keys+=("https://dev.marc.waeckerlin.org/repository/PublicKey")
+# Use Marc Wäckerlin's Repository, see https://repository.mrw.sh
+repos+=("debian|ubuntu:::https://repository.mrw.sh:::https://repository.mrw.sh/@DISTRIBUTOR@/marc-waeckerlin.repo")
+keys+=("https://repository.mrw.sh/PublicKey")
 
 # centos requires epel-release for some packages, such as Qt WebKit
 packages+=("centos:::epel-release")
@@ -1850,7 +1931,15 @@ else
     #### Bootstrap Before Configure ####
     run --no-check vcs2cl
     run aclocal
-    if testtag AX_USE_LIBTOOL; then run libtoolize --force; fi
+    if testtag AX_USE_LIBTOOL; then
+        if which libtoolize > /dev/null; then
+            run libtoolize --force;
+        elif which glibtoolize > /dev/null; then
+            run glibtoolize --force;
+        else
+            error libtoolize not found
+        fi
+    fi
     run automake -a
     run autoconf
     

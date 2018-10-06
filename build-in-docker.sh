@@ -6,10 +6,11 @@ myarch=$(dpkg --print-architecture)
 if test "${arch}" = "amd64"; then
     myarch="amd64|i386"
 fi
-mode="deb"
+mode=
 img="mwaeckerlin/ubuntu:latest"
 repos=()
 keys=()
+dns=()
 envs=("-e LANG=${LANG}" "-e HOME=${HOME}" "-e TERM=xterm" "-e DEBIAN_FRONTEND=noninteractive" "-e DEBCONF_NONINTERACTIVE_SEEN=true")
 dirs=("-v $(pwd):/workdir" "-v ${HOME}/.gnupg:${HOME}/.gnupg")
 packages=()
@@ -41,6 +42,7 @@ while test $# -gt 0; do
             echo "  -f, --flag <flag>     add flag to ./bootstrap.sh or ./configure"
             echo "  -r, --repo <url>      add given apt repository"
             echo "  -k, --key <url>       add public key from url"
+            echo "  -n, --dns <ip>        add ip as dns server"
             echo "  -e, --env <var>=<val> set environment variable in docker"
             echo "  -d, --dir <dir>       access given directory read only"
             echo "  -p, --package <pkg>   install extra debian packages"
@@ -73,8 +75,8 @@ while test $# -gt 0; do
             echo "                     -e ANDROID_HOME=/opt/local/android \\"
             echo "                     -d /opt/local/android \\"
             echo "                     -r universe \\"
-            echo "                     -r https://dev.marc.waeckerlin.org/repository \\"
-            echo "                     -k https://dev.marc.waeckerlin.org/repository/PublicKey \\"
+            echo "                     -r https://repository.mrw.sh \\"
+            echo "                     -k https://repository.mrw.sh/PublicKey \\"
             echo "                     -p mrw-c++"
             echo
             exit 0
@@ -127,6 +129,9 @@ while test $# -gt 0; do
             ;;
         (-e|--env) shift;
             envs+=("-e $1")
+            ;;
+        (-n|--dns) shift;
+            dns+=("--dns $1")
             ;;
         (-d|--dirs) shift;
             dirs+=("-v $1:$1:ro")
@@ -195,11 +200,25 @@ function ifthenelse() {
     arg="$1"
     shift
     cmd="$*"
-    DISTRIBUTOR=$(docker exec ${DOCKER_ID} lsb_release -si | sed 's, .*,,' | tr [:upper:] [:lower:])
+    DISTRIBUTOR=$(docker exec ${DOCKER_ID} lsb_release -si | sed 's, .*,,;s,.*,\L&,g')
     CODENAME=$(docker exec ${DOCKER_ID} lsb_release -cs)
     ARCH=$((docker exec ${DOCKER_ID} which dpkg > /dev/null 2> /dev/null && docker exec ${DOCKER_ID} dpkg --print-architecture) || echo amd64)
+    case "$DISTRIBUTOR" in
+        (opensuse) # code name may be not available, then set leap or tumbleweed
+            if test "$CODENAME" = "n/a"; then
+                CODENAME=$(docker exec ${DOCKER_ID} lsb_release -ds | sed "s,\($(docker exec ${DOCKER_ID} lsb_release -si | sed 's, ,\\|,g')\) *,,"';s, .*,,g;s,",,g;s,.*,\L&,g')
+            fi
+            ;;
+        (fedora|mageia) # numeric code name
+            CODENAME=$(docker exec ${DOCKER_ID} lsb_release -rs)
+            ;;
+        (centos) # only look at major number in centos
+            CODENAME=$(docker exec ${DOCKER_ID} lsb_release -rs | sed 's,\..*,,')
+            ;;
+    esac
     if test "${arg/:::/}" = "${arg}"; then
-        docker exec ${DOCKER_ID} bash -c "${cmd//ARG/${arg//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
+        cmd_tmp="${cmd//ARG/${arg//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
+        docker exec ${DOCKER_ID} bash -c "${cmd_tmp//@CODENAME@/${CODENAME}}"
     else
         os="${arg%%:::*}"
         thenpart="${arg#*:::}"
@@ -210,11 +229,13 @@ function ifthenelse() {
         fi
         if [[ "${DISTRIBUTOR}-${CODENAME}-${ARCH}" =~ ${os} ]]; then
             if test -n "${thenpart}"; then
-                docker exec ${DOCKER_ID} bash -c "${cmd//ARG/${thenpart//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
+                cmd_tmp="${cmd//ARG/${thenpart//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
+                docker exec ${DOCKER_ID} bash -c "${cmd_tmp//@CODENAME@/${CODENAME}}"
             fi
         else
             if test -n "${elsepart}"; then
-                docker exec ${DOCKER_ID} bash -c "${cmd//ARG/${elsepart//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
+                cmd_tmp="${cmd//ARG/${elsepart//@DISTRIBUTOR@/${DISTRIBUTOR}}}"
+                docker exec ${DOCKER_ID} bash -c "${cmd_tmp//@CODENAME@/${CODENAME}}"
             fi
         fi
     fi
@@ -223,7 +244,7 @@ function ifthenelse() {
 set -x
 
 docker pull $img
-DOCKER_ID=$(docker create ${dirs[@]} ${envs[@]} -w /workdir $img sleep infinity)
+DOCKER_ID=$(docker create ${dns[@]} ${dirs[@]} ${envs[@]} -w /workdir $img sleep infinity)
 trap 'traperror '"${DOCKER_ID}"' "$? ${PIPESTATUS[@]}" $LINENO $BASH_LINENO "$BASH_COMMAND" "${FUNCNAME[@]}" "${FUNCTION}"' SIGINT INT TERM EXIT
 if ! [[ $arch =~ $myarch ]]; then
     docker cp "/usr/bin/qemu-${arch}-static" "${DOCKER_ID}:/usr/bin/qemu-${arch}-static"
@@ -236,33 +257,52 @@ if ! docker exec ${DOCKER_ID} getent passwd $(id -u) > /dev/null 2>&1; then
     docker exec ${DOCKER_ID} useradd -m -u $(id -u) -g $(id -g) -d"${HOME}" $(id -un)
 fi
 docker exec ${DOCKER_ID} chown $(id -u):$(id -g) "${HOME}"
-case $mode in
+if test -z "$mode"; then
+    case "$targets" in
+        (*deb*) mode=deb;;
+        (*rpm*) mode=rpm;;
+        (*) case "$img" in
+                (*ubuntu*|*debian*|*mint*) mode=deb;;
+                (*fedora*|*centos*|*mageia*) mode=rpm;;
+                (*mingw*|*win*) mode=win;;
+                (*) mode=deb;;
+            esac;;
+    esac
+fi
+case "$mode" in
     (deb|apt|win)
+        OPTIONS='-o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew -y --force-yes --no-install-suggests --no-install-recommends'
+        PREVENT='libpam-systemd policykit.* colord dconf-service'
+        docker exec ${DOCKER_ID} apt-get update ${OPTIONS}
+        docker exec ${DOCKER_ID} apt-mark hold ${PREVENT}
+        docker exec ${DOCKER_ID} apt-get upgrade ${OPTIONS}
+        docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- python-software-properties software-properties-common apt-transport-https dpkg-dev lsb-release wget || \
+            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- software-properties-common apt-transport-https dpkg-dev lsb-release wget || \
+            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- python-software-properties apt-transport-https dpkg-dev lsb-release wget;
         if [[ "${img}" =~ "ubuntu" ]]; then
+            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT} locales
             docker exec ${DOCKER_ID} locale-gen ${LANG}
             docker exec ${DOCKER_ID} update-locale LANG=${LANG}
         fi
-        OPTIONS='-o Dpkg::Options::=--force-confdef -o Dpkg::Options::=--force-confnew -y --force-yes --no-install-suggests --no-install-recommends'
-        for f in 'libpam-systemd:amd64' 'policykit*' 'colord'; do
-            docker exec ${DOCKER_ID} bash -c "echo 'Package: $f' >> /etc/apt/preferences"
+        for f in ${PREVENT}; do
+            docker exec ${DOCKER_ID} bash -c "echo 'Package: ${f}' >> /etc/apt/preferences"
             docker exec ${DOCKER_ID} bash -c "echo 'Pin-Priority: -100' >> /etc/apt/preferences"
             docker exec ${DOCKER_ID} bash -c "echo >> /etc/apt/preferences"
         done
-        docker exec ${DOCKER_ID} apt-get update ${OPTIONS}
-        docker exec ${DOCKER_ID} apt-get upgrade ${OPTIONS}
-        docker exec ${DOCKER_ID} apt-get install ${OPTIONS} python-software-properties software-properties-common apt-transport-https dpkg-dev lsb-release || \
-            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} software-properties-common apt-transport-https dpkg-dev lsb-release || \
-            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} python-software-properties apt-transport-https dpkg-dev lsb-release;
+        if test -n "${keys[@]}"; then # fix dependency bug in cosmic and stretch
+            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT} gnupg
+            for key in "${keys[@]}"; do
+                wget -O- "$key" \
+                    | docker exec -i ${DOCKER_ID} apt-key add -
+            done
+        fi
         for repo in "${repos[@]}"; do
             ifthenelse "${repo}" "apt-add-repository 'ARG'"
         done
-        for key in "${keys[@]}"; do
-            wget -O- "$key" \
-                | docker exec -i ${DOCKER_ID} apt-key add -
-        done
+
         docker exec ${DOCKER_ID} apt-get update ${OPTIONS}
         for package in "${packages[@]}"; do
-            ifthenelse "${package}" "apt-get install ${OPTIONS} ARG"
+            ifthenelse "${package}" "apt-get install ${OPTIONS} ${PREVENT} ARG"
         done
         for command in "${commands[@]}"; do
             ifthenelse "${command}" "ARG"
@@ -271,7 +311,7 @@ case $mode in
         ;;
     (rpm|yum|dnf|zypper|urpmi)
         if [[ "$img" =~ "centos" ]]; then
-            docker exec ${DOCKER_ID} yum install -y redhat-lsb
+            docker exec ${DOCKER_ID} yum install -y redhat-lsb epel-release
             docker exec -i ${DOCKER_ID} bash -c 'cat > /etc/yum.repos.d/wandisco-svn.repo' <<EOF
 [WandiscoSVN]
 name=Wandisco SVN Repo
@@ -283,21 +323,24 @@ gpgcheck=0
 EOF
         fi
         INSTALL_TOOL=$((docker exec ${DOCKER_ID} test -x /usr/bin/zypper && echo zypper install -y) ||  (docker exec ${DOCKER_ID} test -x /usr/bin/dnf && echo dnf install -y) || (docker exec ${DOCKER_ID} test -x /usr/bin/yum && echo yum install -y) || (docker exec ${DOCKER_ID} test -x /usr/sbin/urpmi && echo urpmi --auto))
-        if test "$INSTALL_TOOL" = "urpmi --auto"; then
+        if test "$INSTALL_TOOL" = "urpmi --auto" -o "$INSTALL_TOOL" = "zypper install -y"; then
             LSB_RELEASE=lsb-release
         else
             LSB_RELEASE=/usr/bin/lsb_release
         fi
         docker exec ${DOCKER_ID} ${INSTALL_TOOL} rpm-build automake libtool subversion gcc-c++ pkgconfig wget $LSB_RELEASE
+        if docker exec ${DOCKER_ID} test -x /usr/bin/dnf; then
+            docker exec ${DOCKER_ID} dnf install -y 'dnf-command(config-manager)'
+        fi
         i=0
         for key in "${keys[@]}"; do
-            wget -Orpm-key "$key"
+            docker exec -i ${DOCKER_ID} wget -Orpm-key "$key"
             docker exec -i ${DOCKER_ID} rpm --import rpm-key
-            rm rpm-key
+            docker exec -i ${DOCKER_ID} rm rpm-key
         done
         for repo in "${repos[@]}"; do
-            INSTALL_REPO=$((docker exec ${DOCKER_ID} test -x /usr/bin/zypper && echo zypper ar) || (docker exec ${DOCKER_ID} test -x /usr/bin/dnf && echo dnf config-manager --add-repo) || (docker exec ${DOCKER_ID} test -x /usr/bin/yum && echo wget -O/etc/yum.repos.d/additional$i.repo) || (docker exec ${DOCKER_ID} test -x /usr/sbin/urpmi && echo false))
-            ifthenelse "${repo}" "${INSTALL_REPO} 'ARG'"
+            INSTALL_REPO=$((docker exec ${DOCKER_ID} test -x /usr/bin/zypper && echo zypper ar) || (docker exec ${DOCKER_ID} test -x /usr/bin/dnf && echo dnf config-manager --add-repo) || (docker exec ${DOCKER_ID} test -x /usr/bin/yum && echo yum-config-manager --add-repo) || (docker exec ${DOCKER_ID} test -x /usr/sbin/urpmi && echo false))
+            ifthenelse "${repo}" "${INSTALL_REPO} ARG"
             ((++i))
         done
         for package in "${packages[@]}"; do
@@ -315,3 +358,17 @@ for f in "${flags[@]}"; do
 done
           
 docker exec -u $(id -u):$(id -g) ${DOCKER_ID} ./bootstrap.sh -t "${targets}" ${host} "${FLAGS[@]}"
+
+# last check: try to install built deb or rpm files (if not already cleaned up)
+# not supported in trusty and jessie
+if test "$mode" = deb -a "${img//trusty/}" = "${img}" -a "${img//jessie/}" = "${img}"; then
+   if test "${targets//deb/}" != "${targets}" && ls *.deb > /dev/null 2> /dev/null; then
+       docker exec ${DOCKER_ID} bash -c "apt-get install ${OPTIONS} ${PREVENT} /workdir/*.deb"
+   fi
+fi
+if test "$mode" = rpm -a "${targets//rpm/}" != "${targets}"; then
+    if ls *.rpm > /dev/null 2> /dev/null; then
+        docker exec ${DOCKER_ID} bash -c "${INSTALL_TOOL} /workdir/*.rpm"
+    fi
+fi
+echo "done."

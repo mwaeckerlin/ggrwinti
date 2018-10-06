@@ -24,7 +24,7 @@ else
 fi
 
 function install() {
-    if ${SUDO} apt-get -y install $*; then
+    if ${SUDO} apt-get install -y --force-yes --no-install-suggests --no-install-recommends $*; then
         return 0
     else
         return 1

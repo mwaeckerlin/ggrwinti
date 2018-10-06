@@ -218,8 +218,17 @@ AC_DEFUN([AX_INIT_STANDARD_PROJECT], [
   AX_SUBST(AUTHOR_URL)
   AX_SUBST(AUTHOR_MAIL)
   AX_SUBST(PACKAGER)
-  PROJECT_URL="${PROJECT_URL:-${AUTHOR_URL}/projects/${PACKAGE_NAME}}"
-  SOURCE_DOWNLOAD="${SOURCE_DOWNLOAD:-${AUTHOR_URL}/downloads/${PACKAGE_NAME}}"
+  PROJECT_URL="${PROJECT_URL:-${AUTHOR_URL}}"
+  for path in . .. ../.. ../../..; do
+    if test -d ${path}/.svn; then
+      PROJECT_URL="$(LANG= svn info | sed -n 's,^Repository Root: ,,p')"
+      break
+    elif test -d ${path}/.git; then
+      PROJECT_URL="$(git remote get-url origin)"
+      break
+    fi
+  done
+  SOURCE_DOWNLOAD="${SOURCE_DOWNLOAD:-${PROJECT_URL}}"
   AX_SUBST(PROJECT_URL)
   AX_SUBST(SOURCE_DOWNLOAD)
   VENDOR=$((lsb_release -is 2>/dev/null || echo unknown) | tr ' ' '_')
@@ -365,12 +374,13 @@ AC_DEFUN([AX_USE_CXX], [
 #### Begin: Appended by $0
 %.app: %
 	-rm -r [\$][@]
-	\$(MAKE) DESTDIR=[\$][\$](pwd)/[\$][@]/tmp install
+	\$(MAKE) DESTDIR=[\$][\$](pwd)/tmp install
 	QTDIR="\${QTDIR}" \
 	QT_PLUGINS="\${QT_PLUGINS}" \
 	QT_PLUGIN_PATH="\${QT_PLUGIN_PATH}" \
 	  \${top_builddir}/mac-create-app-bundle.sh \
-	    [\$][@] [\$][<] [\$][\$](pwd)/[\$][@]/tmp\${prefix}
+	    [\$][@] [\$][<] [\$][\$](pwd)/tmp[\$]{prefix}
+	-rm -rf tmp
 
 maintainer-clean-cxx-targets:
 	-rm makefile.in
@@ -578,6 +588,7 @@ clean-debian-targets:
 	-rm -rf \${PACKAGE_NAME}_\${PACKAGE_VERSION}~\${DISTRO}.\${BUILD_NUMBER}.{dsc,tar.gz} \${PACKAGE_NAME}_\${PACKAGE_VERSION}~\${DISTRO}.\${BUILD_NUMBER}*.changes \$\$(sed -n 's,Package: \(.*\),\1_${PACKAGE_VERSION}~${DISTRO}.${BUILD_NUMBER}*.deb,p;' debian/control)
 deb: distdir
 	cd \${PACKAGE_NAME}-\${PACKAGE_VERSION} && ( export CFLAGS="\${CFLAGS}"; export CPPFLAGS="\${CPPFLAGS}"; export CXXFLAGS="\${CXXFLAGS}"; export LDFLAGS="\${LDFLAGS}"; export DEB_CFLAGS_APPEND="\${CFLAGS}"; export DEB_CPPFLAGS_APPEND="\${CPPFLAGS}"; export  DEB_CXXFLAGS_APPEND="\${CXXFLAGS}"; export DEB_LDFLAGS_APPEND="\${LDFLAGS}"; dpkg-buildpackage )
+	gpg --verify \${PACKAGE_NAME}_\${PACKAGE_VERSION}~\${DISTRO}.\${BUILD_NUMBER}.dsc
 distclean-debian-targets:
 	-rm debian/changelog debian/control
 #### End: $0
@@ -856,7 +867,7 @@ AC_DEFUN([AX_PKG_REQUIRE], [
   DEV_DIST_PKG=
   pkg=m4_default([$2], [$1])
   $6
-  dep_pkg=${DEV_DEB_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-dev}
+  deb_pkg=${DEV_DEB_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-dev}
   rpm_pkg=${DEV_RPM_DIST_PKG:-${DEV_DIST_PKG:-${pkg}}-devel}
   if test -n "$4"; then
     for f in $pkg $4; do
@@ -943,7 +954,6 @@ AC_DEFUN([AX_PKG_CHECK], [
             (test -x /usr/sbin/urpmq && urpmq "$rpm_pkg" 1>&2 > /dev/null); then
     AX_RPM_BUILD_DEPEND([$rpm_pkg])
   fi
-)
 ])
 
 # make sure, a specific header exists
@@ -1066,37 +1076,37 @@ AC_DEFUN([AX_CHECK_VALID_LD_FLAG], [
 
 # Check if a package exists in the current distribution, if yes, require it
 # in debian/control.in append @DEB_DEPEND_IFEXISTS@ to Build-Depends
+# if you pass a list, it will require the first matching, if any matches
 #  - parameter:
-#     $1 = package name
+#     $1 = space separated list of package names
 AC_DEFUN([AX_DEB_DEPEND_IFEXISTS], [
-  pkg="$1"
-  if test -n "$(apt-cache policy -q ${pkg} 2> /dev/null)"; then
-     DEB_DEPEND_IFEXISTS="${DEB_DEPEND_IFEXISTS}, ${pkg}"
-  fi
+  for pkg in $1; do
+    if test -n "$(apt-cache policy -q ${pkg} 2> /dev/null)"; then
+       DEB_DEPEND_IFEXISTS="${DEB_DEPEND_IFEXISTS}, ${pkg}"
+       break
+    fi
+  done
 ])
 
 # require package in debian/control.in append @DEB_BUILD_DEPEND@ to Build-Depends
 #  - parameter:
 #     $1 = package name
 AC_DEFUN([AX_DEB_BUILD_DEPEND], [
-  pkg="$1"
-  DEB_BUILD_DEPEND="${DEB_BUILD_DEPEND}, ${pkg}"
+  DEB_BUILD_DEPEND="${DEB_BUILD_DEPEND}, $1"
 ])
 
 # require package in debian/control.in append @DEB_DEPEND@ to Depends
 #  - parameter:
 #     $1 = package name
 AC_DEFUN([AX_DEB_DEPEND], [
-  pkg="$1"
-  DEB_DEPEND="${DEB_DEPEND}, ${pkg}"
+  DEB_DEPEND="${DEB_DEPEND}, $1"
 ])
 
 # require package in debian/control.in append @DEB_DEPEND@ to Depends
 #  - parameter:
 #     $1 = package name
 AC_DEFUN([AX_DEB_SECTION], [
-  pkg="$1"
-  DEB_SECTION="${pkg}"
+  DEB_SECTION="$1"
 ])
 
 # call after setting debian dependencies
@@ -1109,36 +1119,36 @@ AC_DEFUN([AX_DEB_RESOLVE], [
 
 # Check if a package exists in the current distribution, if yes, require it
 # in .spec.in append @RPM_DEPEND_IFEXISTS@ to Build-Depends
+# if you pass a list, it will require the first matching, if any matches
 #  - parameter:
-#     $1 = package name
+#     $1 = space separated package names
 AC_DEFUN([AX_RPM_DEPEND_IFEXISTS], [
-  pkg="$1"
-  
-  if (test -x /usr/bin/zypper && zypper search -x "$pkg" 1>&2 > /dev/null) || \
-     (test -x /usr/bin/dnf && dnf list -q "$pkg" 1>&2 > /dev/null) || \
-     (test -x /usr/bin/yum && yum list -q "$pkg" 1>&2 > /dev/null) || \
-     (test -x /usr/sbin/urpmq && urpmq "$pkg" 1>&2 > /dev/null); then
-       RPM_DEPEND_IFEXISTS="${RPM_DEPEND_IFEXISTS}, ${pkg}"
-  fi
+  for pkg in $1; do
+    if (test -x /usr/bin/zypper && zypper search -x "$pkg" 1>&2 > /dev/null) || \
+       (test -x /usr/bin/dnf && dnf list -q "$pkg" 1>&2 > /dev/null) || \
+       (test -x /usr/bin/yum && yum list -q "$pkg" 1>&2 > /dev/null) || \
+       (test -x /usr/sbin/urpmq && urpmq "$pkg" 1>&2 > /dev/null); then
+         RPM_DEPEND_IFEXISTS="${RPM_DEPEND_IFEXISTS}, ${pkg}"
+	 break
+    fi
+  done
 ])
 
 # require package in .spec.in append @RPM_BUILD_DEPEND@ to Build-Depends
 #  - parameter:
 #     $1 = package name
 AC_DEFUN([AX_RPM_BUILD_DEPEND], [
-  pkg="$1"
-  RPM_BUILD_DEPEND="${RPM_BUILD_DEPEND}, ${pkg}"
+  RPM_BUILD_DEPEND="${RPM_BUILD_DEPEND}, $1"
 ])
 
 # require package in .spec.in append @RPM_DEPEND@ to Depends
 #  - parameter:
 #     $1 = package name
 AC_DEFUN([AX_RPM_DEPEND], [
-  pkg="$1"
   if test -z "${RPM_DEPEND}"; then
-    RPM_DEPEND="${pkg}"
+    RPM_DEPEND="$1"
   else
-    RPM_DEPEND="${RPM_DEPEND}, ${pkg}"
+    RPM_DEPEND="${RPM_DEPEND}, $1"
   fi
 ])
 
@@ -1146,8 +1156,7 @@ AC_DEFUN([AX_RPM_DEPEND], [
 #  - parameter:
 #     $1 = package name
 AC_DEFUN([AX_RPM_GROUP], [
-  pkg="$1"
-  RPM_GROUP="${pkg}"
+  RPM_GROUP="$1"
 ])
 
 # call after setting rpmian dependencies
@@ -1160,36 +1169,23 @@ AC_DEFUN([AX_RPM_RESOLVE], [
 
 # Check if a package exists in the current distribution, if yes, require it
 # in .spec.in append @ALL_DEPEND_IFEXISTS@ to Build-Depends
+# if you pass a list, it will require the first matching, if any matches
 #  - parameter:
-#     $1 = package name
+#     $1 = space separated list of package names
 AC_DEFUN([AX_ALL_DEPEND_IFEXISTS], [
-  pkg="$1"
-  if test -n "$(apt-cache policy -q ${pkg} 2> /dev/null)"; then
-     DEB_DEPEND_IFEXISTS="${DEB_DEPEND_IFEXISTS}, ${pkg}"
-  fi
-  if (test -x /usr/bin/zypper && zypper search -x "$pkg" 1>&2 > /dev/null) || \
-     (test -x /usr/bin/dnf && dnf list -q "$pkg" 1>&2 > /dev/null) || \
-     (test -x /usr/bin/yum && yum list -q "$pkg" 1>&2 > /dev/null) || \
-     (test -x /usr/sbin/urpmq && urpmq "$pkg" 1>&2 > /dev/null); then
-       RPM_DEPEND_IFEXISTS="${RPM_DEPEND_IFEXISTS}, ${pkg}"
-  fi
+  AX_DEB_DEPEND_IFEXISTS([$1])
+  AX_RPM_DEPEND_IFEXISTS([$1])
 ])
 
 # Check if a package exists in the current distribution, if yes, require it
 # in .spec.in append @ALL_DEPEND_IFEXISTS@ to Build-Depends
+# if you pass a list, it will require the first matching, if any matches
 #  - parameter:
 #     $1 = package name
 AC_DEFUN([AX_ALL_DEPEND_IFEXISTS_DEV], [
-  pkg="$1"
-  if test -n "$(apt-cache policy -q ${pkg}-dev 2> /dev/null)"; then
-     DEB_DEPEND_IFEXISTS="${DEB_DEPEND_IFEXISTS}, ${pkg}-dev"
-  fi
-  if (test -x /usr/bin/zypper && zypper search -x "$pkg"-devel 1>&2 > /dev/null) || \
-     (test -x /usr/bin/dnf && dnf list -q "$pkg"-devel 1>&2 > /dev/null) || \
-     (test -x /usr/bin/yum && yum list -q "$pkg"-devel 1>&2 > /dev/null) || \
-     (test -x /usr/sbin/urpmq && urpmq "$pkg"-devel 1>&2 > /dev/null); then
-       RPM_DEPEND_IFEXISTS="${RPM_DEPEND_IFEXISTS}, ${pkg}-devel"
-  fi
+  pkgs="$1"
+  AX_DEB_DEPEND_IFEXISTS([${pkgs// /-dev }-dev])
+  AX_RPM_DEPEND_IFEXISTS([${pkgs// /-devel }-devel])
 ])
 
 # require package in .spec.in append @ALL_BUILD_DEPEND@ to Build-Depends
@@ -1199,6 +1195,15 @@ AC_DEFUN([AX_ALL_BUILD_DEPEND], [
   pkg="$1"
   DEB_BUILD_DEPEND="${DEB_BUILD_DEPEND}, ${pkg}"
   RPM_BUILD_DEPEND="${RPM_BUILD_DEPEND}, ${pkg}"
+])
+
+# require package in .spec.in and control.in, append to runtime depends
+#  - parameter:
+#     $1 = package name
+AC_DEFUN([AX_ALL_DEPEND], [
+  pkg="$1"
+  DEB_DEPEND="${DEB_DEPEND}, ${pkg}"
+  RPM_DEPEND="${RPM_DEPEND}, ${pkg}"
 ])
 
 # require package in .spec.in append @ALL_BUILD_DEPEND@ to Build-Depends
@@ -1225,8 +1230,9 @@ AC_DEFUN([AX_ALL_DEPEND], [
 
 # finish configuration - to be called instead of AC_OUTPUT
 AC_DEFUN([AX_OUTPUT], [
+  AX_INIT_QT
   AX_DEB_RESOLVE
   AX_RPM_RESOLVE
   AC_OUTPUT
-  AX_INIT_QT
+  AC_MSG_NOTICE([configured for ${PACKAGE_NAME}-${VERSION}])
 ])

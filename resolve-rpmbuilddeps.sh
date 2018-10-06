@@ -97,12 +97,12 @@ fi
 
 if test -n "${SCHROOTNAME}"; then
     FILES=$(LANG= schroot -c ${SCHROOTNAME} -- rpmbuild -bb --clean --nobuild --define "_topdir ." --define "_sourcedir ." ${PACKAGE_NAME}.spec  2>&1 | sed -n 's, is needed by.*,,p')
-    if test -n "${FILES}"; then
+    if test -n "${FILES// /}${DEPS// /}"; then
         schroot -c ${SCHROOTNAME} -u root -- ${INSTALL_TOOL}  ${FILES} ${DEPS}
     fi
 else
     FILES=$(LANG= rpmbuild -bb --clean --nobuild --define "_topdir ." --define "_sourcedir ." ${PACKAGE_NAME}.spec 2>&1 | sed -n 's, is needed by.*,,p')
-    if test -n "${FILES}"; then
+    if test -n "${FILES// /}${DEPS// /}"; then
         ${INSTALL_TOOL} ${FILES} ${DEPS}
     fi
 fi
@@ -112,7 +112,7 @@ if test -n "${SCHROOTNAME}"; then
 else
     FILES=$(LANG= rpmbuild -bb --clean --nobuild --define "_topdir ." --define "_sourcedir ." ${PACKAGE_NAME}.spec 2>&1 | sed -n 's, is needed by.*,,p')
 fi
-if test -n "${FILES}"; then
+if test -n "${FILES// /}"; then
     echo "**** ERROR: Cannot install: " $FILES
     exit 1
 fi

@@ -33,9 +33,11 @@ AX_BUILD_HTML
 #AX_REQUIRE_QT([QT], [QtCore QtGui QtNetwork], [QtWidgets])
 #AX_QT_NO_KEYWORDS
 
-AC_CONFIG_FILES(html/appinfo/info.xml)
+AC_CONFIG_FILES(html/appinfo/info.xml
+                docker/makefile)
 
 AX_DEB_SECTION(web)
+AX_ALL_DEPEND(wget)
 AX_ALL_DEPEND(xml2)
 AX_ALL_DEPEND(mysql-client|default-mysql-client)
 AX_ALL_DEPEND(sqlite3)

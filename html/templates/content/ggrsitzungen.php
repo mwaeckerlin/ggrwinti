@@ -1,5 +1,3 @@
-<h2>GGR Sitzungstermine</h2>
-
 <form action="" id="ggrsitzungen">
   <?php
   if (key_exists('data', $_)) {

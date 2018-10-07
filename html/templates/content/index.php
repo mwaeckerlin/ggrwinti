@@ -21,8 +21,6 @@
   <option value="marc"></option>
 </datalist>
 
-<h2>Geschäftsliste: <?php  echo $_['title']; ?></h2>
-
 <form action="" id="geschaefte">
   <div class="filter">
     <div><input data-field="ggrnr" placeholder="filter" type="text" /></div>
@@ -64,5 +62,3 @@
   }
   ?>
 </form>
-
-<p><a class="table-export" data-table="#geschaefte" download="geschaefte.csv">exportieren</a></p>

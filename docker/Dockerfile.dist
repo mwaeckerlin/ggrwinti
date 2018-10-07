@@ -1,0 +1,16 @@
+FROM mwaeckerlin/nextcloud
+MAINTAINER mwaeckerlin
+
+ENV APPS "calendar contacts groupfolders ggrwinti"
+ENV DEBUG "1"
+
+RUN apt-get update -y \
+ && apt-get install -y wget xml2
+ADD docker/cronjob.sh /etc/cron.daily/update-db
+ADD docker/start-ggrwinti.sh /start-ggrwinti.sh
+#ADD html  /${APPSDIR}.original/ggrwinti
+ADD scripts/sitzungen.awk /usr/sbin/sitzungen.awk
+ADD scripts/update-db.sh /usr/sbin/update-db.sh
+ADD scripts/html2sql.sed /usr/sbin/html2sql.sed
+
+CMD /start-ggrwinti.sh

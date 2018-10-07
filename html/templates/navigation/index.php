@@ -1,9 +1,9 @@
 <?php
-use \OCP\Util;
-$util = new Util();
+use \OCP\URLGenerator;
+$url = \OC::$server->getURLGenerator();
 ?>
 
 <ul>
-  <li><a href="/index.php<?php echo $util->linkTo('ggrwinti'); ?>geschaefte">Offene Geschäfte</a></li>
-  <li><a href="/index.php<?php echo $util->linkTo('ggrwinti'); ?>ggrsitzungen">GGR Sitzungen</a></li>
+  <li><a href="<?php echo $url->linkToRoute('ggrwinti.geschaeft.index'); ?>">Offene Geschäfte</a></li>
+  <li><a href="<?php echo $url->linkToRoute('ggrwinti.ggrsitzungen.index'); ?>">GGR Sitzungen</a></li>
 </ul>

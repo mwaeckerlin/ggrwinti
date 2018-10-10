@@ -1,7 +1,7 @@
 Source: @PACKAGE_NAME@
 Priority: extra
 Maintainer: @PACKAGER@
-Build-Depends: debhelper, fakeroot, git2cl, git, pkg-config, automake, libtool, autotools-dev, pandoc, lsb-release, doxygen, graphviz, mscgen, default-jre-headless|default-jre @DEB_BUILD_DEPEND@ @DEB_DEPEND_IFEXISTS@
+Build-Depends: gnupg, debhelper, fakeroot, git2cl, git, pkg-config, automake, libtool, libltdl-dev, autotools-dev, pandoc, lsb-release, doxygen, graphviz, mscgen, default-jre-headless|default-jre @DEB_BUILD_DEPEND@ @DEB_DEPEND_IFEXISTS@
 
 Package: @PACKAGE_NAME@
 Section: @DEB_SECTION@

@@ -3,11 +3,10 @@
 ##       1         2         3         4         5         6         7         8
 ## 45678901234567890123456789012345678901234567890123456789012345678901234567890
 
-dockerdir = ${distdir}/docker
-docker_DATA = cronjob.sh ggrwinti.json start-ggrwinti.sh \
-              Dockerfile Dockerfile.dist
+dist_noinst_DATA = cronjob.sh ggrwinti.json start-ggrwinti.sh \
+                   Dockerfile Dockerfile.dist
 
-all: docker
+all:
 
 docker:
 	docker build --force-rm -t mwaeckerlin/ggrwinti:local -f Dockerfile.dist ..

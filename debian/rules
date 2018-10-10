@@ -2,7 +2,7 @@
 ##
 ## This file has been added:
 ##  - by bootstrap.sh
-##  -  on Thu, 28 April 2016 15:02:36 +0200
+##  -  on Tue, 09 October 2018 16:35:18 +0200
 ## Feel free to change it or even remove and rebuild it, up to your needs
 ##
 ##       1         2         3         4         5         6         7         8
@@ -10,6 +10,3 @@
 
 %:
 	dh $@
-
-override_dh_auto_configure:
-	 ./configure --prefix=/usr --htmldir=/var/www

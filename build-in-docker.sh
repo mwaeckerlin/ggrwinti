@@ -280,7 +280,7 @@ case "$mode" in
             docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- software-properties-common apt-transport-https dpkg-dev lsb-release wget || \
             docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- python-software-properties apt-transport-https dpkg-dev lsb-release wget;
         if [[ "${img}" =~ "ubuntu" ]]; then
-            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT} locales
+            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- locales
             docker exec ${DOCKER_ID} locale-gen ${LANG}
             docker exec ${DOCKER_ID} update-locale LANG=${LANG}
         fi
@@ -290,7 +290,7 @@ case "$mode" in
             docker exec ${DOCKER_ID} bash -c "echo >> /etc/apt/preferences"
         done
         if test -n "${keys[@]}"; then # fix dependency bug in cosmic and stretch
-            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT} gnupg
+            docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- gnupg
             for key in "${keys[@]}"; do
                 wget -O- "$key" \
                     | docker exec -i ${DOCKER_ID} apt-key add -
@@ -302,7 +302,7 @@ case "$mode" in
 
         docker exec ${DOCKER_ID} apt-get update ${OPTIONS}
         for package in "${packages[@]}"; do
-            ifthenelse "${package}" "apt-get install ${OPTIONS} ${PREVENT} ARG"
+            ifthenelse "${package}" "apt-get install ${OPTIONS} ${PREVENT// /- }- ARG"
         done
         for command in "${commands[@]}"; do
             ifthenelse "${command}" "ARG"
@@ -363,7 +363,7 @@ docker exec -u $(id -u):$(id -g) ${DOCKER_ID} ./bootstrap.sh -t "${targets}" ${h
 # not supported in trusty and jessie
 if test "$mode" = deb -a "${img//trusty/}" = "${img}" -a "${img//jessie/}" = "${img}"; then
    if test "${targets//deb/}" != "${targets}" && ls *.deb > /dev/null 2> /dev/null; then
-       docker exec ${DOCKER_ID} bash -c "apt-get install ${OPTIONS} ${PREVENT} /workdir/*.deb"
+       docker exec ${DOCKER_ID} bash -c "apt-get install ${OPTIONS} ${PREVENT// /- }- /workdir/*.deb"
    fi
 fi
 if test "$mode" = rpm -a "${targets//rpm/}" != "${targets}"; then

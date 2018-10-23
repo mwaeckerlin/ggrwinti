@@ -59,7 +59,7 @@ while [ $found -ne 0 ]; do
     cd "${target}"
     for file in $(find . -type f); do
         for lib in $(otool -L ${file} | tail -n +2 \
-            | egrep '/usr/local/|/opt/local/|'"${HOME}" \
+            | egrep '/usr/local/|/opt/local/|/opt/X11/|'"${HOME}" \
             | grep -v $file | awk '{print $1}'); do
             found=1
             test -f ${lib##*/} \

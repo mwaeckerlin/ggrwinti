@@ -275,7 +275,7 @@ case "$mode" in
         PREVENT='libpam-systemd policykit.* colord dconf-service'
         docker exec ${DOCKER_ID} apt-get update ${OPTIONS}
         docker exec ${DOCKER_ID} apt-mark hold ${PREVENT}
-        docker exec ${DOCKER_ID} apt-get upgrade ${OPTIONS}
+        #docker exec ${DOCKER_ID} apt-get upgrade ${OPTIONS}
         docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- python-software-properties software-properties-common apt-transport-https dpkg-dev lsb-release wget || \
             docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- software-properties-common apt-transport-https dpkg-dev lsb-release wget || \
             docker exec ${DOCKER_ID} apt-get install ${OPTIONS} ${PREVENT// /- }- python-software-properties apt-transport-https dpkg-dev lsb-release wget;

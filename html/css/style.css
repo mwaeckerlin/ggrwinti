@@ -30,3 +30,6 @@
 #geschaefte .geschaeft.erledigt {
   background-color: #eee;
 }
+#geschaefte .geschaeft a {
+  font-weight: bold;
+}

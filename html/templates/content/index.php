@@ -39,7 +39,7 @@
       echo '<a href="http://gemeinderat.winterthur.ch/de/politbusiness/?action=showinfo&info_id='.$data->id().'" target="_blank"><div data-field="ggrnr">' . $data->ggrnr() . "</div></a>";
       switch (count($docs)) {
         case 0:
-          echo '<div data-field="title"><del>' . $data->type().': '.$data->title() . "</del></div>";
+          echo '<div data-field="title">' . $data->type().': '.$data->title() . "</div>";
           break;
         case 1:
           echo '<div data-field="title"><a href="/remote.php/webdav'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">' . $data->type().': '.$data->title() . "</a></div>";

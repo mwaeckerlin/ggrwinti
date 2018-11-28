@@ -37,9 +37,9 @@ class GeschaeftMapper extends Mapper {
     foreach ($entities as $item) {
       $docs[$item->ggrnr()] = array();
       foreach ($root->getUserFolder($user)->search(str_replace('.', '-', $item->ggrnr())) as $file) {
-        if ($file->getMimetype()=='application/pdf') {
-          $docs[$item->ggrnr()][] = $file;
-        }
+        //if ($file->getMimetype()=='application/pdf') {
+        $docs[$item->ggrnr()][] = $file;
+        //}
       }
     }
     return array('items' => $entities, 'docs' => $docs);

@@ -42,15 +42,14 @@
           echo '<div data-field="title">' . $data->type().': '.$data->title() . "</div>";
           break;
         case 1:
-          echo '<div data-field="title"><a href="/remote.php/webdav'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">' . $data->type().': '.$data->title() . "</a></div>";
+          echo '<div data-field="title" class="docs"><a href="/remote.php/webdav'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">' . $data->type().': '.$data->title() . "</a></div>";
           break;
         default:
-          echo '<div data-field="title"><a href="/remote.php/webdav'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">' . $data->type().': '.$data->title() . "</a>";
-          $i=0;
+          echo '<div data-field="title" class="docs">' . $data->type().': '.$data->title() . "<ul>";
           foreach ($docs as $doc) {
-            echo '<a href="/remote.php/webdav/'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">['.(++$i).']</a> ';
+            echo '<li><a href="/remote.php/webdav/'.str_replace($_['user'].'/files/', '', $doc->getPath()).'">'.$doc->getPath().'</a></li>';
           }
-          echo "</div>";
+          echo "</ol></div>";
           break;
       }
       echo '<div><input placeholder="Zuständig" class="edit" data-field="responsible" data-id="'.$data->id().'" type="text" name="responsible" list="users" maxlength="255" value="' . $data->responsible() . '" /></div>';

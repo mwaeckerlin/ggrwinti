@@ -1,1 +1,136 @@
-/usr/share/automake-1.15/INSTALL
+Install Software
+================
+
+There are prebuilt software packages in the repositories, look in
+https://repository.mrw.sh for your operating system.
+
+Note: PublicKey has changed on Novmber 1st 2015, please import the new
+key.
+
+Linux
+-----
+
+There are package repositories for most distributions at https://repository.mrw.sh.
+
+### Ubuntu and Debian
+
+To accept my signature, install my key:
+
+        wget -O- https://repository.mrw.sh/PublicKey \
+            | sudo apt-key add -
+
+You can install all software using your package manager (`apt`), first install the repository:
+
+        sudo apt-get install -y wget software-properties-common apt-transport-https
+        sudo apt-add-repository https://repository.mrw.sh
+        sudo apt-get update -y
+Then you can install any project you wish, e.g. [`webtester`](https://mrw.sh/development/webtester):
+
+        sudo apt-get install webtester -y
+
+### OpenSUSE
+
+To accept my signature, install my key:
+
+        wget https://repository.mrw.sh/PublicKey
+        rpm --import PublicKey
+
+You can use your packagemanager (`zypper` or _YaST_). First install the repostitory:
+
+        zypper ar https://repository.mrw.sh/opensuse/marc-waeckerlin.repo
+
+Then install packages from the repository, e.g. [`webtester`](https://mrw.sh/development/webtester):
+
+        zypper install webtester
+
+In case of trouble: Check if your version of OpenSUSE is supported,
+use `lsb_release -rs` to get the version of your OpenSUSE:
+https://drepository.mrw.sh/opensuse
+
+### Fedora
+
+To accept my signature, install my key:
+
+        wget https://repository.mrw.sh/PublicKey
+        rpm --import PublicKey
+
+You can use your packagemanager (`dnf`). First install the repository:
+
+        dnf install 'dnf-command(config-manager)'
+        dnf config-manager --add-repo https://repository.mrw.sh/fedora/marc-waeckerlin.repo
+
+Then install packages from the repository, e.g. [`webtester`](https://mrw.sh/development/webtester):
+
+        dnf install webtester
+
+In case of trouble: Check if your version of Fedora is supported, use `lsb_release -rs` to get the version of your Fedora: https://repository.mrw.sh/fedora
+
+### CentOS
+
+To accept my signature, install my key:
+
+        wget https://repository.mrw.sh/PublicKey
+        rpm --import PublicKey
+
+You can use your packagemanager (`yum`). First install the repository:
+
+        yum install wget
+        wget -O/etc/yum.repos.d/marc-waeckerlin.repo https://repository.mrw.sh/centos/marc-waeckerlin.repo
+
+Then install packages from the repository, e.g. [`webtester`](https://mrw.sh/development/webtester):
+
+        yum install webtester
+
+In case of trouble: Check if your version of CentOS is supported, use lsb_release -rs to get the version of your CentOS: https://repository.mrw.sh/centos
+
+### Mageia
+
+To accept my signature, install my key:
+
+        wget https://repository.mrw.sh/PublicKey
+        rpm --import PublicKey
+
+You can use your packagemanager (`dnf`). First install the repository:
+
+        dnf install 'dnf-command(config-manager)'
+        dnf config-manager --add-repo https://repository.mrw.sh/mageia/marc-waeckerlin.repo
+
+Then install packages from the repository, e.g. [`webtester`](https://mrw.sh/development/webtester):
+
+        dnf install webtester
+
+### Other Linux Distributions
+
+Either use the nearest possible distribution, or use alien to convert from another distribution to your preferred package format, or compile the project yourself (see below).
+
+Windows
+-------
+
+Download from https://repository.mrw.sh/windows
+
+MacOSX
+------
+
+You need e.g. Mac Ports to compile. Install the following dependencies:
+
+        sudo port install subversion svn2cl doxygen graphviz cppunit libtool boost log4cxx qt5-mac
+
+Fix libtool-bug:
+
+        sudo ln -s /opt/local/bin/glibtoolize /opt/local/bin/libtoolize
+
+Compile from Source
+-------------------
+
+For all unsupported operating systems, including MacOSX.
+
+To compile, please download the tar-sources from: https://repository.mrw.sh/sources
+
+Then untar the package and use the common commands, e.g. for version `1.0.2` of a project named project, that means:
+
+        tar xzf project-1.0.2.tar.gz
+        cd project-1.0.2
+        ./bootstrap.sh
+        ./configure
+        make
+        sudo make install

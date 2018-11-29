@@ -38,7 +38,7 @@ class GeschaeftMapper extends Mapper {
       $docs[$item->ggrnr()] = array();
       foreach ($root->getUserFolder($user)->search(str_replace('.', '-', $item->ggrnr())) as $file) {
         //if ($file->getMimetype()=='application/pdf') {
-        $docs[$item->ggrnr()][] = $file;
+        $docs[$item->ggrnr()][$file->getPath()] = $file;
         //}
       }
     }

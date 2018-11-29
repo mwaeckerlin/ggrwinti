@@ -47,7 +47,7 @@
         default:
           echo '<div data-field="title" class="docs">' . $data->type().': '.$data->title() . "<ul>";
           foreach ($docs as $doc) {
-            echo '<li><a href="/remote.php/webdav/'.str_replace($_['user'].'/files/', '', $doc->getPath()).'">'.preg_replace('^.*/', '', $doc->getPath()).'</a></li>';
+            echo '<li><a href="/remote.php/webdav/'.str_replace($_['user'].'/files/', '', $doc->getPath()).'">'.preg_replace('|^.*/|', '', $doc->getPath()).'</a></li>';
           }
           echo "</ol></div>";
           break;

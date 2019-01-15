@@ -1,4 +1,4 @@
-FROM mwaeckerlin/nextcloud:14
+FROM mwaeckerlin/nextcloud
 MAINTAINER mwaeckerlin
 
 ENV APPS "ggrwinti calendar contacts groupfolders"

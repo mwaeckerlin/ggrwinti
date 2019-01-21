@@ -41,10 +41,6 @@
         case 0:
           echo '<div data-field="title">' . $data->type().': '.$data->title() . "</div>";
           break;
-        case 1:
-          if ($docs[0])
-            echo '<div data-field="title" class="docs"><a href="/remote.php/webdav'.str_replace($_['user'].'/files/', '', $docs[0]->getPath()).'">' . $data->type().': '.$data->title() . "</a></div>";
-          break;
         default:
           echo '<div data-field="title" class="docs">' . $data->type().': '.$data->title() . "<ul>";
           foreach ($docs as $doc) {

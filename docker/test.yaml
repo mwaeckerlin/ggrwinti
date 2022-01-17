@@ -1,0 +1,39 @@
+version: '3.3'
+services:
+
+  mysql:
+    image: mysql:5.7
+    volumes:
+      - type: bind
+        source: /var/tmp/ggrwinti/mysql
+        target: /var/lib/mysql
+    environment:
+      - 'MYSQL_DATABASE=nextcloud'
+      - 'MYSQL_USER=nextcloud'
+      - 'MYSQL_PASSWORD=mySqlP@ssw0rd'
+      - 'MYSQL_ROOT_PASSWORD=mySqlR007P@ssw0rd'
+    command: --log-bin=/var/lib/mysql/mysql-bin.log --binlog-format=ROW --server-id=1
+
+  ggrwinti:
+    image: mwaeckerlin/nextcloud
+    ports:
+      - 8031:80
+    volumes:
+      - type: bind
+        source: /var/tmp/ggrwinti/config
+        target: /var/www/nextcloud/config
+      - type: bind
+        source: /var/tmp/ggrwinti/data
+        target: /var/www/nextcloud/data
+      - type: bind
+        source: /var/tmp/ggrwinti/apps
+        target: /var/www/nextcloud/apps
+      - type: bind
+        source: /home/marc/git/ggrwinti/html
+        target: /var/www/nextcloud/apps/ggrwinti
+    environment:
+      - 'MYSQL_DATABASE=nextcloud'
+      - 'MYSQL_USER=nextcloud'
+      - 'MYSQL_PASSWORD=mySqlP@ssw0rd'
+      - 'ADMIN_PWD=admin'
+      - 'URL=merkur:8031'

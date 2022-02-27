@@ -1,9 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=ggrwinti
-GenericName=ggrwinti
-Comment=@DESCRIPTION@
-Icon=@prefix@/share/@PACKAGE_NAME@/@PACKAGE_ICON@
-Exec=ggrwinti %u
-Terminal=false
-Categories=Qt;Utility;

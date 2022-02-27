@@ -1,0 +1,6 @@
+dbupdate
+.dockignore
+.gitignore
+docker-compose.yaml
+Dockerfile
+README.md

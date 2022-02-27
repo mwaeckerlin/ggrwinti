@@ -1,5 +1,57 @@
 version: '3.4'
 services:
+
+  mysql:
+    image: mysql
+    volumes:
+      - type: volume
+        source: mysql
+        target: /var/lib/mysql
+    environment:
+      - 'MYSQL_DATABASE=nextcloud'
+      - 'MYSQL_USER=nextcloud'
+      - 'MYSQL_PASSWORD=Ch@ng3_M3'
+      - 'MYSQL_RANDOM_ROOT_PASSWORD=yes'
+
+  smtp:
+    image: mwaeckerlin/smtp-relay
+    environment:
+      - MAILHOST=example.com
+
+  ggrwinti:
+    image: mwaeckerlin/ggrwinti
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - 8080:80
+    volumes:
+      - type: volume
+        source: config
+        target: /var/www/nextcloud/config
+      - type: volume
+        source: data
+        target: /var/www/nextcloud/data
+      - type: volume
+        source: apps
+        target: /var/www/nextcloud/apps
+    environment:
+      - 'MYSQL_DATABASE=nextcloud'
+      - 'MYSQL_USER=nextcloud'
+      - 'MYSQL_PASSWORD=Ch@ng3_M3'
+      - 'ADMIN_PWD=Ch@ng3_M3_Too'
+      - 'URL=localhost'
+
   cron:
     image: mwaeckerlin/ggrwinti-dbupdate
     build: dbupdate
+    environment:
+      - 'MYSQL_DATABASE=nextcloud'
+      - 'MYSQL_USER=nextcloud'
+      - 'MYSQL_PASSWORD=Ch@ng3_M3'
+
+volumes:
+  mysql:
+  config:
+  data:
+  apps:

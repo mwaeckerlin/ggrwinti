@@ -1,0 +1,35 @@
+* {
+  box-sizing: border-box;
+}
+#geschaefte {
+  display: table;
+  width: 100%;
+  box-sizing: border-box;
+  border-collapse: collapse;
+  box-sizing: border-box;
+}
+#geschaefte > div {
+  display: table-row;
+  border: 1px solid black;
+  box-sizing: border-box;
+}
+#geschaefte > div > div {
+  display: table-cell;
+  vertical-align: top;
+  padding: 0 1ex;
+  box-sizing: border-box;
+}
+#geschaefte .geschaeft div textarea {
+  height: 2em;
+}
+#geschaefte .geschaeft div textarea:hover,
+#geschaefte .geschaeft div textarea:focus,
+#geschaefte .geschaeft div textarea:active {
+  height: 10em;
+}
+#geschaefte .geschaeft.erledigt {
+  background-color: #eee;
+}
+#geschaefte .geschaeft .docs {
+  font-weight: bold;
+}

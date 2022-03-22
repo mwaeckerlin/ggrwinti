@@ -20,9 +20,9 @@ services:
 
   ggrwinti:
     image: mwaeckerlin/ggrwinti
-    build:
-      context: .
-      dockerfile: docker/Dockerfile
+    build: .
+    depends_on:
+      - mysql
     ports:
       - 8080:80
     volumes:
@@ -39,12 +39,18 @@ services:
       - 'MYSQL_DATABASE=nextcloud'
       - 'MYSQL_USER=nextcloud'
       - 'MYSQL_PASSWORD=Ch@ng3_M3'
-      - 'ADMIN_PWD=Ch@ng3_M3_Too'
-      - 'URL=localhost'
+      - 'ADMIN_PWD=ert456'
+      - 'URL=localhost:8080'
+      - 'PROTOCOL=http'
+    deploy:
+      restart_policy:
+        condition: on-failure
 
   cron:
     image: mwaeckerlin/ggrwinti-dbupdate
     build: dbupdate
+    depends_on:
+      - mysql
     environment:
       - 'MYSQL_DATABASE=nextcloud'
       - 'MYSQL_USER=nextcloud'

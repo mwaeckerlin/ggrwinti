@@ -17,5 +17,6 @@ RUN ./configure --prefix=/usr
 RUN make
 RUN make install
 WORKDIR /srv
-COPY dbupdate.js dbupdate.sh /srv/
+RUN npm install mysql2 fs
+COPY geschaefteupdate.js sitzungenupdate.js dbupdate.sh /srv/
 CMD /srv/dbupdate.sh

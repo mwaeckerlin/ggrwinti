@@ -50,6 +50,7 @@ services:
     image: mwaeckerlin/ggrwinti-dbupdate
     build: dbupdate
     depends_on:
+      - ggrwinti
       - mysql
     environment:
       - 'MYSQL_DATABASE=nextcloud'

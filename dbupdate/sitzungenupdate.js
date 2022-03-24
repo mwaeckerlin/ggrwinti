@@ -11,6 +11,8 @@ async function read(stream) {
 
 read(process.stdin).then(input => {
 
+    if (!input) throw new Error('empty input', input)
+
     const con = mysql.createConnection({
         host: process.env.MYSQL_HOST ?? 'mysql',
         user: process.env.MYSQL_USER ?? 'nextcloud',
@@ -39,7 +41,7 @@ read(process.stdin).then(input => {
 
             con.query(query, (err, res) => {
                 if (err) throw err
-                console.log(res)
+                console.log(data.map(item => item.id).join('\n'))
             })
 
         }
@@ -48,22 +50,3 @@ read(process.stdin).then(input => {
     })
 
 }).catch(console.error)
-
-/*
-names=( 'id' 'title' 'ggrnr' 'type' 'status' 'date' )
-sql geschaefte names[@]  vals[@]
-
-names=('id' 'date')
-values=("$id" "'$date'")
-sql ggrsitzungen names[@] values[@]
-
-echo -n "insert into ${PREFIX}ggrwinti_${1} ("
-join ',' "${arg2[@]}"
-echo -n ") values ("
-join ',' "${arg3[@]}"
-echo -n ") on duplicate key update "
-join ',' "${nms[@]}"
-*/
-
-//console.log(data)
-//console.log(query)

@@ -11,6 +11,8 @@ async function read(stream) {
 
 read(process.stdin).then(input => {
 
+    if (!input) throw new Error('empty input', input)
+
     const con = mysql.createConnection({
         host: process.env.MYSQL_HOST ?? 'mysql',
         user: process.env.MYSQL_USER ?? 'nextcloud',
@@ -25,7 +27,7 @@ read(process.stdin).then(input => {
 
         while (fullData.length) {
 
-            const data = fullData.splice(0, 100).map(item => ({
+            const data = fullData.splice(0, 1000000).map(item => ({
                 id: item.title.replace(/.*<a href="[^"]*\/(.*)".*/s, '$1'),
                 title: item.title.replace(/<a.*>(.*?)<\/a>/s, '$1'),
                 ggrnr: item._nummer,
@@ -43,7 +45,6 @@ read(process.stdin).then(input => {
 
             con.query(query, (err, res) => {
                 if (err) throw err
-                console.log(res)
             })
 
         }
@@ -52,22 +53,3 @@ read(process.stdin).then(input => {
     })
 
 }).catch(console.error)
-
-/*
-names=( 'id' 'title' 'ggrnr' 'type' 'status' 'date' )
-sql geschaefte names[@]  vals[@]
-
-names=('id' 'date')
-values=("$id" "'$date'")
-sql ggrsitzungen names[@] values[@]
-
-echo -n "insert into ${PREFIX}ggrwinti_${1} ("
-join ',' "${arg2[@]}"
-echo -n ") values ("
-join ',' "${arg3[@]}"
-echo -n ") on duplicate key update "
-join ',' "${nms[@]}"
-*/
-
-//console.log(data)
-//console.log(query)

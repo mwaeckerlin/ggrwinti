@@ -3,9 +3,7 @@ NextCloud App für die Fraktionsarbeit im Winterthurer Gemeinderat
 
 Organisiere Deine Fraktion in Nextcloud: Füge Deine Gemeinderäte als Mitglied hinzu, definiere eine Gruppe, dann weise die Geschäfte den Personen zu und dokumentiere die Entscheidungen. Teile einen Pfad und lade Berichte zu den Geschäften hoch, indem Du die Geschäftsnummer im Dateinamen verwendest.
 
-Überprüft täglich die [Webseite des Gemeinderats Winterthur](http://gemeinderat.winterthur.ch) und gleicht [Geschäfte](http://gemeinderat.winterthur.ch/de/politbusiness) und [Sitzungen](http://gemeinderat.winterthur.ch/de/sitzung/) in der lokalen Datenbank ab.
-
-Entwickelt vom Gemeinderat der Piratenpartei Marc Wäckerlin für die grünliberale-/Piratenpartei-Fraktion.
+Überprüft täglich die [Webseite des Gemeinderats Winterthur](http://parlament.winterthur.ch) und gleicht [Geschäfte](https://parlament.winterthur.ch/politbusiness) und [Sitzungen](https://parlament.winterthur.ch/sitzung) in der lokalen Datenbank ab.
 
 Configuration
 -------------

@@ -1,4 +1,4 @@
-FROM mwaeckerlin/nextcloud:22
+FROM mwaeckerlin/nextcloud:21
 
 ENV APPS "ggrwinti calendar contacts groupfolders"
 ENV DEBUG "1"
